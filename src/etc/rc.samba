@@ -1,0 +1,88 @@
+#!/bin/sh
+
+echo "****************************"
+echo "*******   WARNING    *******"
+echo "****************************"
+echo
+echo "This process will change the existing data on your smb4.conf (Samba configuration file), krb5.conf (Kerberos Configuration File) and stunnel.conf (Stunnel Configuration file)"
+
+while true; do
+
+	echo
+	echo "In order to configure the SMB/KERBEROS, this Kontrol Box must be previously configured using the WEBGUI Interface."
+	echo "Hostname, DNS, NTP (Clock Syncronization with AD), IP Address/Netmask and Gateways should be configured already to continue..."
+	echo
+    read -p "Are you sure you want to continue? y/n  " yn
+    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) echo; echo " PROCESS STOPPED! Please check the WEBGUI and start this process again when ready."; exit;;
+        * ) echo "Please enter y or n.";;
+    esac
+done
+
+echo "Enter the WORKGROUP name you want to Join --> (eg. WORKGROUP or NETBIOS DOMAIN name ) "
+read smb_workgroup
+smb_workgroup_upper=$( echo $smb_workgroup | tr '[:lower:]' '[:upper:]' )
+
+echo
+echo "Enter the KDC FQDN or IP Address - Typically this is the AD Controller FQDN - (eg. servername.domain.com) "
+read ad_kdc
+
+smb_realm=`hostname | cut -d. -f2- | tr '[a-z]' '[A-Z]'`
+
+smb_domain=`hostname | cut -d. -f2-`
+
+	echo
+	echo $smb_realm "<-- This will be the REALM name"
+        echo
+        echo $smb_domain "<-- This will be the domain name"
+	echo
+
+
+while true; do
+    echo
+	read -p "Is the information above OK? y/n  " yn
+    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) echo; echo "Please review the required information and start the process again"; exit;;
+        * ) echo "Please enter y or n.";;
+    esac
+done
+
+sed -i "" "s/^workgroup.*/workgroup = ${smb_workgroup_upper}/" /usr/local/etc/smb4.conf
+
+sed -i "" "s/^realm.*/realm  = ${smb_realm}/" /usr/local/etc/smb4.conf
+
+sed -i "" "2s/.*/default_realm = ${smb_realm}/" /usr/local/etc/krb5.conf
+
+sed -i "" "14s/.*/   ${smb_realm} = { /" /usr/local/etc/krb5.conf
+
+sed -i "" "15s/.*/   kdc = ${ad_kdc}/" /usr/local/etc/krb5.conf
+
+sed -i "" "16s/.*/   admin_server = ${ad_kdc}/" /usr/local/etc/krb5.conf
+
+sed -i "" "17s/.*/   default_domain = ${smb_domain}/" /usr/local/etc/krb5.conf
+
+sed -i "" "21s/.*/  .${smb_domain} = ${smb_realm} /" /usr/local/etc/krb5.conf
+
+sed -i "" "22s/.*/   ${smb_domain} = ${smb_realm} /" /usr/local/etc/krb5.conf
+
+#sed -i "" "56s/.*/ connect = ${ad_kdc}:43268 /" /usr/local/etc/stunnel/stunnel.conf
+
+
+/usr/local/etc/rc.d/samba_server restart
+echo
+echo
+/usr/local/etc/rc.d/samba_server status
+echo
+#/usr/local/etc/rc.d/stunnel restart
+echo
+echo
+#/usr/local/etc/rc.d/stunnel status
+echo
+echo
+echo
+echo "******************************************"
+echo " **************     DONE    **************"
+echo "******************************************"
+

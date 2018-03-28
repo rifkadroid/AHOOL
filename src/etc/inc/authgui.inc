@@ -73,7 +73,7 @@ if (!isAllowedPage($_SERVER['REQUEST_URI'])) {
 
 		exit;
 	} else {
-		// add this so they don't get stuck on the logout page when they have no permissions. 
+		// add this so they don't get stuck on the logout page when they have no permissions.
 		$_SESSION["Logged_In"] = false;
 		display_error_form("201", gettext("No page assigned to this user! Click here to logout."));
 
@@ -156,8 +156,8 @@ function display_error_form($http_code, $desc) {
 			<footer id="3">
 			<div id="footertext">
 					<p class="text-muted">
-						<a target="_blank" href="https://www.pfsense.org/?gui=bootstrap">pfSense</a> is &copy;
-						2004 - 2018 by <a href="https://pfsense.org/license" class="tblnk">Rubicon Communications, LLC (Netgate)</a>. All Rights Reserved.
+						<a target="_blank" href="http://kontrolsecurity.com.br">Kontrol</a> is &copy;
+						2016 - 2018 by <a href="http://kontrolsecurity.com.br" class="tblnk">KONTROL Tecnologia - Brazil</a>. All Rights Reserved.
 						[<a href="/license.php" class="tblnk">view license</a>]
 					</p>
 				</div>
@@ -363,8 +363,8 @@ function display_login_form() {
 	        <footer id="3">
 	            <div id="footertext">
 					<p class="text-muted">
-						<a target="_blank" href="https://www.pfsense.org/?gui=bootstrap">pfSense</a> is &copy;
-						2004 - 2018 by <a href="https://pfsense.org/license" class="tblnk">Rubicon Communications, LLC (Netgate)</a>. All Rights Reserved.
+						<a target="_blank" href="http://kontrolsecurity.com.br">Kontrol</a> is &copy;
+						2004 - 2018 by <a href="http://kontrolsecurity.com.br" class="tblnk">KONTROL Tecnologia - Brazil</a>. All Rights Reserved.
 						[<a href="/license.php" class="tblnk">view license</a>]
 					</p>
 	            </div>

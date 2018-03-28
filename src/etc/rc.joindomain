@@ -1,0 +1,79 @@
+#!/bin/sh
+clear
+echo
+echo
+echo "This process will join this KONTROL box to a Windows Domain"
+echo "Hostname, IP address/Netmask, DNS and NTP must be previously configured using the WEBGUI interface"
+
+while true; do
+    echo
+	read -p "Are you sure you want to continue? y/n  " yn
+    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) echo; echo " PROCESS STOPPED! Please read the Kontrol documentation or call the support"; echo; echo; exit;;
+        * ) echo "Please enter y or n.";;
+    esac
+done
+
+#cleaning existing credentials
+kdestroy
+echo
+echo "Enter the DOMAIN NAME you want to Join --> (eg. KONTROL.CORP ) "
+read ad_domain
+ad_domain_upper=$( echo $ad_domain | tr '[:lower:]' '[:upper:]' )
+echo
+echo
+host_var=`hostname`
+
+echo "Enter the ID with the proper permissions to Join this Kontrol Box to your Windows Domain (eg. Administrator) "
+read ad_account 
+echo
+kinit $ad_account
+echo
+echo
+
+#deleting any old keytab if exist.
+echo "Deleting any old keytab, if it exists"
+rm /etc/krb5.keytab
+echo
+
+echo "Adding Kontrol-UTM to Windows Domain using credential--> $ad_account with the hostname--> $host_var "
+echo
+net ads join createupn=HTTP/$host_var@$ad_domain_upper -k
+echo
+echo "Adding the SPN HTTP"
+net ads keytab add HTTP
+echo
+#Generating keytab file 
+net ads keytab create -k
+echo
+echo
+echo
+#restarting Samba Service
+/usr/local/etc/rc.d/samba_server restart
+echo
+echo
+chown root:proxy /etc/krb5.keytab
+chmod 0440 /etc/krb5.keytab
+ktutil -k /etc/krb5.keytab list
+echo
+echo
+ad_hostname=`hostname -s`
+
+echo "SMB / WINBIND STATUS"
+/usr/local/etc/rc.d/samba_server status
+echo
+echo
+/usr/local/etc/rc.d/squid.sh restart
+echo
+echo
+echo
+echo "********************************************"
+echo "****************    DONE    ****************"
+echo "********************************************"
+echo
+echo "You can now find your Kontrol box --> $ad_hostname on your Windows Domain"
+echo
+echo "If you can't see this Box on your Windows Domain, please check for HOSTNAME duplicity and restart the process"
+echo
+
