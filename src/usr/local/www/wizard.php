@@ -114,7 +114,7 @@ if ($_POST && !$input_errors) {
 		eval($pkg['step'][$stepid]['stepsubmitphpaction']);
 	}
 	if (!$input_errors) {
-		write_config(gettext("Configuration changed via the pfSense wizard subsystem."));
+		write_config(gettext("Configuration changed via the Kontrol wizard subsystem."));
 	}
 
 	$stepid++;
@@ -139,8 +139,8 @@ if ($stepid > $totalsteps) {
 	$stepid = $totalsteps;
 }
 
-$title = preg_replace("/pfSense/i", $g['product_name'], $pkg['step'][$stepid]['title']);
-$description = preg_replace("/pfSense/i", $g['product_name'], $pkg['step'][$stepid]['description']);
+$title = preg_replace("/Kontrol/i", $g['product_name'], $pkg['step'][$stepid]['title']);
+$description = preg_replace("/Kontrol/i", $g['product_name'], $pkg['step'][$stepid]['description']);
 
 function update_config_field($field, $updatetext, $unset, $arraynum, $field_type) {
 	global $config;
@@ -184,8 +184,8 @@ function update_config_field($field, $updatetext, $unset, $arraynum, $field_type
 	$thisvar = $updatetext;
 }
 
-$title	   = preg_replace("/pfSense/i", $g['product_name'], $pkg['step'][$stepid]['title']);
-$description = preg_replace("/pfSense/i", $g['product_name'], $pkg['step'][$stepid]['description']);
+$title	   = preg_replace("/Kontrol/i", $g['product_name'], $pkg['step'][$stepid]['title']);
+$description = preg_replace("/Kontrol/i", $g['product_name'], $pkg['step'][$stepid]['description']);
 
 // handle before form display event.
 do {

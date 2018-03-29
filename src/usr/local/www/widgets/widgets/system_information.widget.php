@@ -175,13 +175,7 @@ $temp_use_f = (isset($user_settings['widgets']['thermal_sensors-0']) && !empty($
 					    " <strong>{$serial}</strong>\n");
 				}
 
-				// If the uniqueID is available, display it here
-				$uniqueid = system_get_uniqueid();
-				if (!empty($uniqueid)) {
-					print("<br />" .
-					    gettext("Netgate Device ID:") .
-					    " <strong>{$uniqueid}</strong>");
-				}
+	
 ?>
 			</td>
 		</tr>
@@ -766,6 +760,3 @@ events.push(function(){
 });
 //]]>
 </script>
-
-
-

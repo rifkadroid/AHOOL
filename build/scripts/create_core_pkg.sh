@@ -94,7 +94,7 @@ done
 
 : ${TMPDIR=/tmp}
 : ${PRODUCT_NAME=pfSense}
-: ${PRODUCT_URL=http://www.pfsense.org/}
+: ${PRODUCT_URL=https://www.pfsense.org/}
 
 [ -d $destdir ] \
 	|| mkdir -p ${destdir}

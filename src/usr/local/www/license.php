@@ -3,20 +3,52 @@
  * license.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2004-2018 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2004-2017 Electric Sheep Fencing, LLC
  * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the
+ *    distribution.
+ *
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgment:
+ *    "This product includes software developed by the pfSense Project
+ *    for use in the pfSense® software distribution. (http://www.pfsense.org/).
+ *
+ * 4. The names "pfSense" and "pfSense Project" must not be used to
+ *    endorse or promote products derived from this software without
+ *    prior written permission. For written permission, please contact
+ *    coreteam@pfsense.org.
+ *
+ * 5. Products derived from this software may not be called "pfSense"
+ *    nor may "pfSense" appear in their names without prior written
+ *    permission of the Electric Sheep Fencing, LLC.
+ *
+ * 6. Redistributions of any form whatsoever must retain the following
+ *    acknowledgment:
+ *
+ * "This product includes software developed by the pfSense Project
+ * for use in the pfSense software distribution (http://www.pfsense.org/).
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE pfSense PROJECT ``AS IS'' AND ANY
+ * EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE pfSense PROJECT OR
+ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 ##|+PRIV
@@ -27,33 +59,44 @@
 ##|-PRIV
 
 require_once("guiconfig.inc");
-$pgtitle = array(gettext($g['product_name']), gettext("License"));
 include("head.inc");
 ?>
 <div class="panel panel-default">
 	<div class="panel-heading"><h2 class="panel-title"><?=gettext("License")?></h2></div>
 	<div class="panel-body content">
-		<p><strong><?php printf(gettext('%1$s is Copyright &copy; %2$s %3$s. All rights reserved.'), $g['product_name'], $g['product_copyright_years'], $g['product_copyright'])?></strong></p>
+
+	
+
+	<p><strong><?=gettext("Kontrol is &copy; by Kontrol Tecnologia - Brazil - 2018 - All rights reserved.")?></strong></p>
+		
+		<p><?=gettext("*************************************************************************************************************")?></p>
+		<p><?=gettext("Kontrol UTM - This product includes software developed by the pfSense Project for use in the pfSense software distribution")?></p>
+		<p><?=gettext("pfSense is Copyright &copy; 2004-2018 Rubicon Communications, LLC (Netgate). All Rights Reserved.")?></p>
 		<p><?=gettext("m0n0wall is Copyright &copy; 2002-2015 by Manuel Kasper (mk@neon1.net). All rights reserved.")?></p>
-		<p><?=sprintf(gettext('Licensed under the Apache License, Version 2.0 (the "License");%1$syou may not use this file except in compliance with the License.%1$sYou may obtain a copy of the License at'), '<br />')?></p>
-		<p><a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
-		<p><?=sprintf(gettext('Unless required by applicable law or agreed to in writing, software%1$sdistributed under the License is distributed on an \"AS IS\" BASIS,%1$sWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.%1$sSee the License for the specific language governing permissions and%1$slimitations under the License.'), '<br />')?></p>
+		<p><?=gettext("*************************************************************************************************************")?></p>
+		
+
+		<p class="text-uppercase"><?php printf(gettext("THIS SOFTWARE IS PROVIDED BY THE Kontrol Security Appliances ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES "
+			. "OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE KONTROL TEAM OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, "
+			. "INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, "
+			. "DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING "
+			. "NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."), $g['product_name'], $g['product_name'])?></p>
 	</div>
 </div>
 <div class="panel panel-default">
 	<div class="panel-heading"><h2 class="panel-title"><?=gettext("Third Party Credits")?></h2></div>
 	<div class="panel-body content">
 		<p>
-			<?php printf(gettext('%1$s is based upon/includes various free software packages, listed below. The authors of %1$s would like to thank the authors of these software packages for their efforts.'), $g['product_name'])?><br />
+			<?php printf(gettext("Kontrol is based upon/includes various free software packages, listed below. Kontrol team would like to thank the authors of these software packages for their efforts."), $g['product_name'], $g['product_name'])?><br />
 		</p>
 		<ul class="list-group">
 			<li class="list-group-item">
 				<strong>FreeBSD</strong> (<a href="http://www.freebsd.org" target="_blank">http://www.freebsd.org</a>)<br />
-				<?=gettext("Copyright")?> &copy;<?=gettext("1992-2016 The FreeBSD Project. All rights reserved.")?>
+				<?=gettext("Copyright")?> &copy;<?=gettext("1992-2017 The FreeBSD Project. All rights reserved.")?>
 			</li>
 			<li class="list-group-item">
-				<?=sprintf(gettext('This product includes %1$s, freely available from (%2$s)'), '<strong>PHP</strong>', '<a href="http://www.php.net/" target="_blank">http://www.php.net</a>')?> . <br />
-				<?=gettext("Copyright"); ?> &copy; <?=gettext("1999-2016 The PHP Group. All rights reserved.")?>
+				<?=gettext("This product includes") . " <strong>PHP</strong>, " . gettext("freely available from")?> (<a href="http://www.php.net/" target="_blank">http://www.php.net</a>).<br />
+				<?=gettext("Copyright"); ?> &copy; <?=gettext("1999-2017 The PHP Group. All rights reserved.")?>
 			</li>
 			<li class="list-group-item">
 				<strong>PF</strong> originally from OpenBSD (<a href="http://www.openbsd.org/faq/pf" target="_blank">http://www.openbsd.org</a>)
@@ -79,34 +122,41 @@ NSS library</a>)<br />
 				<strong>Circular log support for FreeBSD syslogd</strong> (<a href="http://software.wheelhouse.org/syslogd/" target="_blank">http://software.wheelhouse.org/syslogd/</a>)<br />
 				<?=gettext("Copyright"); ?> &copy; 2001 Jeff Wheelhouse (jdw@wwwi.com)
 			</li>
+ 				<li class="list-group-item">
+                                <strong>LIGHSQUID Reporting</strong> (<a href="http://lightsquid.sourceforge.net/Index2.html/" target="_blank">http://lightsquid.sourceforge.net/Index2.html</a>)<br />
+                                <?=gettext("Copyright"); ?> &copy; 2017 Sergey Erokhin - aka ESL.
+                        </li>
+
+
+
 			<li class="list-group-item">
 				<strong>cpdup</strong> (<a href="http://apollo.backplane.com/FreeSrc/" target="_blank">http://apollo.backplane.com/FreeSrc/</a>)<br />
 				<?=gettext("Copyright"); ?> &copy; 1997-1999 Matthew Dillon and Dima Ruban.
 			</li>
 			<li class="list-group-item">
 				<strong>curl</strong> (<a href="https://curl.haxx.se/" target="_blank">https://curl.haxx.se/</a>)<br />
-				<?=gettext("Copyright"); ?> &copy; 1998-2016 Daniel Stenberg.
+				<?=gettext("Copyright"); ?> &copy; 1998-2017 Daniel Stenberg.
 			</li>
 			<li class="list-group-item">
 				<strong>D3.js</strong> (<a href="https://d3js.org/" target="_blank">https://d3js.org/</a>)<br />
-				<?=gettext("Copyright"); ?> &copy; 2015-2016 Mike Bostock.
+				<?=gettext("Copyright"); ?> &copy; 2015-2017 Mike Bostock.
 			</li>
 			<li class="list-group-item">
 				<strong>d3pie</strong> (<a href="http://d3pie.org/" target="_blank">http://d3pie.org/</a>)<br />
-				<?=gettext("Copyright"); ?> &copy; 2014-2016 Benjamin Keen.
+				<?=gettext("Copyright"); ?> &copy; 2014-2017 Benjamin Keen.
 			</li>
 			
 			<li class="list-group-item">
 				<strong>Dnsmasq</strong> - a DNS forwarder for NAT firewalls (<a href="http://www.thekelleys.org.uk" target="_blank">http://www.thekelleys.org.uk</a>)<br />
-				<?=gettext("Copyright"); ?> &copy; 2000-2016 Simon Kelley.
+				<?=gettext("Copyright"); ?> &copy; 2000-2017 Simon Kelley.
 			</li>
 			<li class="list-group-item">
 				<strong>dpinger</strong> - Pinger engine for monitoring latency and loss (<a href="https://github.com/dennypage/dpinger" target="_blank">https://github.com/dennypage/dpinger</a>)<br />
-				<?=gettext("Copyright"); ?> &copy; 2015-2016 Denny Page.
+				<?=gettext("Copyright"); ?> &copy; 2015-2017 Denny Page.
 			</li>
 			<li class="list-group-item">
 				<strong>ipmitool</strong> - command-line interface to IPMI-enabled devices (<a href="https://sourceforge.net/projects/ipmitool/" target="_blank">https://sourceforge.net/projects/ipmitool/</a>)<br />
-				<?=gettext("Copyright"); ?> &copy; 2003-2016 Sun Microsystems, Inc.
+				<?=gettext("Copyright"); ?> &copy; 2003-2017 Sun Microsystems, Inc.
 			</li>
 			<li class="list-group-item">
 				<strong>ISC DHCP</strong> <?=gettext("server")?> (<a href="http://www.isc.org/products/DHCP/" target="_blank">http://www.isc.org/products/DHCP</a>)<br />
@@ -115,7 +165,7 @@ NSS library</a>)<br />
 			</li>
 			<li class="list-group-item">
 				<strong>jQuery</strong> (<a href="https://jquery.com/" target="_blank">https://jquery.com/</a>)<br />
-				<?=gettext("Copyright"); ?> &copy; 2005-2016 jQuery Foundation and other contributors. 
+				<?=gettext("Copyright"); ?> &copy; 2005-2017 jQuery Foundation and other contributors. 
 			</li>
 			<li class="list-group-item">
 				<strong>MPD</strong> - Multi-link PPP daemon for FreeBSD (<a href="http://mpd.sourceforge.net/" target="_blank">http://mpd.sourceforge.net/</a>)<br />
@@ -124,7 +174,7 @@ NSS library</a>)<br />
 			</li>
 			<li class="list-group-item">
 				<strong>nginx</strong> (<a href="http://www.nginx.org" target="_blank">http://www.nginx.org)</a><br />
-				<?=gettext("Copyright"); ?> &copy;<?=gettext("2011-2016 Nginx, Inc.")?>
+				<?=gettext("Copyright"); ?> &copy;<?=gettext("2011-2017 Nginx, Inc.")?>
 				<?=gettext("All rights reserved.")?>
 			</li>
 			<li class="list-group-item">
@@ -134,7 +184,7 @@ NSS library</a>)<br />
 			</li>
 			<li class="list-group-item">
 				<strong>strongSwan</strong> (<a href="https://www.strongswan.org/" target="_blank">https://www.strongswan.org</a>)<br />
-				<?=gettext("Copyright"); ?> &copy; <?=gettext("2005-2016 University of Applied Sciences Rapperswil")?>
+				<?=gettext("Copyright"); ?> &copy; <?=gettext("2005-2017 University of Applied Sciences Rapperswil")?>
 			</li>
 			<li class="list-group-item">
 				<strong>wol</strong> (<a href="http://ahh.sourceforge.net/wol" target="_blank">http://ahh.sourceforge.net/wol</a>)<br />
@@ -142,11 +192,11 @@ NSS library</a>)<br />
 			</li>
 			<li class="list-group-item">
 				<strong>openldap-client</strong> (<a href="http://www.openldap.org/" target="_blank">http://www.openldap.org/</a>)<br />
-				<?=gettext("Copyright"); ?> &copy; 1999-2016 The OpenLDAP Foundation
+				<?=gettext("Copyright"); ?> &copy; 1999-2017 The OpenLDAP Foundation
 			</li>
 			<li class="list-group-item">
 				<strong>OpenVPN</strong> (<a href="http://openvpn.net/" target="_blank">http://openvpn.net/</a>)<br />
-				<?=gettext("Copyright (C) 2002-2016 OpenVPN Solutions LLC ")?>
+				<?=gettext("Copyright (C) 2002-2017 OpenVPN Solutions LLC ")?>
 			</li>
 			<li class="list-group-item">
 				<strong>pftop</strong> (<a href="http://www.eee.metu.edu.tr/~canacar/pftop/" target="_blank">http://www.eee.metu.edu.tr/~canacar/pftop/</a>)<br />
@@ -159,15 +209,15 @@ NSS library</a>)<br />
 			</li>
 			<li class="list-group-item">
 				<strong>rate</strong> command line traffic analysis tool(<a href="http://s-tech.elsat.net.pl/bmtools/" target="_blank">http://s-tech.elsat.net.pl/bmtools/</a>)<br />
-				<?=gettext("Copyright"); ?> &copy; 2003-2016 Mateusz 'mteg' Golicz
+				<?=gettext("Copyright"); ?> &copy; 2003-2017 Mateusz 'mteg' Golicz
 			</li>
 			<li class="list-group-item">
 				<strong>relayd</strong> server load balancing with pf (<a href="http://www.openbsd.org" target="_blank">http://www.openbsd.org</a>)<br />
-				<?=gettext("Copyright"); ?> &copy; 2007-2016 Reyk Floeter
+				<?=gettext("Copyright"); ?> &copy; 2007-2017 Reyk Floeter
 			</li>
 			<li class="list-group-item">
 				<strong>rrdtool</strong> data logging and graphing system for time series data (<a href="http://oss.oetiker.ch/rrdtool/" target="_blank">http://oss.oetiker.ch/rrdtool/</a>)<br />
-				<?=gettext("Copyright"); ?> &copy; 1998-2016 Tobias Oetiker
+				<?=gettext("Copyright"); ?> &copy; 1998-2017 Tobias Oetiker
 			</li>
 			<li class="list-group-item">
 				<strong>scponly</strong> (<a href="https://github.com/scponly/scponly/wiki" target="_blank">https://github.com/scponly/scponly/wiki</a>)<br />
@@ -175,7 +225,7 @@ NSS library</a>)<br />
 			</li>
 			<li class="list-group-item">
 				<strong>smartmontools</strong> (<a href="https://www.smartmontools.org/" target="_blank">https://www.smartmontools.org/</a>)<br />
-				<?=gettext("Copyright"); ?> &copy; 2002-2016 Bruce Allen, Christian Franke
+				<?=gettext("Copyright"); ?> &copy; 2002-2017 Bruce Allen, Christian Franke
 			</li>
 			<li class="list-group-item">
 				<strong>sortable</strong> Sortable JavaScript and CSS library (<a href="http://github.hubspot.com/sortable/" target="_blank">http://github.hubspot.com/sortable/</a>)<br />
@@ -191,7 +241,7 @@ NSS library</a>)<br />
 			</li>
 			<li class="list-group-item">
 				<strong>xinetd</strong> (<a href="http://www.xinetd.org/" target="_blank">http://www.xinetd.org/</a>)<br />
-				<?=gettext("Copyright"); ?> &copy; 1992-2016 Panagiotis Tsirigotis
+				<?=gettext("Copyright"); ?> &copy; 1992-2017 Panagiotis Tsirigotis
 			</li>
 		</ul>
 	</div>
