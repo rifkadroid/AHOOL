@@ -147,9 +147,9 @@ case ${opmode} in
 16)
 	/etc/rc.php-fpm_restart
 	;;
-	
+
 17)
-	tail -f /var/log/squid/cache.log
+	tail -f /var/squid/logs/cache.log
 	;;
 	
 100)
@@ -170,4 +170,3 @@ case ${opmode} in
 esac
 
 done
-
