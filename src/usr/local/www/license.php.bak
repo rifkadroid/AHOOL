@@ -65,16 +65,16 @@ include("head.inc");
 	<div class="panel-heading"><h2 class="panel-title"><?=gettext("License")?></h2></div>
 	<div class="panel-body content">
 
-	
+
 
 	<p><strong><?=gettext("Kontrol is &copy; by Kontrol Tecnologia - Brazil - 2018 - All rights reserved.")?></strong></p>
-		
+
 		<p><?=gettext("*************************************************************************************************************")?></p>
 		<p><?=gettext("Kontrol UTM - This product includes software developed by the pfSense Project for use in the pfSense software distribution")?></p>
 		<p><?=gettext("pfSense is Copyright &copy; 2004-2018 Rubicon Communications, LLC (Netgate). All Rights Reserved.")?></p>
 		<p><?=gettext("m0n0wall is Copyright &copy; 2002-2015 by Manuel Kasper (mk@neon1.net). All rights reserved.")?></p>
 		<p><?=gettext("*************************************************************************************************************")?></p>
-		
+
 
 		<p class="text-uppercase"><?php printf(gettext("THIS SOFTWARE IS PROVIDED BY THE Kontrol Security Appliances ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES "
 			. "OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE KONTROL TEAM OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, "
@@ -166,7 +166,7 @@ NSS library</a>)<br />
 			<li class="list-group-item">
 				<strong>jQuery</strong> (<a href="https://jquery.com/" target="_blank">https://jquery.com/</a>)<br />
 <<<<<<< HEAD
-				<?=gettext("Copyright"); ?> &copy; 2005-2017 jQuery Foundation and other contributors. 
+				<?=gettext("Copyright"); ?> &copy; 2005-2017 jQuery Foundation and other contributors.
 =======
 				<?=gettext("Copyright"); ?> &copy; 2005-2016 jQuery Foundation and other contributors.
 >>>>>>> e3fb3f3b5b6802f9775b8bc3bfaecf6e75915fd9
