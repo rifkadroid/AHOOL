@@ -4,8 +4,9 @@ echo "****************************"
 echo "*******   WARNING    *******"
 echo "****************************"
 echo
-echo "This process will change the existing data on your smb4.conf (Samba configuration file), krb5.conf (Kerberos Configuration File) and stunnel.conf (Stunnel Configuration file)"
-
+echo "This process will change the existing data on your smb4.conf (Samba configuration file)"
+echo "krb5.conf (Kerberos Configuration File) and stunnel.conf (Stunnel Configuration file)"
+echo
 while true; do
 
 	echo
@@ -83,6 +84,5 @@ echo
 echo
 echo
 echo "******************************************"
-echo " **************     DONE    **************"
+echo "**************     DONE     **************"
 echo "******************************************"
-

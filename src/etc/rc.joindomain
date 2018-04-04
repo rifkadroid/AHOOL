@@ -2,9 +2,9 @@
 clear
 echo
 echo
-echo "This process will join this KONTROL box to a Windows Domain"
-echo "Hostname, IP address/Netmask, DNS and NTP must be previously configured using the WEBGUI interface"
-
+echo "** This process will join this KONTROL box to a Windows Domain **"
+echo "** Hostname, IP address/Netmask, DNS and NTP must be previously configured using the WEBGUI interface **"
+echo
 while true; do
     echo
 	read -p "Are you sure you want to continue? y/n  " yn
@@ -26,7 +26,7 @@ echo
 host_var=`hostname`
 
 echo "Enter the ID with the proper permissions to Join this Kontrol Box to your Windows Domain (eg. Administrator) "
-read ad_account 
+read ad_account
 echo
 kinit $ad_account
 echo
@@ -44,7 +44,7 @@ echo
 echo "Adding the SPN HTTP"
 net ads keytab add HTTP
 echo
-#Generating keytab file 
+#Generating keytab file
 net ads keytab create -k
 echo
 echo
@@ -76,4 +76,3 @@ echo "You can now find your Kontrol box --> $ad_hostname on your Windows Domain"
 echo
 echo "If you can't see this Box on your Windows Domain, please check for HOSTNAME duplicity and restart the process"
 echo
-

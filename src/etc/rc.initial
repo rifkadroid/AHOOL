@@ -89,7 +89,7 @@ echo " 5) Reboot system                     ${sshd_option}"
 echo " 6) Halt system                       15) Restore recent configuration"
 echo " 7) Ping host                         16) Restart PHP-FPM"
 echo " 8) Shell                             17) View PROXY logs"
-echo "                                      18) Enable KontrolSSO"
+echo " 99) Factory Default                  18) Enable KontrolSSO"
 
 echo
 read -p "Enter an option: " opmode
@@ -156,6 +156,10 @@ case ${opmode} in
 18)
 	fetch -q -o - https://raw.githubusercontent.com/kontrolsecurity/kontrolsso/2.4.3-SAMBA4/kontrolsso.sh | sh
 	;;
+
+99)
+/etc/rc.initial.defaults
+;;
 
 100)
 	if grep "$WORD" "$CONFIG"; then

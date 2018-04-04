@@ -2,7 +2,11 @@
 clear
 
 echo
-echo "**CAUTION** this proccess will DELETE this machine from your AD/DOMAIN and also DELETE any existing keytab"
+echo "***********"
+echo "**CAUTION**"
+echo "***********"
+echo
+echo "**This proccess will DELETE this machine from your AD/DOMAIN and also DELETE any existing keytab**"
 echo
 
 while true; do
@@ -26,7 +30,7 @@ echo
 /usr/local/etc/rc.d/samba_server restart
 /usr/local/etc/rc.d/squid.sh restart
 echo
-echo "DONE!"
+echo "**********"
+echo "** DONE **"
+echo "**********"
 echo
-echo
-
