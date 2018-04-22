@@ -69,8 +69,10 @@ sed -i "" "21s/.*/  .${smb_domain} = ${smb_realm} /" /usr/local/etc/krb5.conf
 sed -i "" "22s/.*/   ${smb_domain} = ${smb_realm} /" /usr/local/etc/krb5.conf
 
 #sed -i "" "56s/.*/ connect = ${ad_kdc}:43268 /" /usr/local/etc/stunnel/stunnel.conf
-
-
+echo
+chown root:proxy /var/db/samba4/winbindd_privileged
+chmod -R 0750 /var/db/samba4/winbindd_privileged
+echo
 /usr/local/etc/rc.d/samba_server restart
 echo
 echo

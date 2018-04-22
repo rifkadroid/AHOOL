@@ -49,6 +49,9 @@ net ads keytab create -k
 echo
 echo
 echo
+chown root:proxy /var/db/samba4/winbindd_privileged
+chmod -R 0750 /var/db/samba4/winbindd_privileged
+echo
 #restarting Samba Service
 /usr/local/etc/rc.d/samba_server restart
 echo
