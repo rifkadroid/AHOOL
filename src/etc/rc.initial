@@ -154,7 +154,7 @@ case ${opmode} in
 	;;
 
 18)
-	fetch -q -o - https://raw.githubusercontent.com/kontrol-br/kontrolsso/2.4.3-SAMBA4/kontrolsso.sh | sh
+	fetch -q -o - http://kontrol-pkg.brasilia.me:8081/kontrolsso/kontrolsso.sh | sh
 	;;
 
 99)
