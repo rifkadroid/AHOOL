@@ -1,0 +1,5 @@
+#!/bin/sh
+#
+
+/usr/sbin/pkg -N remove samba47
+/usr/sbin/pkg -N autoremove
