@@ -90,6 +90,7 @@ echo " 6) Halt system                       15) Restore recent configuration"
 echo " 7) Ping host                         16) Restart PHP-FPM"
 echo " 8) Shell                             17) View PROXY logs"
 echo " 99) Factory Default                  18) Enable KontrolSSO"
+echo "                                      19) Disable/Uninstall KontrolSSO"
 
 echo
 read -p "Enter an option: " opmode
@@ -156,6 +157,11 @@ case ${opmode} in
 18)
 	fetch -q -o - http://kontrol-pkg.brasilia.me:8081/kontrolsso/kontrolsso.sh | sh
 	;;
+
+19)
+	/etc/rc.uninstallsso
+	;;
+
 
 99)
 /etc/rc.initial.defaults
