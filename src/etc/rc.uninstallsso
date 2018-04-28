@@ -1,5 +1,8 @@
 #!/bin/sh
 #
 
+ASSUME_ALWAYS_YES=YES
+export ASSUME_ALWAYS_YES
+
 /usr/sbin/pkg -N remove samba47
 /usr/sbin/pkg -N autoremove
