@@ -774,7 +774,7 @@ function filter_generate_aliases() {
 		     $config['system']['maximumtableentries'] <
 		     $g['minimumtableentries_bogonsv6']) {
 			file_notice("Filter_Reload", sprintf(gettext(
-			    "In order block bogon IPv6 networks the Firewall Maximum Table Entries value in System / Advanced / Firewall must be increased at least to %s"),
+			    "To block bogon IPv6 networks the Firewall Maximum Table Entries value in System / Advanced / Firewall must be increased at least to %s"),
 			    $g['minimumtableentries_bogonsv6']));
 		} else {
 			$aliases .= "table <bogonsv6> persist file \"/etc/bogonsv6\"\n";
@@ -1178,6 +1178,9 @@ function filter_generate_optcfg_array() {
 					} else {
 						$oic['vips6'][$vipidx]['sn'] = $vip['subnet_bits'];
 					}
+				}
+				if (isset($vip['mode'])) {
+					$oic['vips'][$vipidx]['mode']=$vip['mode'];
 				}
 			}
 		}
@@ -3611,6 +3614,9 @@ EOD;
 			$ipfrules .= "pass out {$log['pass']} route-to ( {$ifcfg['if']} {$gw} ) from {$ifcfg['ip']} to !{$ifcfg['sa']}/{$ifcfg['sn']} tracker {$increment_tracker($tracker)} keep state allow-opts label \"let out anything from firewall host itself\"\n";
 			if (is_array($ifcfg['vips'])) {
 				foreach ($ifcfg['vips'] as $vip) {
+					if ($vip['mode'] == "proxyarp") {
+						continue; 
+					} 
 					if (ip_in_subnet($vip['ip'], "{$ifcfg['sa']}/{$ifcfg['sn']}")) {
 						$ipfrules .= "pass out {$log['pass']} route-to ( {$ifcfg['if']} {$gw} ) from {$vip['ip']} to !{$ifcfg['sa']}/{$ifcfg['sn']} tracker {$increment_tracker($tracker)} keep state allow-opts label \"let out anything from firewall host itself\"\n";
 					} else {
