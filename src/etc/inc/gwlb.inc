@@ -22,6 +22,7 @@
 
 require_once("config.inc");
 require_once("rrd.inc");
+require_once("ipsec.inc");
 
 /* Returns an array of default values used for dpinger */
 function return_dpinger_defaults() {
@@ -729,7 +730,31 @@ function return_gateways_array($disabled = false, $localhost = false, $inactive 
 						}
 					}
 					$ctype = "VPNv4";
-				} else if ($tunnelif == "gif" || $tunnelif == "gre") {
+				} elseif (substr($ifcfg['if'], 0, 5) == "ipsec") {
+					$ikeid = substr($ifcfg['if'], 5);
+					if (is_array($config['ipsec']) && is_array($config['ipsec']['phase1']) && is_array($config['ipsec']['phase2'])) {
+						foreach ($config['ipsec']['phase1'] as $ph1ent) {
+							// Skip disabled or non-matching IPsec
+							if (($ikeid != $ph1ent['ikeid']) || $ph1ent['disabled']) {
+								continue;
+							}
+							$vti_addrs = ipsec_vti($ph1ent, true);
+							// Skip non-VTI tunnels
+							if (!$vti_addrs || !is_array($vti_addrs)) {
+								continue;
+							}
+							// If any of the VTI remotes is v4, then we can make a v4 gw
+							foreach ($vti_addrs as $vtia) {
+								if (is_ipaddrv4($vtia['right'])) {
+									$ctype = "VTIv4";
+								}
+							}
+						}
+						if (empty($ctype)) {
+							continue 2;
+						}
+					}
+				} elseif ($tunnelif == "gif" || $tunnelif == "gre") {
 					$ctype = "TUNNELv4";
 				}
 				break;
@@ -835,6 +860,30 @@ function return_gateways_array($disabled = false, $localhost = false, $inactive 
 						}
 					}
 					$ctype = "VPNv6";
+				} elseif (substr($ifcfg['if'], 0, 5) == "ipsec") {
+					$ikeid = substr($ifcfg['if'], 5);
+					if (is_array($config['ipsec']) && is_array($config['ipsec']['phase1']) && is_array($config['ipsec']['phase2'])) {
+						foreach ($config['ipsec']['phase1'] as $ph1ent) {
+							// Skip disabled or non-matching IPsec
+							if (($ikeid != $ph1ent['ikeid']) || $ph1ent['disabled']) {
+								continue;
+							}
+							$vti_addrs = ipsec_vti($ph1ent, true);
+							// Skip non-VTI tunnels
+							if (!$vti_addrs || !is_array($vti_addrs)) {
+								continue;
+							}
+							// If any of the VTI remotes is v6, then we can make a v6 gw
+							foreach ($vti_addrs as $vtia) {
+								if (is_ipaddrv6($vtia['right'])) {
+									$ctype = "VTIv6";
+								}
+							}
+						}
+						if (empty($ctype)) {
+							continue 2;
+						}
+					}
 				} else if ($tunnelif == "gif" || $tunnelif == "gre") {
 					$ctype = "TUNNELv6";
 				}
@@ -1040,12 +1089,14 @@ function fixup_default_gateway($ipprotocol, $gateways_status, $gateways_arr) {
 }
 
 function getcurrentdefaultgatewayip($ipprotocol) {
-	return trim(exec("/sbin/route -n get -{$ipprotocol} default | /usr/bin/awk '/gateway:/ {print $2}'"), " \n");
+	return trim(exec("/sbin/route -n get -{$ipprotocol} default 2>/dev/null | /usr/bin/awk '/gateway:/ {print $2}'"), " \n");
 }
 
 function setdefaultgateway($gw) {
 	global $g;
-	file_put_contents("/dev/console", "\n[".getmypid()."] SET DFGW:".$gw['name']);
+	if (isset($config['system']['route-debug'])) {
+		file_put_contents("/dev/console", "\n[".getmypid()."] SET DEF GW: {$gw['name']}");
+	}
 	$ipprotocol = $gw['ipprotocol'];
 	if ($gw['gateway'] == "dynamic") {
 		if ($ipprotocol == 'inet') {
@@ -1084,7 +1135,9 @@ function setdefaultgateway($gw) {
 				route_add_or_change("-{$ipprotocol} {$gw['gateway']} -iface {$gw['interface']}");
 			}
 		}
-		file_put_contents("/dev/console", "\n[".getmypid()."] SET DFGW:".$gw['name']." ".$gw['gateway']);
+		if (isset($config['system']['route-debug'])) {
+			file_put_contents("/dev/console", "\n[".getmypid()."] SET DEF GW: {$gw['name']} ({$gw['gateway']})");
+		}
 		route_add_or_change("-{$ipprotocol} default {$gw['gateway']}");
 		return true;
 	}

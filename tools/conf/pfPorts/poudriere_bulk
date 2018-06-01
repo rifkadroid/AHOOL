@@ -53,6 +53,7 @@ net/%%PRODUCT_NAME%%-pkg-haproxy-devel
 net/%%PRODUCT_NAME%%-pkg-mtr-nox11
 net/%%PRODUCT_NAME%%-pkg-ntopng
 net/%%PRODUCT_NAME%%-pkg-pfBlockerNG
+net/%%PRODUCT_NAME%%-pkg-pfBlockerNG-devel
 net/%%PRODUCT_NAME%%-pkg-routed
 net/%%PRODUCT_NAME%%-pkg-siproxd
 net/bird
@@ -73,6 +74,7 @@ security/%%PRODUCT_NAME%%-pkg-tinc
 security/%%PRODUCT_NAME%%@all
 sysutils/%%PRODUCT_NAME%%-builder
 sysutils/%%PRODUCT_NAME%%-pkg-AutoConfigBackup
+sysutils/%%PRODUCT_NAME%%-pkg-AutoConfigBackup2
 sysutils/%%PRODUCT_NAME%%-pkg-Backup
 sysutils/%%PRODUCT_NAME%%-pkg-Cron
 sysutils/%%PRODUCT_NAME%%-pkg-LCDproc
