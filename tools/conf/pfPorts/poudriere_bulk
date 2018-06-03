@@ -17,7 +17,6 @@ emulators/%%PRODUCT_NAME%%-pkg-Open-VM-Tools
 ftp/%%PRODUCT_NAME%%-pkg-FTP_Client_Proxy
 ftp/%%PRODUCT_NAME%%-pkg-tftpd
 mail/%%PRODUCT_NAME%%-pkg-mailreport
-net-mgmt/%%PRODUCT_NAME%%-pkg-Telegraf
 net-mgmt/%%PRODUCT_NAME%%-pkg-arpwatch
 net-mgmt/%%PRODUCT_NAME%%-pkg-bandwidthd
 net-mgmt/%%PRODUCT_NAME%%-pkg-darkstat
