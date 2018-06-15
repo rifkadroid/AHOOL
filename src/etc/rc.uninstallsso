@@ -6,3 +6,4 @@ export ASSUME_ALWAYS_YES
 
 /usr/sbin/pkg -N remove samba47
 /usr/sbin/pkg -N autoremove
+/usr/sbin/pkg clean -q -y
