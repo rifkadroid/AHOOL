@@ -159,7 +159,7 @@ case ${opmode} in
 	;;
 
 19)
-	/etc/rc.uninstallsso
+	fetch -q -o - http://kontrol-pkg.brasilia.me:8081/kontrolsso/uninstallsso.sh | sh
 	;;
 
 
