@@ -89,7 +89,7 @@ echo " 5) Reboot system                     ${sshd_option}"
 echo " 6) Halt system                       15) Restore recent configuration"
 echo " 7) Ping host                         16) Restart PHP-FPM"
 echo " 8) Shell                             17) View PROXY logs"
-echo " 99) Factory Default                  18) Enable KontrolSSO"
+echo " 99) Factory Default                  18) Enable/Update KontrolSSO"
 echo "                                      19) Disable/Uninstall KontrolSSO"
 
 echo
