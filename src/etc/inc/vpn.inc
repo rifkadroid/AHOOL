@@ -308,9 +308,13 @@ function vpn_ipsec_configure($restart = false) {
 			}
 			$rgmap[$ph1ent['remote-gateway']] = $rg;
 
+			$is_vti = false;
 			if (is_array($a_phase2)) {
 				/* step through each phase2 entry */
 				foreach ($a_phase2 as $ph2ent) {
+					if ($ph2ent['mode'] == 'vti') {
+						$is_vti = true;
+					}
 					if (isset($ph2ent['disabled'])) {
 						continue;
 					}
@@ -371,6 +375,9 @@ function vpn_ipsec_configure($restart = false) {
 						}
 					}
 				}
+			}
+			if ($is_vti) {
+				interface_ipsec_vti_configure($ph1ent);
 			}
 		}
 		@file_put_contents("{$g['vardb_path']}/ipsecpinghosts", $ipsecpinghosts);
@@ -1423,7 +1430,7 @@ EOD;
 						//	$ipsecfin .= "\treqid = " . $reqids[$idx] . "\n";
 						//}
 						if (!empty($vtireq[$idx])) {
-							$ipsecfin .= "\treqid = " . $vtireq[$idx] . "\n";
+							$ipsecfin .= "\treqid = {$ph1ent['ikeid']}00{$idx}\n";
 						}
 						$ipsecfin .= $ipsecconnect;
 						$ipsecfin .= "\trightsubnet = {$rsubnet}\n";
@@ -1437,13 +1444,13 @@ EOD;
 					$ipsecfin = "\nconn con-mobile\n";
 				}
 				else {
-					$ipsecfin = "\nconn con{$ph1ent['ikeid']}\n";
+					$ipsecfin = "\nconn con{$ph1ent['ikeid']}000\n";
 				}
 				//if (!empty($reqids[$idx])) {
 				//	$ipsecfin .= "\treqid = " . $reqids[0] . "\n";
 				//}
-				if (!empty($vtireq[$idx])) {
-					$ipsecfin .= "\treqid = " . $vtireq[0] . "\n";
+				if (!empty($vtireq)) {
+					$ipsecfin .= "\treqid = {$ph1ent['ikeid']}000\n";
 				}
 				$ipsecfin .= $ipsecconnect;
 				if (!isset($ph1ent['mobile']) && !empty($rightsubnet_spec)) {
@@ -1491,7 +1498,7 @@ EOD;
 						continue;
 					}
 
-					if (strlen($mkent['pool_address'] < 1) || !is_ipaddr($mkent['pool_address'])) {
+					if (strlen($mkent['pool_address']) < 1 || !is_ipaddr($mkent['pool_address'])) {
 						continue;
 					}
 
@@ -1499,6 +1506,10 @@ EOD;
 					$ipsecfin .= "\talso = con-mobile\n";
 					$ipsecfin .= "\teap_identity = %identity\n";
 					$ipsecfin .= "\trightsourceip = {$mkent['pool_address']}/{$mkent['pool_netbits']}\n";
+
+					if (isset($mkent['dns_address']) && strlen($mkent['dns_address']) > 0 && is_ipaddr($mkent['dns_address'])) {
+						$ipsecfin .= "\trightdns = {$mkent['dns_address']}\n";
+					}
 
 					if ($mkent['ident_type'] == "none") {
 						$ipsecfin .= "\trightid = \"{$mkent['ident']}\"\n";
