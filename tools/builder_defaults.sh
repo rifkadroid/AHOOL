@@ -65,12 +65,12 @@ if [ ! -d ${SCRATCHDIR} ]; then
 fi
 
 # Product details
-export PRODUCT_NAME=${PRODUCT_NAME:-"Kontrol"}
+export PRODUCT_NAME=${PRODUCT_NAME:-"nonSense"}
 export PRODUCT_NAME_SUFFIX=${PRODUCT_NAME_SUFFIX:-"-CE"}
 export REPO_BRANCH_PREFIX=${REPO_BRANCH_PREFIX:-""}
 export PRODUCT_URL=${PRODUCT_URL:-""}
 export PRODUCT_SRC=${PRODUCT_SRC:-"${BUILDER_ROOT}/src"}
-export PRODUCT_EMAIL=${PRODUCT_EMAIL:-"contato@kontrolsecurity.com.br"}
+export PRODUCT_EMAIL=${PRODUCT_EMAIL:-"coreteam@pfsense.org"}
 export XML_ROOTOBJ=${XML_ROOTOBJ:-$(echo "${PRODUCT_NAME}" | tr '[[:upper:]]' '[[:lower:]]')}
 
 if [ "${PRODUCT_NAME}" = "pfSense" -a "${BUILD_AUTHORIZED_BY_NETGATE}" != "yes" ]; then
@@ -203,8 +203,6 @@ if [ -z "${BUILTDATESTRING}" ]; then
 fi
 echo "$BUILTDATESTRING" > $BUILTDATESTRINGFILE
 
-STAGING_HOSTNAME=${STAGING_HOSTNAME:-"kontrol-staging.brasilia.me"}
-
 # Poudriere
 export ZFS_TANK=${ZFS_TANK:-"zroot"}
 export ZFS_ROOT=${ZFS_ROOT:-"/poudriere"}
@@ -260,18 +258,20 @@ export BUILDER_PKG_DEPENDENCIES="devel/git ftp/curl net/rsync sysutils/screen \
     emulators/qemu-user-static security/sssd security/pam_ldap \
     security/pam_mkhomedir archivers/gtar textproc/xmlstarlet"
 
+STAGING_HOSTNAME=${STAGING_HOSTNAME:-"release-staging.nyi.netgate.com"}
+
 # Host to rsync pkg repos from poudriere
-export PKG_RSYNC_HOSTNAME=${PKG_RSYNC_HOSTNAME:-${STAGING_HOSTNAME}}
+export PKG_RSYNC_HOSTNAME=${PKG_RSYNC_HOSTNAME:-"nfs1.nyi.netgate.com"}
 export PKG_RSYNC_USERNAME=${PKG_RSYNC_USERNAME:-"wwwsync"}
 export PKG_RSYNC_SSH_PORT=${PKG_RSYNC_SSH_PORT:-"22"}
-export PKG_RSYNC_DESTDIR=${PKG_RSYNC_DESTDIR:-"/staging/ce/packages"}
+export PKG_RSYNC_DESTDIR=${PKG_RSYNC_DESTDIR:-"/storage/files/release-staging/ce/packages"}
 
 # Final packages server
 if [ -n "${_IS_RELEASE}" -o -n "${_IS_RC}" ]; then
-	export PKG_FINAL_RSYNC_HOSTNAME=${PKG_FINAL_RSYNC_HOSTNAME:-"kontrol-pkg.brasilia.me"}
+	export PKG_FINAL_RSYNC_HOSTNAME=${PKG_FINAL_RSYNC_HOSTNAME:-"nfs1.nyi.netgate.com"}
 	export PKG_FINAL_RSYNC_DESTDIR=${PKG_FINAL_RSYNC_DESTDIR:-"/storage/files/pkg"}
 else
-	export PKG_FINAL_RSYNC_HOSTNAME=${PKG_FINAL_RSYNC_HOSTNAME:-"kontrol-pkg.brasilia.me"}
+	export PKG_FINAL_RSYNC_HOSTNAME=${PKG_FINAL_RSYNC_HOSTNAME:-"nfs1.nyi.netgate.com"}
 	export PKG_FINAL_RSYNC_DESTDIR=${PKG_FINAL_RSYNC_DESTDIR:-"/storage/files/beta/packages"}
 fi
 export PKG_FINAL_RSYNC_USERNAME=${PKG_FINAL_RSYNC_USERNAME:-"wwwsync"}
@@ -280,8 +280,8 @@ export SKIP_FINAL_RSYNC=${SKIP_FINAL_RSYNC:-}
 
 # pkg repo variables
 export USE_PKG_REPO_STAGING="1"
-export PKG_REPO_SERVER_DEVEL=${PKG_REPO_SERVER_DEVEL:-"pkg+http://kontrol-dev.brasilia.me/packages"}
-export PKG_REPO_SERVER_RELEASE=${PKG_REPO_SERVER_RELEASE:-"pkg+http://kontrol-pkg.brasilia.me"}
+export PKG_REPO_SERVER_DEVEL=${PKG_REPO_SERVER_DEVEL:-"pkg+https://beta.pfsense.org/packages"}
+export PKG_REPO_SERVER_RELEASE=${PKG_REPO_SERVER_RELEASE:-"pkg+https://pkg.pfsense.org"}
 export PKG_REPO_SERVER_STAGING=${PKG_REPO_SERVER_STAGING:-"pkg+http://${STAGING_HOSTNAME}/ce/packages"}
 
 if [ -n "${_IS_RELEASE}" -o -n "${_IS_RC}" ]; then
@@ -340,11 +340,11 @@ export VARIANTUPDATES=""
 
 # Rsync data to send snapshots
 if [ -n "${_IS_RELEASE}" -o -n "${SKIP_FINAL_RSYNC}" ]; then
-	export RSYNCIP=${RSYNCIP:-"kontrol-pkg.brasilia.me"}
+	export RSYNCIP=${RSYNCIP:-"nfs1.nyi.netgate.com"}
 	export RSYNCUSER=${RSYNCUSER:-"wwwsync"}
-	export RSYNCPATH=${RSYNCPATH:-"/staging/ce/images"}
+	export RSYNCPATH=${RSYNCPATH:-"/storage/files/release-staging/ce/images"}
 else
-	export RSYNCIP=${RSYNCIP:-"kontrol-pkg.brasilia.me"}
+	export RSYNCIP=${RSYNCIP:-"nfs1.nyi.netgate.com"}
 	export RSYNCUSER=${RSYNCUSER:-"wwwsync"}
 	export RSYNCPATH=${RSYNCPATH:-"/storage/files/snapshots/${TARGET}/${PRODUCT_NAME}_${GIT_REPO_BRANCH_OR_TAG}"}
 fi
@@ -360,10 +360,10 @@ else
 	export SNAPSHOTS_RSYNCUSER=${RSYNCUSER}
 fi
 
-if [ "${PRODUCT_NAME}" = "Kontrol" ]; then
-	export VENDOR_NAME=${VENDOR_NAME:-"Kontrol Tecnologia"}
-	export OVF_INFO=${OVF_INFO:-"Kontrol is a free, open source customized distribution of FreeBSD tailored for use as a firewall and router. In addition to being a powerful, flexible firewalling and routing platform, it includes a long list of related features and a package system allowing further expandability without adding bloat and potential security vulnerabilities to the base distribution. Kontrol is a popular project with more than 1 million downloads since its inception, and proven in countless installations ranging from small home networks protecting a PC and an Xbox to large corporations, universities and other organizations protecting thousands of network devices."}
+if [ "${PRODUCT_NAME}" = "pfSense" ]; then
+	export VENDOR_NAME=${VENDOR_NAME:-"Rubicon Communications, LLC (Netgate)"}
+	export OVF_INFO=${OVF_INFO:-"pfSense is a free, open source customized distribution of FreeBSD tailored for use as a firewall and router. In addition to being a powerful, flexible firewalling and routing platform, it includes a long list of related features and a package system allowing further expandability without adding bloat and potential security vulnerabilities to the base distribution. pfSense is a popular project with more than 1 million downloads since its inception, and proven in countless installations ranging from small home networks protecting a PC and an Xbox to large corporations, universities and other organizations protecting thousands of network devices."}
 else
-	export VENDOR_NAME=${VENDOR_NAME:-"Kontrol"}
+	export VENDOR_NAME=${VENDOR_NAME:-"nonSense"}
 	export OVF_INFO=${OVF_INFO:-"none"}
 fi
