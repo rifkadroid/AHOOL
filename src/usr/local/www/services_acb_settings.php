@@ -80,18 +80,35 @@ if (isset($_POST['save'])) {
 		}
 	}
 
+	$update_gep = false;
+
+	if ($pconfig['legacy'] == 'yes') {
+		if ($_POST['gold__encryption_password'] != "********") {
+			if ($_POST['gold__encryption_password'] != $_POST['gold__encryption_password_confirm']) {
+				$input_errors[] = gettext("Legacy Gold encryption password and confirmation do not match");
+			} else {
+				$update_gep = true;
+			}
+		}
+	}
+
 	if (!$input_errors) {
 		if($update_ep) {
 			$config['system']['acb']['encryption_password'] = $pconfig['encryption_password'];
 		}
 
-		$config['system']['acb']['acb_enable'] = $pconfig['acb_enable'];
+		$config['system']['acb']['enable'] = $pconfig['enable'];
 
 		if($update_gp) {
 			$config['system']['acb']['gold_password'] = $pconfig['gold_password'];
 		}
 
+		if ($update_gep) {
+			$config['system']['acb']['gold_encryption_password'] = $pconfig['gold_encryption_password'];
+		}
+
 		$config['system']['acb']['gold_username'] = $pconfig['gold_username'];
+		$config['system']['acb']['hint'] = $pconfig['hint'];
 
 		write_config("AutoCcnfigBackup settings updated");
 	}
@@ -104,6 +121,12 @@ if ($input_errors) {
 	print_input_errors($input_errors);
 }
 
+$tab_array = array();
+$tab_array[] = array("Settings", true, "/services_acb_settings.php");
+$tab_array[] = array("Restore", false, "/services_acb.php");
+$tab_array[] = array("Backup now", false, "/services_acb_backup.php");
+display_top_tabs($tab_array);
+
 $form = new Form;
 $section = new Form_Section('Auto Config Backup');
 
@@ -115,10 +138,10 @@ $section->addInput(new Form_Input(
 ));
 
 $section->addInput(new Form_Checkbox(
-	'acb_enable',
+	'enable',
 	'Enable ACB',
 	'Enable automatic configuration backups',
-	($pconfig['acb_enable'] == "yes")
+	($pconfig['enable'] == "yes")
 ));
 
 $section->addPassword(new Form_Input(
@@ -127,6 +150,14 @@ $section->addPassword(new Form_Input(
 	'password',
 	$pconfig['encryption_password']
 ));
+
+$section->addInput(new Form_Input(
+	'hint',
+	'Hint',
+	'text',
+	$pconfig['hint']
+))->setHelp("You may optionally provide a hint which will be stored in plain text along with each backup. " .
+			"This may assist in recovering a backup should you lose your device key.");
 
 $form->add($section);
 
@@ -144,6 +175,13 @@ $section->addPassword(new Form_Input(
 	'*Password',
 	'password',
 	$pconfig['gold_password']
+));
+
+$section->addPassword(new Form_Input(
+	'gold_encryption_password',
+	'*Encryption password',
+	'password',
+	$pconfig['gold_encryption_password']
 ));
 
 $form->add($section);

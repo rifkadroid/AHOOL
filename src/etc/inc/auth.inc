@@ -805,7 +805,7 @@ function local_user_get_groups($user, $all = false) {
 }
 
 function local_user_set_groups($user, $new_groups = NULL) {
-	global $debug, $config, $groupindex;
+	global $debug, $config, $groupindex, $userindex;
 
 	if (!is_array($config['system']['group'])) {
 		return;
@@ -830,6 +830,14 @@ function local_user_set_groups($user, $new_groups = NULL) {
 		$group = & $config['system']['group'][$groupindex[$groupname]];
 		$group['member'][] = $user['uid'];
 		$mod_groups[] = $group;
+
+		/*
+		 * If it's a new user, make sure it is added before try to
+		 * add it as a member of a group
+		 */
+		if (!isset($userindex[$user['uid']])) {
+			local_user_set($user);
+		}
 	}
 	unset($group);
 
@@ -880,11 +888,18 @@ function local_group_set($group, $reset = false) {
 	$group_name = $group['name'];
 	$group_gid = $group['gid'];
 	$group_members = '';
+
 	if (!$reset && !empty($group['member']) && count($group['member']) > 0) {
 		$group_members = implode(",", $group['member']);
 	}
 
-	if (empty($group_name) || $group['scope'] == "remote") {
+	if (empty($group_name)) {
+		return;
+	}
+
+	// If the group is now remote, make sure there is no local group with the same name
+	if ($group['scope'] == "remote") {
+		local_group_del($group);
 		return;
 	}
 
@@ -904,8 +919,8 @@ function local_group_set($group, $reset = false) {
 	if ($debug) {
 		log_error(sprintf(gettext("Running: %s"), $cmd));
 	}
-	mwexec($cmd);
 
+	mwexec($cmd);
 }
 
 function local_group_del($group) {
@@ -1540,7 +1555,7 @@ function radius_backed($username, $password, $authcfg, &$attributes = array()) {
 	global $debug, $config;
 	$ret = false;
 
-	require_once("radius.inc");
+	require_once("Auth/RADIUS.php");
 	require_once("Crypt/CHAP.php");
 
 	if ($authcfg) {
@@ -1632,7 +1647,6 @@ function radius_backed($username, $password, $authcfg, &$attributes = array()) {
 		}
 	}
 
-	// close OO RADIUS_AUTHENTICATION
 	$rauth->close();
 
 	return $ret;

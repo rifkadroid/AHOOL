@@ -1765,6 +1765,7 @@ poudriere_update_ports() {
 
 poudriere_bulk() {
 	local _archs=$(poudriere_possible_archs)
+	local _makeconf
 
 	LOGFILE=${BUILDER_LOGS}/poudriere.log
 
@@ -1780,9 +1781,9 @@ poudriere_bulk() {
 	[ -d /usr/local/etc/poudriere.d ] || \
 		mkdir -p /usr/local/etc/poudriere.d
 
+	_makeconf=/usr/local/etc/poudriere.d/${POUDRIERE_PORTS_NAME}-make.conf
 	if [ -f "${BUILDER_TOOLS}/conf/pfPorts/make.conf" ]; then
-		cp -f "${BUILDER_TOOLS}/conf/pfPorts/make.conf" \
-			/usr/local/etc/poudriere.d/${POUDRIERE_PORTS_NAME}-make.conf
+		cp -f "${BUILDER_TOOLS}/conf/pfPorts/make.conf" ${_makeconf}
 	fi
 
 	cat <<EOF >>/usr/local/etc/poudriere.d/${POUDRIERE_PORTS_NAME}-make.conf
@@ -1795,6 +1796,30 @@ PFSENSE_DEFAULT_REPO=${PFSENSE_DEFAULT_REPO}
 PRODUCT_NAME=${PRODUCT_NAME}
 REPO_BRANCH_PREFIX=${REPO_BRANCH_PREFIX}
 EOF
+
+	local _value=""
+	for jail_arch in ${_archs}; do
+		eval "_value=\${PKG_REPO_BRANCH_DEVEL_${jail_arch##*.}}"
+		if [ -n "${_value}" ]; then
+			echo "PKG_REPO_BRANCH_DEVEL_${jail_arch##*.}=${_value}" \
+				>> ${_makeconf}
+		fi
+		eval "_value=\${PKG_REPO_BRANCH_RELEASE_${jail_arch##*.}}"
+		if [ -n "${_value}" ]; then
+			echo "PKG_REPO_BRANCH_RELEASE_${jail_arch##*.}=${_value}" \
+				>> ${_makeconf}
+		fi
+		eval "_value=\${PKG_REPO_SERVER_DEVEL_${jail_arch##*.}}"
+		if [ -n "${_value}" ]; then
+			echo "PKG_REPO_SERVER_DEVEL_${jail_arch##*.}=${_value}" \
+				>> ${_makeconf}
+		fi
+		eval "_value=\${PKG_REPO_SERVER_RELEASE_${jail_arch##*.}}"
+		if [ -n "${_value}" ]; then
+			echo "PKG_REPO_SERVER_RELEASE_${jail_arch##*.}=${_value}" \
+				>> ${_makeconf}
+		fi
+	done
 
 	# Change version of pfSense meta ports for snapshots
 	if [ -z "${_IS_RELEASE}" ]; then
