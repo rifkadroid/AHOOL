@@ -24,9 +24,9 @@
 <totalsteps>10</totalsteps>
 <step>
 	<id>1</id>
-	<title>pfSense Setup</title>
+	<title>Kontrol Setup</title>
 	<disableheader>true</disableheader>
-	<description>This wizard will provide guidance through the initial configuration of pfSense.&lt;br/&gt;&lt;br/&gt; The wizard may be stopped at any time by clicking the logo image at the top of the screen.</description>
+	<description>This wizard will provide guidance through the initial configuration of Kontrol.&lt;br/&gt;&lt;br/&gt; The wizard may be stopped at any time by clicking the logo image at the top of the screen.</description>
 	<fields>
 		<field>
 			<name>Next</name>
@@ -43,7 +43,7 @@
 	<title>Netgate Global Support is available</title>
 	<disableheader>true</disableheader>
 	<description>
-    pfSense firewalls are known for their reliability, manageability, and flexibility.
+    Kontrol firewalls are known for their reliability, manageability, and flexibility.
     &lt;br/&gt; &lt;br/&gt;
     You know that network security is crucial, now more than ever.
     Support provides peace-of-mind and help if you need it.
@@ -64,7 +64,7 @@
 <step>
 	<id>3</id>
 	<title>General Information</title>
-	<description>On this screen the general pfSense parameters will be set.</description>
+	<description>On this screen the general Kontrol parameters will be set.</description>
 	<fields>
 		<field>
 			<name>Hostname</name>
@@ -568,7 +568,7 @@
 			} else {
 				$_POST['ipaddress'] = $_POST['selectedtype'];
 				$config['interfaces']['wan']['ipaddr'] = $_POST['selectedtype'];
-				write_config(gettext("WAN interface configuration saved via pfSense setup wizard."));
+				write_config(gettext("WAN interface configuration saved via Kontrol setup wizard."));
 			}
 			if (!$config['interfaces']['lan']) {
 				header("Location: /wizard.php?xml=setup_wizard.xml&stepid=6&next=Next");
@@ -710,7 +710,7 @@
 			$admin_user =& getUserEntryByUID(0);
 			local_user_set_password($admin_user, $_POST['adminpassword']);
 			local_user_set($admin_user);
-			write_config(gettext("Admin WebGUI password saved via pfSense setup wizard."));
+			write_config(gettext("Admin WebGUI password saved via Kontrol setup wizard."));
 		} else {
 			print_info_box("Passwords do not match! Please press back in the browser window and correct.");
 			die;
@@ -723,7 +723,7 @@
 	<id>8</id>
 	<title>Reload configuration</title>
 	<disableheader>true</disableheader>
-	<description>Click 'Reload' to reload pfSense with new changes.</description>
+	<description>Click 'Reload' to reload Kontrol with new changes.</description>
 	<fields>
 		<field>
 			<name>Reload</name>
@@ -775,7 +775,7 @@
 		unset($config['wizardtemp']);
 		/* See https://redmine.pfsense.org/issues/8524 */
 		$config['system']['webgui']['althostnames'] = $althosts_before;
-		write_config(gettext("Configuration saved on completion of the pfSense setup wizard."));
+		write_config(gettext("Configuration saved on completion of the Kontrol setup wizard."));
 		reload_all();
 		mwexec_bg("/etc/rc.update_bogons.sh now");
 		touch("{$g['cf_conf_path']}/copynotice_display");
@@ -787,7 +787,7 @@
 	<title>Wizard completed.</title>
 	<stepbeforeformdisplay>
 	<![CDATA[
-		if ($g['product_name'] <> 'pfSense') {
+		if ($g['product_name'] <> 'Kontrol') {
 			header("Location: " . fixup_string("\$myurl"));
 			exit;
 		}
@@ -796,7 +796,7 @@
 	<description>
 	<![CDATA[
 	<div style="padding-right:25px;">
-		<p><h4>Congratulations! pfSense is now configured.</h4></p>
+		<p><h4>Congratulations! Kontrol is now configured.</h4></p>
 		<p>
 		We recommend that you check to see if there are any software updates available. Keeping your software up to date is
 		one of the most important things you can do to maintain the security of your network.</p>
@@ -804,7 +804,7 @@
 		<p></p>
 		<p><h4>Remember, we're here to help.</h4></p>
 		<p>
-		<a target='_blank' href='https://www.netgate.com/more-support-info/'><strong><span style="font-size:16px"> Click here</span></strong></a> to learn about Netgate 24/7/365 support services.</p><p>
+		<a target='_blank' href='http://kontrolsecurity.com.br/'><strong><span style="font-size:16px"> Click here</span></strong></a> to learn about kontrol support services.</p><p>
 		<input type="button" onclick="window.location.href='$myurl'" class="btn btn-sm btn-success" value="Finish"/>
 		</p>
 	</div>
