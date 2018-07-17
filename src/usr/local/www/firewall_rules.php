@@ -254,7 +254,15 @@ if (isset($_POST['del_x'])) {
 
 		if ($_POST['separator']) {
 			$idx = 0;
+			if (!is_array($config['filter']['separator'])) {
+				$config['filter']['separator'] = array();
+			}
+
 			foreach ($_POST['separator'] as $separator) {
+				if (!is_array($config['filter']['separator'][strtolower($separator['if'])]))  {
+					$config['filter']['separator'][strtolower($separator['if'])] = array();
+				}
+
 				$config['filter']['separator'][strtolower($separator['if'])]['sep' . $idx++] = $separator;
 			}
 		}
@@ -491,6 +499,13 @@ foreach ($a_filter as $filteri => $filterent):
 			pprint_port($filterent['destination']['port'])
 		);
 
+		if (!is_array($config['schedules'])) {
+			$config['schedules'] = array();
+		}
+
+		if (!is_array($config['schedules']['schedule'])) {
+			$config['schedules']['schedule'] = array();
+		}
 		//build Schedule popup box
 		$a_schedules = &$config['schedules']['schedule'];
 		$schedule_span_begin = "";

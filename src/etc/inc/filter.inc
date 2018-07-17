@@ -2226,7 +2226,7 @@ function filter_nat_rules_generate() {
 			}
 
 			/* if item is an alias, expand */
-			$dstport = "";
+			$dstport = array();
 			$dstport[0] = alias_expand($rule['destination']['port']);
 			if (!$dstport[0]) {
 				$dstport = explode("-", $rule['destination']['port']);
@@ -4438,7 +4438,7 @@ function display_separator($separators, $nrules, $columns_in_table) {
 			if ($separator['row'][0] == "fr" . $nrules) {
 				$cellcolor = $separator['color'];
 				print('<tr class="ui-sortable-handle separator">' .
-					'<td class="' . $cellcolor . '" colspan="' . ($columns_in_table -1) . '">' . '<span class="' . $cellcolor . '">' . $separator['text'] . '</span></td>' .
+					'<td class="' . $cellcolor . '" colspan="' . ($columns_in_table -1) . '">' . '<span class="' . $cellcolor . '">' . htmlspecialchars($separator['text']) . '</span></td>' .
 					'<td  class="' . $cellcolor . '"><a href="#"><i class="fa fa-trash no-confirm sepdel" title="' . gettext("delete this separator") . '"></i></a></td>' .
 					'</tr>' . "\n");
 			}
