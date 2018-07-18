@@ -1,0 +1,73 @@
+#!/bin/sh
+clear
+
+echo
+echo "***********"
+echo "**CAUTION**"
+echo "***********"
+echo
+echo "**This proccess will DELETE this machine from your AD/DOMAIN and DELETE any existing keytab**"
+echo
+
+while true; do
+    echo
+	read -p "Are you sure you want to continue? y/n  " yn
+    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) echo; echo " PROCESS STOPPED! If you need any help, Please read the Kontrol documentation or call the support"; exit;;
+        * ) echo "Please enter y or n.";;
+    esac
+done
+
+echo
+echo "Enter the ID with Domain Admin permissions (eg. Administrator)"
+read ad_account
+net ads leave -U $ad_account
+echo
+rm /etc/krb5.keytab  2> /dev/null
+echo
+
+/usr/local/etc/rc.d/samba_server restart
+
+# Getting the PID of the Winbindd process and kill it
+PID=`pgrep winbindd`
+
+# Number of seconds to wait before using "kill -9"
+WAIT_SECONDS=5
+
+# Counter to keep count of how many seconds have passed
+count=0
+
+while kill $PID 2> /dev/null
+do
+    # Wait for one second
+    sleep 1
+    # Increment the second counter
+    count=$((count+1))
+
+    # Has the process been killed? If so, exit the loop.
+    if ! ps -p $PID > /dev/null ; then
+        break
+    fi
+    # Have we exceeded $WAIT_SECONDS? If so, kill the process with "kill -9"
+    # and exit the loop
+    if [ $count -gt $WAIT_SECONDS ]; then
+        kill -9 $PID
+        break
+    fi
+done 
+
+#Starting WINBINND DAEMON MODE
+/usr/local/sbin/winbindd --daemon --configfile=/usr/local/etc/smb4.conf
+echo
+echo
+chown root:proxy /var/db/samba4/winbindd_privileged
+chmod -R 0750 /var/db/samba4/winbindd_privileged
+echo
+
+/usr/local/etc/rc.d/squid.sh restart
+echo
+echo "**********"
+echo "** DONE **"
+echo "**********"
+echo

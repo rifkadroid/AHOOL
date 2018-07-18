@@ -1,0 +1,80 @@
+#!/bin/sh
+
+echo "****************************************************************************"
+echo "**************************      WARNING      *******************************"
+echo "****************************************************************************"
+echo
+echo "****************************************************************************"
+echo "This process will delete the existing keytab file --> /etc/krb5.keytab "
+echo "CANCEL THIS PROCESS IN CASE YOU ARE NOT SURE ABOUT WHAT YOU ARE DOING"
+echo "Before you go ahead, please be aware that you must configure this machine to use"
+echo "the AD DNS service and Syncronize the internal clock with the AD NTP Server"
+echo "Also, this machine must be part of a Windows Domain to generate a keytab"
+echo "If this machine is NOT part of a Windows Domain, please check the JOIN DOMAIN menu"
+echo "****************************************************************************"
+
+while true; do
+    read -p "Are you sure you want to continue? y/n  " yn
+    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) echo; echo "OK. Stopping the script. Please read the Kontrol documentation or call the support"; exit;;
+        * ) echo "Please enter y or n.";;
+    esac
+done
+
+echo
+echo "Enter the ID/Account with Domain Admin permissions (eg. Administrator)"
+read ad_account
+kinit $ad_account
+
+echo "Enter the OU or CONTAINER you want to Join this Kontrol Box - (eg. Computers)"
+read ad_container
+#echo "Enter the Full Qualified Domain Name - FQDN (It must match the same one used when joining this machine to AD Domain - eg. kontrolbox.domain.com)"
+#read ad_fqdn
+
+ad_fqdn=`hostname`
+ad_hostname=`hostname -s`
+
+echo
+echo "Enter the Domain Controler FQDN or IP address (This can be any AD Controller)"
+read ad_dc
+
+
+echo
+echo
+echo $ad_fqdn " <-- This is the FQDN that will be used for the keytab SPN "
+echo
+echo
+while true; do
+    read -p "Is everything CORRECT? Do you want to continue? y/n  " yn
+    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) echo; echo " Please review the required information and start the process again. Hostname is set by the WEBGUI"; exit;;
+        * ) echo "Please enter y or n.";;
+    esac
+done
+
+echo
+echo
+
+# Deleting existing keytab file under /etc/
+rm /etc/krb5.keytab
+
+msktutil -c -b CN=$ad_container -s HTTP/$ad_fqdn -k /etc/krb5.keytab --computer-name "$ad_hostname"-K --upn HTTP/$ad_fqdn --server $ad_dc --verbose --enctypes 28
+
+chown root:proxy /etc/krb5.keytab
+chmod 0440 /etc/krb5.keytab
+ktutil -k /etc/krb5.keytab list
+
+echo
+echo
+echo "*******************************************************************************************************************"
+echo "Please check above if the file: /etc/krb5.keytab was created accordingly and if the SPN of this KONTROL BOX is OK"
+echo "In case nothing appeared or you mistyped something, please repeat the process and validate your credentials and FQDNs"
+echo "Additionaly, You can check the SPN manually using the command:  ktutil -k /etc/krb5.keytab list"
+echo "*******************************************************************************************************************"
+echo "In case you get KVNO errors during the Internet Access, please clear your Browser CACHE and try again"
+echo "*******************************************************************************************************************"
+echo
+
+
