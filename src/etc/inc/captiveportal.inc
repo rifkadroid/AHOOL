@@ -591,7 +591,7 @@ function captiveportal_init_rules($reinit = false) {
 	$cprules .= "# layer 2: pass ARP\n";
 	$cprules .= captiveportal_create_ipfw_rule("add", $rulenum,
 	    "pass layer2 mac-type arp,rarp");
-	$cprules .= "# pfsense requires for WPA\n";
+	$cprules .= "# Kontrol requires for WPA\n";
 	$cprules .= captiveportal_create_ipfw_rule("add", $rulenum,
 	    "pass layer2 mac-type 0x888e,0x88c7");
 	$cprules .= "# PPP Over Ethernet Session Stage/Discovery Stage\n";

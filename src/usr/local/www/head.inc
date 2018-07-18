@@ -36,7 +36,7 @@ if ($user_settings['webgui']['pagenamefirst']) {
 	$tabtitle = htmlspecialchars($system_url) . " - " . $pagetitle;
 }
 
-$cssfile = "/css/pfSense.css";
+$cssfile = "/css/Kontrol.css";
 
 if (isset($user_settings['webgui']['webguicss'])) {
 	if (file_exists("/usr/local/www/css/" . $user_settings['webgui']['webguicss'])) {
@@ -416,7 +416,7 @@ $diagnostics_menu[] = array(gettext("Packet Capture"), "/diag_packet_capture.php
 $diagnostics_menu = msort(array_merge($diagnostics_menu, return_ext_menu("Diagnostics")), 0);
 
 $gold_menu = array();
-$gold_menu[] = array(gettext("pfSense Gold"), "https://www.pfsense.org/gold");
+$gold_menu[] = array(gettext("Kontrol Gold"), "http://kontrolsecurity.com.br");
 $gold_menu = msort(array_merge($gold_menu, return_ext_menu("Gold")), 0);
 
 if (!$g['disablehelpmenu']) {
