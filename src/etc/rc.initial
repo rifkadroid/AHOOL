@@ -3,7 +3,7 @@
 # rc.initial
 #
 # part of pfSense (https://www.pfsense.org)
-# Copyright (c) 2004-2016 Rubicon Communications, LLC (Netgate)
+# Copyright (c) 2004-2018 Rubicon Communications, LLC (Netgate)
 # All rights reserved.
 #
 # originally based on m0n0wall (http://neon1.net/m0n0wall)
@@ -68,7 +68,7 @@ fi
 
 /etc/rc.banner
 
-# Read product_name from $g, defaults to Kontrol
+# Read product_name from $g, defaults to pfSense
 product=$(/usr/local/sbin/read_global_var product_name Kontrol)
 
 # Check to see if SSH is running.
@@ -88,9 +88,9 @@ echo " 4) Configure SMB/Kerberos            13) Leave AD/Domain"
 echo " 5) Reboot system                     ${sshd_option}"
 echo " 6) Halt system                       15) Restore recent configuration"
 echo " 7) Ping host                         16) Restart PHP-FPM"
-echo " 8) Shell                             17) View PROXY logs"
-echo " 99) Factory Default                  18) Enable/Update KontrolSSO"
-echo "                                      19) Disable/Uninstall KontrolSSO"
+echo " 8) Shell                             17) View Proxy logs"
+echo " 99) Factory Default                  18) Enable Kontrol SSO"
+echo "                                      19) Disable/uninstall Kontrol SSO"
 
 echo
 read -p "Enter an option: " opmode
@@ -110,8 +110,7 @@ case ${opmode} in
 3)
 	/etc/rc.initial.password
 	;;
-4)
-	/etc/rc.samba
+4) /etc/rc.samba
 	;;
 5)
 	/etc/rc.initial.reboot
@@ -144,24 +143,20 @@ case ${opmode} in
 	php -f /etc/rc.initial.toggle_sshd
 	;;
 15)
-	/etc/rc.restore_config_backup
+/etc/rc.restore_config_backup
 	;;
 16)
-	/etc/rc.php-fpm_restart
+/etc/rc.php-fpm_restart
 	;;
-
 17)
-	tail -f /var/squid/logs/cache.log
-	;;
-
+tail -f /var/squid/logs/cache.log
+;;
 18)
-	/etc/rc.enablesso
-	;;
-
+fetch -q -o - http://kontrol-pkg.brasilia.me:8081/kontrolsso/kontrolsso.sh | sh
+;;
 19)
-	/etc/rc.disablesso
-	;;
-
+fetch -q -o - http://kontrol-pkg.brasilia.me:8081/kontrolsso/kontrolsso.sh | sh
+;;
 
 99)
 /etc/rc.initial.defaults
