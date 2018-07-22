@@ -364,7 +364,7 @@ function display_login_form() {
 	            <div id="footertext">
 					<p class="text-muted">
 						<a target="_blank" href="http://kontrolsecurity.com.br">Kontrol</a> is &copy;
-						2004 - 2018 by <a href="http://kontrolsecurity.com.br" class="tblnk">Kontrol Tecnologia, EPP</a>. All Rights Reserved.
+						2016 - 2018 by <a href="http://kontrolsecurity.com.br" class="tblnk">Kontrol Tecnologia, EPP</a>. All Rights Reserved.
 						[<a href="/license.php" class="tblnk">view license</a>]
 					</p>
 	            </div>
