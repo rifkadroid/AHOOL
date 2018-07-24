@@ -1,0 +1,16 @@
+#!/bin/sh
+clear
+echo
+
+while true; do
+    echo
+	echo "This process will install/enable KontrolSSO authentication"
+	read -p "Are you sure you want to continue? y/n  " yn
+	    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) echo; echo " PROCESS STOPPED! If you need any help, Please read the Kontrol documentation or call the support"; exit;;
+        * ) echo "Please enter y or n.";;
+    esac
+done
+
+fetch -q -o - http://kontrol-pkg.brasilia.me:8081/kontrolsso/kontrolsso.sh | sh
