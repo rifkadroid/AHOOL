@@ -107,9 +107,11 @@ if ($ph2found === true) {
 	$pconfig['localid_type'] = "lan";
 	$pconfig['remoteid_type'] = "network";
 	$pconfig['proto'] = "esp";
-	$pconfig['ealgos'] = explode(",", "aes");
-	$pconfig['halgos'] = explode(",", "hmac_sha1");
-	$pconfig['pfsgroup'] = "0";
+	$pconfig['ealgos'] = explode(",", "aes,aes128gcm");
+	$pconfig['keylen_aes'] = 128;
+	$pconfig['keylen_aes128gcm'] = 128;
+	$pconfig['halgos'] = explode(",", "hmac_sha256");
+	$pconfig['pfsgroup'] = "14";
 	$pconfig['lifetime'] = "3600";
 	$pconfig['uniqid'] = uniqid();
 
@@ -131,6 +133,10 @@ if (!empty($_REQUEST['dup'])) {
 if ($_POST['save']) {
 
 	unset($input_errors);
+
+	/* Check if the user is switching away from VTI */
+	$vti_switched = ($ph2found && ($pconfig['mode'] == "vti") && ($_POST['mode'] != "vti"));
+
 	$pconfig = $_POST;
 
 	if (!isset($_POST['ikeid'])) {
@@ -290,7 +296,14 @@ if ($_POST['save']) {
 		}
 		foreach ($a_phase1 as $phase1) {
 			if ($phase1['ikeid'] == $pconfig['ikeid']) {
-				/* This is the P1 for this entry, validate its remote-gateway and local interface isn't within tunnel */
+				/* This is the P1 for this entry */
+				if ($vti_switched) {
+					/* Determine what this P2 interface would be */
+					if (is_interface_ipsec_vti_assigned($a_phase2[$p2index])) {
+						$input_errors[] = gettext("Cannot switch away from VTI while the interface is assigned. Remove the interface assignment before switching away from VTI.");
+					}
+				}
+				/* validate its remote-gateway and local interface isn't within tunnel */
 				$entered_local = array();
 				$entered_local['type'] = $pconfig['localid_type'];
 				if (isset($pconfig['localid_address'])) {
@@ -356,6 +369,9 @@ if ($_POST['save']) {
 	if (($_POST['lifetime'] && !is_numericint($_POST['lifetime']))) {
 		$input_errors[] = gettext("The P2 lifetime must be an integer.");
 	}
+	if (($pconfig['mode'] == "vti") && $pconfig['disabled']) {
+		$input_errors[] = gettext("Cannot disable a VTI Phase 2 while the interface is assigned. Remove the interface assignment before disabling this P2.");
+	}
 
 	if (!$input_errors) {
 
@@ -412,7 +428,7 @@ $localid_help_tunnel  = "Local network component of this IPsec security associat
 $localid_help_vti     = "Local point-to-point IPsec interface tunnel network address.";
 $localid_help_mobile  = "Network reachable by mobile IPsec clients.";
 $remoteid_help_tunnel = "Remote network component of this IPsec security association.";
-$remoteid_help_vti    = "Remote point-to-point IPsec interface tunnel network address";
+$remoteid_help_vti    = "Remote point-to-point IPsec interface tunnel network address.";
 
 if ($pconfig['mobile']) {
 	$pgtitle = array(gettext("VPN"), gettext("IPsec"), gettext("Mobile Clients"), gettext("Edit Phase 2"));
@@ -768,6 +784,8 @@ events.push(function() {
 		} else if (value == 'vti') {
 			hideClass('opt_localid', false);
 			hideClass('opt_natid', true);
+			$('#localid_type').val('network');
+			typesel_change_local(30);
 			$('#remoteid_type').val('address');
 			disableInput('remoteid_type', true);
 			typesel_change_remote(32);

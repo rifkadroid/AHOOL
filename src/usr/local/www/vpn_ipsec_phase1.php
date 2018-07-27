@@ -170,9 +170,9 @@ if (isset($p1index) && $a_phase1[$p1index]) {
 // default value for new P1 and failsafe to always have at least 1 encryption item for the Form_ListItem
 if (!is_array($pconfig['encryption']['item']) || count($pconfig['encryption']['item']) == 0) {
 	$item = array();
-	$item['encryption-algorithm'] = array('name' => "aes");
-	$item['hash-algorithm'] = "sha1";
-	$item['dhgroup'] = "2";
+	$item['encryption-algorithm'] = array('name' => "aes", 'keylen' => 128);
+	$item['hash-algorithm'] = "sha256";
+	$item['dhgroup'] = "14";
 	$pconfig['encryption']['item'][] = $item;
 }
 
@@ -441,6 +441,9 @@ if ($_POST['save']) {
 				}
 			}
 		}
+	}
+	if (is_array($old_ph1ent) && ipsec_vti($old_ph1ent) && $pconfig['disabled']) {
+		$input_errors[] = gettext("Cannot disable a Phase 1 with a child Phase 2 while the interface is assigned. Remove the interface assignment before disabling this P2.");
 	}
 
 	if (!$input_errors) {
