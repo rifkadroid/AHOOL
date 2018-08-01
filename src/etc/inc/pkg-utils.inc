@@ -342,10 +342,13 @@ function get_pkg_info($pkgs = 'all', $remote_repo_usage_disabled = false,
 
 	if (is_array($pkgs)) {
 		$pkg_filter = $pkgs;
-	} elseif ($pkgs != 'all') {
-		return array();
+		$pkgs = $g['pkg_prefix'] . '*';
+	} elseif ($pkgs == 'all') {
+		$pkgs = $g['pkg_prefix'] . '*';
 	}
-	$pkgs = $g['pkg_prefix'] . '*';
+
+	$base_packages = (substr($pkgs, 0, strlen($g['pkg_prefix'])) !=
+	    $g['pkg_prefix']);
 
 	if ($installed_pkgs_only && !is_pkg_installed($pkgs)) {
 		/*
@@ -382,13 +385,19 @@ function get_pkg_info($pkgs = 'all', $remote_repo_usage_disabled = false,
 	$search_items = array();
 	$info_items = array();
 
+	if ($base_packages) {
+		$repo_param = "";
+	} else {
+		$repo_param = "-r {$g['product_name']}";
+	}
+
 	/*
 	 * If we want more than just the currently installed packages or
 	 * we want up-to-date remote repo info then do a full pkg search
 	 */
 	if (!$installed_pkgs_only || !$remote_repo_usage_disabled) {
 		$did_search = true;
-		$search_rc = pkg_exec("search -r {$g['product_name']} " .
+		$search_rc = pkg_exec("search {$repo_param} " .
 		    "{$extra_param}-R --raw-format json-compact " .
 		    $pkgs, $search_out, $search_err);
 		if ($search_rc == 0) {
@@ -474,7 +483,8 @@ function get_pkg_info($pkgs = 'all', $remote_repo_usage_disabled = false,
 		if (is_pkg_installed($pkg_info['name'])) {
 			$rc = pkg_exec("query %R {$pkg_info['name']}", $out,
 			    $err);
-			if (rtrim($out) != $g['product_name']) {
+			if (!$base_packages &&
+			    rtrim($out) != $g['product_name']) {
 				continue;
 			}
 
