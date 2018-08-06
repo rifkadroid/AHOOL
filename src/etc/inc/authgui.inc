@@ -156,9 +156,7 @@ function display_error_form($http_code, $desc) {
 			<footer id="3">
 			<div id="footertext">
 					<p class="text-muted">
-						<a target="_blank" href="http://kontrolsecurity.com.br">Kontrol</a> is &copy;
-						2016 - 2018 by <a href="http://kontrolsecurity.com.br" class="tblnk">Kontrol Tecnologia, EPP</a>. All Rights Reserved.
-						[<a href="/license.php" class="tblnk">view license</a>]
+						<?=print_credit()?>
 					</p>
 				</div>
 			</footer>
@@ -256,7 +254,7 @@ function display_login_form() {
 	// For the login form, get the settings of no particular user.
 	// That ensures we will use the system default theme for the login form.
 	$user_settings = get_user_settings("");
-	$cssfile = "/css/Kontrol.css";
+	$cssfile = "/css/pfSense.css";
 
 	if (isset($user_settings['webgui']['webguicss'])) {
 		if (file_exists("/usr/local/www/css/" . $user_settings['webgui']['webguicss'])) {
@@ -363,9 +361,7 @@ function display_login_form() {
 	        <footer id="3">
 	            <div id="footertext">
 					<p class="text-muted">
-						<a target="_blank" href="http://kontrolsecurity.com.br">Kontrol</a> is &copy;
-						2016 - 2018 by <a href="http://kontrolsecurity.com.br" class="tblnk">Kontrol Tecnologia, EPP</a>. All Rights Reserved.
-						[<a href="/license.php" class="tblnk">view license</a>]
+						<?=print_credit()?>
 					</p>
 	            </div>
 	        </footer>
