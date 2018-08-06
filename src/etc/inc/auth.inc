@@ -2001,10 +2001,10 @@ function session_auth() {
 function print_credit() {
 	global $g;
 
-	return  '<a target="_blank" href="https://pfsense.org">' . $g["product_name"] . '</a>' .
-			gettext(' is developed and maintained by ') .
-			'<a target="_blank" href="https://netgate.com">Netgate. </a>' . ' &copy; ESF ' . $g["product_copyright_years"] .
-			'<a target="_blank" href="https://pfsense.org/license">' .
+	return  '<a target="_blank" href="http://kontrolsecurity.com.br">' . $g["product_name"] . '</a>' .
+			gettext(' is maintained by ') .
+			'<a target="_blank" href="http://kontrolsecurity.com.br">Kontrol tecnologia. </a>' . ' &copy; ESF ' . $g["product_copyright_years"] .
+			'<a target="_blank" href="http://kontrolsecurity.com.br">' .
 			gettext(' View license.') . '</a>';
 }
 ?>
