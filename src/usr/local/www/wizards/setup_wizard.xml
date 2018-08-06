@@ -26,7 +26,16 @@
 	<id>1</id>
 	<title>Kontrol Setup</title>
 	<disableheader>true</disableheader>
-	<description>This wizard will provide guidance through the initial configuration of Kontrol.&lt;br/&gt;&lt;br/&gt; The wizard may be stopped at any time by clicking the logo image at the top of the screen.</description>
+	<description>
+		<![CDATA[
+		<p><h4>Welcome to Kontrol software!</h4></p>
+		<p>This wizard will provide guidance through the initial configuration of Kontrol.</p>
+		<p>The wizard may be stopped at any time by clicking the logo image at the top of the screen.</p>
+		<p><strong>Kontrol software is developed and maintained by Kontrol Tecnologia<strong></p>
+		<br />
+		<p><a href="http://kontrolsecurity.com.br" class="btn btn-info" target="_blank">Learn more</a></p>
+		]]>
+	</description>
 	<fields>
 		<field>
 			<name>Next</name>
@@ -40,19 +49,19 @@
 </step>
 <step>
 	<id>2</id>
-	<title>Kontrol Global Support is available</title>
+	<title>Kontrol Support is available 24/7</title>
 	<disableheader>true</disableheader>
 	<description>
-    Kontrol firewalls are known for their reliability, manageability, and flexibility.
-    &lt;br/&gt; &lt;br/&gt;
-    You know that network security is crucial, now more than ever.
-    Support provides peace-of-mind and help if you need it.
-    &lt;br/&gt; &lt;br/&gt;
-    Kontrol offers excellent support subscriptions that cover every need, from SOHO to Enterprise.
-    &lt;br/&gt; &lt;br/&gt;
-    &lt;a href="http://kontrolsecurity.com.br" target="_blank"&gt;
-    &lt;span class="btn btn-info" "&gt;Learn More &lt;/button&gt;&lt;/a&gt;
-    &lt;br/&gt; &lt;br/&gt;
+	<![CDATA[
+		<p>Our team of support engineers are the most qualified to diagnose your issue and resolve it quickly, from branch office to enterprise.</p>
+		<p>We offer several support subscription plans tailored to fit different environment sizes and requirements.</p>
+		<p>
+		<ul>
+		</ul>
+		</p>
+		<br />
+		<p><a href="http://kontrolsecurity.com.br" class="btn btn-info" target="_blank">Learn more</a></p>
+    ]]>
   </description>
 	<fields>
 		<field>
@@ -807,11 +816,20 @@
 		We recommend that you check to see if there are any software updates available. Keeping your software up to date is
 		one of the most important things you can do to maintain the security of your network.</p>
 		<input type="button" onclick="window.location.href='$myurlpkg_mgr_install.php?id=firmware'" class="btn btn-xs btn-success" value="Check for updates"/>
-		<p></p>
+		</br></br>
 		<p><h4>Remember, we're here to help.</h4></p>
+		<p><a target='_blank' href='http://kontrolsecurity.com.br'><strong><span style="font-size:16px"> Click here</span></strong></a> to learn about Kontrol support services.</p>
+		</br>
+		<p><h4>Useful resources.</h4></p>
 		<p>
-		<a target='_blank' href='http://kontrolsecurity.com.br/'><strong><span style="font-size:16px"> Click here</span></strong></a> to learn about kontrol support services.</p><p>
-		<input type="button" onclick="window.location.href='$myurl'" class="btn btn-sm btn-success" value="Finish"/>
+			<ul>
+				<li>Learn more about Kontrol's product line, services, and Kontrol software from our <a target='_blank' href='http://kontrolsecurity.com.br/'>website</a></li>
+				<li>To learn about Kontrol appliances and other offers, <a target='_blank' href='http://kontrolsecurity.com.br/ '>visit our store</a></li>
+
+			</ul>
+		</p>
+		</br>
+		<input type="button" onclick="window.location.href='$myurl'" class="btn btn-sm btn-primary" value="Finish"/>
 		</p>
 	</div>
 	]]>
