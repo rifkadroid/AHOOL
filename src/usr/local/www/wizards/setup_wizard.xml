@@ -24,7 +24,7 @@
 <totalsteps>10</totalsteps>
 <step>
 	<id>1</id>
-	<title>pfSense Setup</title>
+	<title>Kontrol Setup</title>
 	<disableheader>true</disableheader>
 	<description>
 		<![CDATA[
@@ -818,14 +818,14 @@
 		<input type="button" onclick="window.location.href='$myurlpkg_mgr_install.php?id=firmware'" class="btn btn-xs btn-success" value="Check for updates"/>
 		</br></br>
 		<p><h4>Remember, we're here to help.</h4></p>
-		<p><a target='_blank' href='https://kontrolsecurity.com.br/pfw2'><strong><span style="font-size:16px"> Click here</span></strong></a> to learn about Kontrol support services.</p>
+		<p><a target='_blank' href='https://kontrolsecurity.com.br/'><strong><span style="font-size:16px"> Click here</span></strong></a> to learn about Kontrol support services.</p>
 		</br>
 		<p><h4>Useful resources.</h4></p>
 		<p>
 			<ul>
 				<li>Learn more about Kontrol's product line, services, and Kontrol software from our <a target='_blank' href='https://kontrolsecurity.com.br/'>website</a></li>
-				<li>To learn about Netgate appliances and other offers, <a target='_blank' href='https://kontrolsecurity.com.br/'>visit our store</a></li>
-				
+				<li>To learn about Kontrol appliances and other offers, <a target='_blank' href='https://kontrolsecurity.com.br/'>visit our page</a></li>
+
 			</ul>
 		</p>
 		</br>
