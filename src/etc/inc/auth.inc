@@ -211,6 +211,22 @@ if (function_exists("display_error_form") && !isset($config['system']['webgui'][
 					$found_host = true;
 				}
 			}
+
+			/* Fall back to probing active interface addresses rather than config.xml to allow
+			 * changed addresses that have not yet been applied.
+			 * See https://redmine.pfsense.org/issues/8822
+			 */
+			if (!$found_host) {
+				$refifs = get_interface_arr();
+				foreach ($refifs as $rif) {
+					if (($referrer_host == find_interface_ip($rif)) ||
+					    ($referrer_host == find_interface_ipv6($rif)) ||
+					    ($referrer_host == find_interface_ipv6_ll($rif))) {
+						$found_host = true;
+						break;
+					}
+				}
+			}
 		}
 		if ($found_host == false) {
 			if (!security_checks_disabled()) {
@@ -1931,13 +1947,22 @@ function session_auth() {
 			session_regenerate_id();
 			$_SESSION['Logged_In'] = "True";
 			$_SESSION['remoteauth'] = $remoteauth;
+			if ($remoteauth) {
+				if (empty($authcfg['type']) || ($authcfg['type'] == "Local Auth")) {
+					$_SESSION['authsource'] = gettext("Local Database");
+				} else {
+					$_SESSION['authsource'] = strtoupper(gettext($authcfg['type'])) . "/{$authcfg['name']}";
+				}
+			} else {
+				$_SESSION['authsource'] = gettext('Local Database Fallback') ;
+			}
 			$_SESSION['Username'] = $_POST['usernamefld'];
 			$_SESSION['user_radius_attributes'] = $attributes;
 			$_SESSION['last_access'] = time();
 			$_SESSION['protocol'] = $config['system']['webgui']['protocol'];
 			phpsession_end(true);
 			if (!isset($config['system']['webgui']['quietlogin'])) {
-				log_auth(sprintf(gettext("Successful login for user '%1\$s' from: %2\$s"), $_POST['usernamefld'], $_SERVER['REMOTE_ADDR']));
+				log_auth(sprintf(gettext("Successful login for user '%1\$s' from: %2\$s"), $_POST['usernamefld'], get_user_remote_address() . get_user_remote_authsource()));
 			}
 			if (isset($_POST['postafterlogin'])) {
 				return true;
@@ -1951,7 +1976,7 @@ function session_auth() {
 		} else {
 			/* give the user an error message */
 			$_SESSION['Login_Error'] = gettext("Username or Password incorrect");
-			log_auth("webConfigurator authentication error for '{$_POST['usernamefld']}' from {$_SERVER['REMOTE_ADDR']}");
+			log_auth(sprintf(gettext("webConfigurator authentication error for user '%1\$s' from: %2\$s"), $_POST['usernamefld'], get_user_remote_address() . get_user_remote_authsource()));
 			if (isAjax()) {
 				echo "showajaxmessage('{$_SESSION['Login_Error']}');";
 				return;
@@ -1996,9 +2021,9 @@ function session_auth() {
 	if (isset($_POST['logout'])) {
 
 		if ($_SESSION['Logout']) {
-			log_error(sprintf(gettext("Session timed out for user '%1\$s' from: %2\$s"), $_SESSION['Username'], $_SERVER['REMOTE_ADDR']));
+			log_error(sprintf(gettext("Session timed out for user '%1\$s' from: %2\$s"), $_SESSION['Username'], get_user_remote_address() . get_user_remote_authsource()));
 		} else {
-			log_error(sprintf(gettext("User logged out for user '%1\$s' from: %2\$s"), $_SESSION['Username'], $_SERVER['REMOTE_ADDR']));
+			log_error(sprintf(gettext("User logged out for user '%1\$s' from: %2\$s"), $_SESSION['Username'], get_user_remote_address() . get_user_remote_authsource()));
 		}
 
 		/* wipe out $_SESSION */
@@ -2052,5 +2077,21 @@ function print_credit() {
 			'<a target="_blank" href="http://kontrolsecurity.com.br">Kontrol tecnologia. </a>' . ' &copy; ESF ' . $g["product_copyright_years"] .
 			'<a target="_blank" href="http://kontrolsecurity.com.br">' .
 			gettext(' View license.') . '</a>';
+}
+function get_user_remote_address() {
+	$remote_address = $_SERVER['REMOTE_ADDR'];
+	if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+		$remote_address .= "[{$_SERVER['HTTP_CLIENT_IP']}]";
+	} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+		$remote_address .= "[{$_SERVER['HTTP_X_FORWARDED_FOR']}]";
+	}
+	return $remote_address;
+}
+function get_user_remote_authsource() {
+	$authsource = "";
+	if (!empty($_SESSION['authsource'])) {
+		$authsource .= " ({$_SESSION['authsource']})";
+	}
+	return $authsource;
 }
 ?>

@@ -268,6 +268,21 @@ function interface_is_qinq($if = NULL) {
 	return (NULL);
 }
 
+function interface_is_lagg($if = NULL) {
+	global $config;
+
+	if (!isset($config['laggs']['lagg']) || !is_array($config['laggs']['lagg'])) {
+		return (NULL);
+	}
+
+	foreach ($config['laggs']['lagg'] as $lagg) {
+		if ($lagg['laggif'] == $if) {
+			return ($lagg);
+		}
+	}
+	return (NULL);
+}
+
 function vlan_inuse($vlan) {
 	global $config;
 
@@ -288,7 +303,7 @@ function vlan_inuse($vlan) {
 function interface_is_vlan($if = NULL) {
 	global $config;
 
-	if ($if == NULL || empty($if)) {
+	if ($if == NULL || empty($if) || is_array($if)) {
 		return (NULL);
 	}
 
@@ -4918,11 +4933,16 @@ function DHCP6_Config_File_Substitutions($wancfg, $wanif, $dhcp6cconf) {
 
 
 function interface_dhcp_configure($interface = "wan") {
-	global $config, $g;
+	global $config, $g, $vlanprio_values;
 
 	$ifcfg = $config['interfaces'][$interface];
 	if (empty($ifcfg)) {
 		$ifcfg = array();
+	}
+
+	$dhclientconf_vlantag = "";
+	if (isset($ifcfg['dhcpvlanenable']) && isset($ifcfg['dhcpcvpt'])) {
+		$dhclientconf_vlantag = "vlan-pcp {$vlanprio_values[$ifcfg['dhcpcvpt']]};\n";
 	}
 
 	/* generate dhclient_wan.conf */
@@ -4953,6 +4973,7 @@ interface "{$realif}" {
 	retry 15;
 	select-timeout 0;
 	initial-interval 1;
+	{$dhclientconf_vlantag}
 	{$dhclientconf_hostname}
 	script "/usr/local/sbin/pfSense-dhclient-script";
 EOD;
@@ -5403,6 +5424,14 @@ function get_parent_interface($interface, $avoidrecurse = false) {
 		$vlan = interface_is_vlan($realif);
 		if ($vlan != NULL) {
 			$parents[0] = $vlan['if'];
+		}
+	}
+
+	if (empty($parents)) {
+		/* Handle LAGGs. */
+		$lagg = interface_is_lagg($realif);
+		if ($lagg != NULL && isset($lagg['members'])) {
+			$parents = explode(",", $lagg['members']);
 		}
 	}
 
