@@ -31,7 +31,7 @@
 		<p><h4>Welcome to Kontrol® software!</h4></p>
 		<p>This wizard will provide guidance through the initial configuration of Kontrol.</p>
 		<p>The wizard may be stopped at any time by clicking the logo image at the top of the screen.</p>
-		<p><strong>Kontrol® software is maintained by Kontrol tecnologia®<strong></p>
+		<p><strong>Kontrol® software is developed and maintained by Kontrol Tecnologia®<strong></p>
 		<br />
 		<p><a href="https://kontrolsecurity.com.br/" class="btn btn-info" target="_blank">Learn more</a></p>
 		]]>
@@ -49,18 +49,21 @@
 </step>
 <step>
 	<id>2</id>
-	<title>Kontrol® Support is available/title>
+	<title>Kontrol Support is available</title>
 	<disableheader>true</disableheader>
 	<description>
 	<![CDATA[
-		<p>Our team of support engineers are the most qualified to diagnose your issue and resolve it quickly, from branch office to enterprise.</p>
-		<p>We offer several support subscription plans tailored to fit different environment sizes and requirements.</p>
+		<p>Our 24/7 worldwide team of support engineers are the most qualified to diagnose your issue and resolve it quickly, from branch office to enterprise — on premises to cloud.</p>
+		<p>We offer several support subscription plans tailored to fit different environment sizes and requirements. Many companies around the world choose Kontrol support because:</p>
 		<p>
 		<ul>
+			<li>Support is available 24 hours a day, seven days a week, including holidays.</li>
+			<li>Support engineers are located around the world, ensuring that no support call is missed.</li>
+			<li>Our support engineers hold many prestigious network engineer certificates and have years of hands-on experience with networking.</li>
 		</ul>
 		</p>
 		<br />
-		<p><a href="https://kontrolsecurity.com.br/pfw2" class="btn btn-info" target="_blank">Learn more</a></p>
+		<p><a href="https://kontrolsecurity.com.br/" class="btn btn-info" target="_blank">Learn more</a></p>
     ]]>
   </description>
 	<fields>
@@ -811,7 +814,7 @@
 	<description>
 	<![CDATA[
 	<div style="padding-right:25px;">
-		<p><h4>Congratulations! Kontrol is now configured.</h4></p>
+		<p><h4>Congratulations! pfSense is now configured.</h4></p>
 		<p>
 		We recommend that you check to see if there are any software updates available. Keeping your software up to date is
 		one of the most important things you can do to maintain the security of your network.</p>
@@ -824,8 +827,9 @@
 		<p>
 			<ul>
 				<li>Learn more about Kontrol's product line, services, and Kontrol software from our <a target='_blank' href='https://kontrolsecurity.com.br/'>website</a></li>
-				<li>To learn about Kontrol appliances and other offers, <a target='_blank' href='https://kontrolsecurity.com.br/'>visit our page</a></li>
-
+				<li>To learn about Kontrol appliances and other offers, <a target='_blank' href='https://kontrolsecurity.com.br/'>visit our store</a></li>
+				<li>Become part of the Kontrol community. Visit our <a target='_blank' href='https://kontrolsecurity.com.br/'>forum</a></li>
+				<li>Subscribe to our <a target='_blank' href='https://kontrolsecurity.com.br/'>newsletter</a> for ongoing product information, software announcements and special offers.</li>
 			</ul>
 		</p>
 		</br>
