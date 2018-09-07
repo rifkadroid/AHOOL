@@ -27,7 +27,8 @@ require_once("guiconfig.inc");
 
 $copyrightfile = "{$g['cf_conf_path']}/copyright";
 $tmpfile = "{$g['cf_conf_path']}/copyright.tmp";
-$idfile = "/var/db/uniqueid";
+# DIsabled by Kontrol - Disabled third party copy license notice below from uniqueid to uniqueid_old (that doesn't exist)
+$idfile = "/var/db/uniqueid_old";
 $FQDN = "https://kontrolsecurity.com.br/";
 $refreshinterval = (24 * 3600);	// 24 hours
 
