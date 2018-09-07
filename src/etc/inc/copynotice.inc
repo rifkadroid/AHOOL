@@ -51,7 +51,7 @@ $copyrightfile = "{$g['cf_conf_path']}/copyright";
 					<p align=\"center\"><strong>NO COMMERCIAL DISTRIBUTION IS ALLOWED.</strong>
 					</p>
 					<p>Kontrol is a federally and internationally registered trademark and service mark of ESF, and is exclusively licensed to Kontrol Tecnologia EPP.</p>
-					<p>Any unauthorized use of the Kontrol&reg; mark is prohibited by Brazilian and international laws. Please refer to the Kontrol <a href=\"https://kontrolsecurity.com.br/" target=\"_blank\"> Trademark Usage Guidelines</a> for how to properly use the mark.</p>
+					<p>Any unauthorized use of the Kontrol&reg; mark is prohibited by Brazilian and international laws.</p>
 					</div>
 					<div class=\"modal-footer\" style=\"background-color:#1e3f75; color:white;\">
 					<button type=\"button\" class=\"btn btn-xs btn-success\" data-dismiss=\"modal\" aria-label=\"Close\">
