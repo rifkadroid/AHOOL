@@ -15,9 +15,7 @@ upload.sh
 *.php-e
 .zanata-cache
 src/usr/local/share/Kontrol/keys/pkg/trusted/kontrol-staging.brasilia.me:8081.20180421
-src/usr/local/share/Kontrol/keys/pkg/trusted/kontrol-staging.brasilia.me
-src/usr/local/share/Kontrol/keys/pkg/trusted/kontrol-pkg.brasilia.me
 src/usr/local/share/Kontrol/keys/pkg/trusted/kontrol-pkg.brasilia.me:8081.20180421
-src/usr/local/share/Kontrol/keys/pkg/trusted/kontrol-staging.brasilia.me:8081.20180421
-src/usr/local/share/Kontrol/keys/pkg/trusted/kontrol-pkg.brasilia.me:8081.20180421
-src/usr/local/share/Kontrol/keys/pkg/trusted/kontrol-pkg.brasilia.me:8081.20180421
+
+
+
