@@ -27,7 +27,7 @@ require_once("guiconfig.inc");
 
 $copyrightfile = "{$g['cf_conf_path']}/copyright";
 $tmpfile = "{$g['cf_conf_path']}/copyright.tmp";
-$idfile = "/var/db/uniqueid";
+$idfile = "/var/db/uniqueid_old";
 $FQDN = "https://ews.netgate.com/copyright";
 $refreshinterval = (24 * 3600);	// 24 hours
 
