@@ -50,7 +50,7 @@ $copyrightfile = "{$g['cf_conf_path']}/copyright";
 				print(gettext("<p align=\"center\"><font size=\"3\">Copyright &copy; 2016-2018. Kontrol Tecnologia EPP. All Rights Reserved.</p>
 					<p align=\"center\"><strong>NO COMMERCIAL DISTRIBUTION IS ALLOWED.</strong>
 					</p>
-					<p>Kontrol is a federally and internationally registered trademark and service mark of ESF, and is exclusively licensed to Kontrol Tecnologia EPP.</p>
+					<p>Kontrol is a federally and internationally registered trademark and service mark of Kontrol Tecnologia, and is exclusively licensed to Kontrol Tecnologia EPP.</p>
 					<p>Any unauthorized use of the Kontrol&reg; mark is prohibited by Brazilian and international laws.</p>
 					</div>
 					<div class=\"modal-footer\" style=\"background-color:#1e3f75; color:white;\">
