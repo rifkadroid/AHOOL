@@ -172,6 +172,11 @@ if ($_POST['save']) {
 					$input_errors[] = gettext("An IPv6 local address was specified but the mode is not set to tunnel6");
 				}
 				break;
+			default:
+				if (($pconfig['mode'] == "vti") && !is_ipaddr($pconfig['localid_address'])) {
+					$input_errors[] = gettext("VTI requires a valid local network or IP address for its endpoint address, it cannot use a network macro for a different interface (e.g. LAN).");
+				}
+
 		}
 		/* Check if the localid_type is an interface, to confirm if it has a valid subnet. */
 		if (is_array($config['interfaces'][$pconfig['localid_type']])) {
@@ -238,6 +243,10 @@ if ($_POST['save']) {
 	/* Validate enabled phase2's are not duplicates */
 	if (isset($pconfig['mobile'])) {
 		/* User is adding phase 2 for mobile phase1 */
+		if ($pconfig['mode'] == "vti") {
+			$input_errors[] = gettext("VTI is not compatible with mobile IPsec.");
+		}
+
 		foreach ($a_phase2 as $key => $name) {
 			if (isset($name['mobile']) && $name['uniqid'] != $pconfig['uniqid']) {
 				/* check duplicate localids only for mobile clents */
@@ -786,11 +795,9 @@ events.push(function() {
 			hideClass('opt_natid', true);
 			$('#localid_type').val('network');
 			typesel_change_local(30);
-			var address_is_blank = !/\S/.test($('#remoteid_address').val());
-			if (address_is_blank) {
-				$('#remoteid_type').val('address');
-				typesel_change_remote(32);
-			}
+			$('#remoteid_type').val('address');
+			disableInput('remoteid_type', true);
+			typesel_change_remote(32);
 			$('#opt_localid_help').html("<?=$localid_help_vti?>");
 			$('#opt_remoteid_help').html("<?=$remoteid_help_vti?>");
 		} else {
