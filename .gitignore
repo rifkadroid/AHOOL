@@ -2,7 +2,6 @@
 _notes/
 /tmp/
 /logs/
-/build.conf
 # Ignore Vim swap files
 .*.swp
 upload.sh
@@ -14,5 +13,3 @@ upload.sh
 .idea
 *.php-e
 .zanata-cache
-kontrol-staging.brasilia.me:8081.20180421
-kontrol-pkg.brasilia.me:8081.20180421
