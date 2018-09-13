@@ -217,7 +217,7 @@ function gen_webguicss_field(&$section, $value) {
 	$csslist = get_css_files();
 
 	if (!isset($csslist[$value])) {
-		$value = "pfSense.css";
+		$value = "Kontrol.css";
 	}
 
 	$section->addInput(new Form_Select(
@@ -3391,12 +3391,12 @@ function compare_by_name($a, $b) {
  * NAME
  *   getarraybyref
  * INPUTS
- *   $array the array of which a items array needs to be found. 
+ *   $array the array of which a items array needs to be found.
  *   $args.. the sub-items to be retrieved/created
  * RESULT
  *   returns the array that was retrieved from configuration, its created if it does not exist
  * NOTES
- *   Used by haproxy / acme / others.?. . 
+ *   Used by haproxy / acme / others.?. .
  *   can be used like this:  $a_certificates = getarraybyref($config, 'installedpackages', 'acme', 'certificates', 'item');
  ******/
 function &getarraybyref(&$array) {
