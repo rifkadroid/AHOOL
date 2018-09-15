@@ -1162,7 +1162,7 @@ function load_loader_conf($loader_conf = NULL, $local = false) {
 	/* These values should be removed from loader.conf and loader.conf.local
 	 * As they will be replaced when necessary. */
 	$remove = array("hw.usb.no_pf", "hint.mdio.0.at", "hint.e6000sw.0",
-	    "vm.pmap.pti");
+	    "hw.e6000sw.default_disabled", "vm.pmap.pti");
 	if (!$local) {
 		/* These values should only be filtered in loader.conf, not .local */
 		$remove = array_merge($remove,
@@ -1174,8 +1174,15 @@ function load_loader_conf($loader_conf = NULL, $local = false) {
 		if (empty($line)) {
 			continue;
 		}
+		$skip = false;
 		list($name, $value) = explode('=', $line, 2);
-		if (!in_array(trim($name), $remove)) {
+		foreach($remove as $rid => $rkey) {
+			if (strncasecmp(trim($name), $rkey, strlen($rkey)) != 0) {
+				$skip = true;
+				break;
+			}
+		}
+		if (!$skip) {
 			$data[] = $line;
 		}
 	}
@@ -1239,7 +1246,7 @@ function setup_loader_settings($path = "", $upgrade = false) {
 		system("echo \"Reading {$loader_conf_file}...\" >> /conf/upgrade_log.txt");
 	}
 
-	$data = load_loader_conf($loader_conf_file);
+	$data = load_loader_conf($loader_conf_file, false);
 	if ($serial_only === true) {
 		$data[] = 'boot_serial="YES"';
 		$data[] = 'console="comconsole"';
