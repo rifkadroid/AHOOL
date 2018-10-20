@@ -31,10 +31,12 @@ net-mgmt/%%PRODUCT_NAME%%-pkg-zabbix-agent
 net-mgmt/%%PRODUCT_NAME%%-pkg-zabbix-agent22
 net-mgmt/%%PRODUCT_NAME%%-pkg-zabbix-agent32
 net-mgmt/%%PRODUCT_NAME%%-pkg-zabbix-agent34
+net-mgmt/%%PRODUCT_NAME%%-pkg-zabbix-agent4
 net-mgmt/%%PRODUCT_NAME%%-pkg-zabbix-proxy
 net-mgmt/%%PRODUCT_NAME%%-pkg-zabbix-proxy22
 net-mgmt/%%PRODUCT_NAME%%-pkg-zabbix-proxy32
 net-mgmt/%%PRODUCT_NAME%%-pkg-zabbix-proxy34
+net-mgmt/%%PRODUCT_NAME%%-pkg-zabbix-proxy4
 net-mgmt/dhcp_probe
 net-mgmt/iprange
 net-mgmt/net-snmp
@@ -82,6 +84,7 @@ sysutils/%%PRODUCT_NAME%%-pkg-Shellcmd
 sysutils/%%PRODUCT_NAME%%-pkg-System_Patches
 sysutils/%%PRODUCT_NAME%%-pkg-apcupsd
 sysutils/%%PRODUCT_NAME%%-pkg-blinkled
+sysutils/%%PRODUCT_NAME%%-pkg-filer
 sysutils/%%PRODUCT_NAME%%-pkg-gwled
 sysutils/%%PRODUCT_NAME%%-pkg-nut
 sysutils/%%PRODUCT_NAME%%-pkg-syslog-ng
