@@ -45,7 +45,10 @@ function activate_powerd() {
 			$normal_mode = $config['system']['powerd_normal_mode'];
 		}
 
-		mwexec("/usr/sbin/powerd -b $battery_mode -a $ac_mode -n $normal_mode");
+		mwexec("/usr/sbin/powerd" .
+			" -b " . escapeshellarg($battery_mode) .
+			" -a " . escapeshellarg($ac_mode) .
+			" -n " . escapeshellarg($normal_mode));
 	}
 }
 
@@ -126,6 +129,7 @@ function system_resolvconf_generate($dynupdate = false) {
 		$resolvconf .= "nameserver $dns_ns\n";
 	}
 
+	$ns = array();
 	if (isset($syscfg['dnsallowoverride'])) {
 		/* get dynamically assigned DNS servers (if any) */
 		$ns = array_unique(get_searchdomains());
@@ -134,8 +138,8 @@ function system_resolvconf_generate($dynupdate = false) {
 				$resolvconf .= "search {$searchserver}\n";
 			}
 		}
-	} else {
-		$ns = array();
+	}
+	if (empty($ns)) {
 		// Do not create blank search/domain lines, it can break tools like dig.
 		if ($syscfg['domain']) {
 			$resolvconf .= "search {$syscfg['domain']}\n";
@@ -866,6 +870,7 @@ function clear_log_file($logfile = "/var/log/system.log", $restart_syslogd = tru
 		touch($logfile);
 	} else {
 		$log_size = isset($config['syslog']['logfilesize']) ? $config['syslog']['logfilesize'] : "511488";
+		$log_size = ($log_size < (2**32)/2) ? $log_size : "511488";
 		$log_size = isset($config['syslog'][basename($logfile, '.log') . '_settings']['logfilesize']) ? $config['syslog'][basename($logfile, '.log') . '_settings']['logfilesize'] : $log_size;
 		exec("/usr/local/sbin/clog -i -s {$log_size} " . escapeshellarg($logfile));
 	}
@@ -1141,10 +1146,34 @@ EOD;
 		$sighup = false;
 	}
 
+	$sshguard_whitelist = array();
+	if (!empty($config['system']['sshguard_whitelist'])) {
+		$sshguard_whitelist = explode(' ',
+		    $config['system']['sshguard_whitelist']);
+	}
+
 	$sshguard_config = array();
 	$sshguard_config[] = 'BACKEND="/usr/local/libexec/sshg-fw-pf"' . "\n";
-	/* XXX Add a GUI option to user to define it? */
-	$sshguard_config[] = 'DETECTION_TIME=3600' . "\n";
+	if (!empty($config['system']['sshguard_threshold'])) {
+		$sshguard_config[] = 'THRESHOLD=' .
+		    $config['system']['sshguard_threshold'] . "\n";
+	}
+	if (!empty($config['system']['sshguard_blocktime'])) {
+		$sshguard_config[] = 'BLOCK_TIME=' .
+		    $config['system']['sshguard_blocktime'] . "\n";
+	}
+	if (!empty($config['system']['sshguard_detection_time'])) {
+		$sshguard_config[] = 'DETECTION_TIME=' .
+		    $config['system']['sshguard_detection_time'] . "\n";
+	}
+	if (!empty($sshguard_whitelist)) {
+		@file_put_contents("/usr/local/etc/sshguard.whitelist",
+		    implode(PHP_EOL, $sshguard_whitelist));
+		$sshguard_config[] =
+		    'WHITELIST_FILE=/usr/local/etc/sshguard.whitelist' . "\n";
+	} else {
+		unlink_if_exists("/usr/local/etc/sshguard.whitelist");
+	}
 	file_put_contents("/usr/local/etc/sshguard.conf", $sshguard_config);
 
 	if (!$sighup) {
