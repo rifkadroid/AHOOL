@@ -41,14 +41,7 @@ function is_dyndns_username($uname) {
 
 require_once("guiconfig.inc");
 
-if (!is_array($config['dyndnses'])) {
-	$config['dyndnses'] = array();
-}
-
-if (!is_array($config['dyndnses']['dyndns'])) {
-	$config['dyndnses']['dyndns'] = array();
-}
-
+init_config_arr(array('dyndnses', 'dyndns'));
 $a_dyndns = &$config['dyndnses']['dyndns'];
 
 $id = $_REQUEST['id'];
@@ -80,7 +73,7 @@ if ($_POST['save'] || $_POST['force']) {
 	unset($input_errors);
 	$pconfig = $_POST;
 
-	if (($pconfig['type'] == "freedns" || $pconfig['type'] == "namecheap" || $pconfig['type'] == "digitalocean") && $_POST['username'] == "") {
+	if (($pconfig['type'] == "freedns" || $pconfig['type'] == "freedns-v6" || $pconfig['type'] == "namecheap" || $pconfig['type'] == "digitalocean") && $_POST['username'] == "") {
 		$_POST['username'] = "none";
 	}
 
@@ -361,7 +354,7 @@ $section->addInput(new Form_Input(
 	'Username',
 	'text',
 	$pconfig['username']
-))->setHelp('Username is required for all types except Namecheap, FreeDNS and Custom Entries.%1$s' .
+))->setHelp('Username is required for all types except Namecheap, FreeDNS , FreeDNS-v6, DigitalOcean and Custom Entries.%1$s' .
 	                'Azure: Enter your Azure AD application ID%1$s' .
 			'DNS Made Easy: Dynamic DNS ID%1$s' .
 			'DNSimple: User account ID (In the URL after the \'/a/\')%1$s' .

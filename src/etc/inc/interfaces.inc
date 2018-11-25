@@ -1808,13 +1808,13 @@ function interfaces_carp_set_maintenancemode($carp_maintenancemode) {
 		$config["virtualip_carp_maintenancemode"] = true;
 		write_config(gettext("Enter CARP maintenance mode"));
 	}
-
+	init_config_arr(array('virtualip', 'vip'));
 	$viparr = &$config['virtualip']['vip'];
 
 	if (is_array($viparr)) {
 		foreach ($viparr as $vip) {
 			if ($vip['mode'] == "carp") {
-				interface_carp_configure($vip);
+				interface_carp_configure($vip, true);
 			}
 		}
 	}
@@ -2821,7 +2821,7 @@ function interface_ipalias_configure(&$vip) {
 	unset($iface, $af, $realif, $carpvip, $vhid);
 }
 
-function interface_carp_configure(&$vip) {
+function interface_carp_configure(&$vip, $maintenancemode_only = false) {
 	global $config, $g;
 	if (isset($config['system']['developerspew'])) {
 		$mt = microtime();
@@ -2834,7 +2834,9 @@ function interface_carp_configure(&$vip) {
 
 	$realif = get_real_interface($vip['interface']);
 	if (!does_interface_exist($realif)) {
-		file_notice("CARP", sprintf(gettext("Interface specified for the virtual IP address %s does not exist. Skipping this VIP."), $vip['subnet']), "Firewall: Virtual IP", "");
+		file_notice("CARP", sprintf(gettext(
+		    "Interface specified for the virtual IP address %s does not exist. Skipping this VIP."),
+		    $vip['subnet']), "Firewall: Virtual IP", "");
 		return;
 	}
 	if ($realif != "lo0") {
@@ -2845,7 +2847,8 @@ function interface_carp_configure(&$vip) {
 	}
 
 	$vip_password = $vip['password'];
-	$vip_password = escapeshellarg(addslashes(str_replace(" ", "", $vip_password)));
+	$vip_password = escapeshellarg(addslashes(str_replace(" ", "",
+	    $vip_password)));
 	if ($vip['password'] != "") {
 		$password = " pass {$vip_password}";
 	}
@@ -2855,19 +2858,29 @@ function interface_carp_configure(&$vip) {
 		$advbase = "advbase " . escapeshellarg($vip['advbase']);
 	}
 
-	$carp_maintenancemode = isset($config["virtualip_carp_maintenancemode"]);
+	$carp_maintenancemode = isset(
+	    $config["virtualip_carp_maintenancemode"]);
 	if ($carp_maintenancemode) {
 		$advskew = "advskew 254";
 	} else {
 		$advskew = "advskew " . escapeshellarg($vip['advskew']);
 	}
 
-	mwexec("/sbin/ifconfig {$realif} vhid " . escapeshellarg($vip['vhid']) . " {$advskew} {$advbase} {$password}");
+	mwexec("/sbin/ifconfig {$realif} vhid " . escapeshellarg($vip['vhid']) .
+	    " {$advskew} {$advbase} {$password}");
 
-	if (is_ipaddrv4($vip['subnet'])) {
-		mwexec("/sbin/ifconfig {$realif} " . escapeshellarg($vip['subnet']) . "/" . escapeshellarg($vip['subnet_bits']) . " alias vhid " . escapeshellarg($vip['vhid']));
-	} else if (is_ipaddrv6($vip['subnet'])) {
-		mwexec("/sbin/ifconfig {$realif} inet6 " . escapeshellarg($vip['subnet']) . " prefixlen " . escapeshellarg($vip['subnet_bits']) . " alias vhid " . escapeshellarg($vip['vhid']));
+	if (!$maintenancemode_only) {
+		if (is_ipaddrv4($vip['subnet'])) {
+			mwexec("/sbin/ifconfig {$realif} " .
+			    escapeshellarg($vip['subnet']) . "/" .
+			    escapeshellarg($vip['subnet_bits']) .
+			    " alias vhid " . escapeshellarg($vip['vhid']));
+		} else if (is_ipaddrv6($vip['subnet'])) {
+			mwexec("/sbin/ifconfig {$realif} inet6 " .
+			    escapeshellarg($vip['subnet']) . " prefixlen " .
+			    escapeshellarg($vip['subnet_bits']) .
+			    " alias vhid " . escapeshellarg($vip['vhid']));
+		}
 	}
 
 	return $realif;
@@ -5265,6 +5278,7 @@ function convert_real_interface_to_friendly_interface_name($interface = "wan", $
 	global $config;
 
 	/* XXX: For speed reasons reference directly the interface array */
+	init_config_arr(array('interfaces'));
 	$ifdescrs = &$config['interfaces'];
 	//$ifdescrs = get_configured_interface_list(true);
 
