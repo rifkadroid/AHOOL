@@ -1,4 +1,8 @@
 #irc/znc
+archivers/unzoo
+archivers/libmspack
+archivers/arj
+archivers/arc
 benchmarks/%%PRODUCT_NAME%%-pkg-iperf
 benchmarks/iperf
 benchmarks/iperf3
@@ -7,6 +11,8 @@ databases/php72-pdo_mysql
 databases/php72-pgsql
 devel/aws-sdk-php
 devel/gdb
+devel/libltd1
+devel/json-c
 dns/%%PRODUCT_NAME%%-pkg-bind9
 dns/dnstop
 editors/nano
@@ -73,6 +79,7 @@ security/%%PRODUCT_NAME%%-pkg-sudo
 security/%%PRODUCT_NAME%%-pkg-suricata
 security/%%PRODUCT_NAME%%-pkg-tinc
 security/%%PRODUCT_NAME%%
+security/clamav
 sysutils/%%PRODUCT_NAME%%-builder
 sysutils/%%PRODUCT_NAME%%-pkg-Backup
 sysutils/%%PRODUCT_NAME%%-pkg-Cron
@@ -101,4 +108,6 @@ sysutils/xe-guest-utilities
 www/%%PRODUCT_NAME%%-pkg-Lightsquid
 www/%%PRODUCT_NAME%%-pkg-squid
 www/%%PRODUCT_NAME%%-pkg-squidGuard
+www/e2guardian
+www/Kontrol-pkg-e2guardian5
 www/pound
