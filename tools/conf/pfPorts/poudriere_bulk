@@ -1,8 +1,4 @@
 #irc/znc
-archivers/unzoo
-archivers/libmspack
-archivers/arj
-archivers/arc
 benchmarks/%%PRODUCT_NAME%%-pkg-iperf
 benchmarks/iperf
 benchmarks/iperf3
@@ -11,8 +7,6 @@ databases/php72-pdo_mysql
 databases/php72-pgsql
 devel/aws-sdk-php
 devel/gdb
-devel/libltdl
-devel/json-c
 dns/%%PRODUCT_NAME%%-pkg-bind9
 dns/dnstop
 editors/nano
@@ -79,11 +73,11 @@ security/%%PRODUCT_NAME%%-pkg-sudo
 security/%%PRODUCT_NAME%%-pkg-suricata
 security/%%PRODUCT_NAME%%-pkg-tinc
 security/%%PRODUCT_NAME%%
-security/clamav
 sysutils/%%PRODUCT_NAME%%-builder
 sysutils/%%PRODUCT_NAME%%-pkg-Backup
 sysutils/%%PRODUCT_NAME%%-pkg-Cron
 sysutils/%%PRODUCT_NAME%%-pkg-LCDproc
+sysutils/%%PRODUCT_NAME%%-pkg-Netgate_Coreboot_Upgrade
 sysutils/%%PRODUCT_NAME%%-pkg-Notes
 sysutils/%%PRODUCT_NAME%%-pkg-RRD_Summary
 sysutils/%%PRODUCT_NAME%%-pkg-Service_Watchdog
