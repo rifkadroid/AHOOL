@@ -104,14 +104,14 @@ if ($_POST) {
 	if (!$input_errors) {
 
 		if ($_POST['ipv6nat_enable'] == "yes") {
+			init_config_arr(array('diag', 'ipv6nat'));
 			$config['diag']['ipv6nat']['enable'] = true;
 			$config['diag']['ipv6nat']['ipaddr'] = $_POST['ipv6nat_ipaddr'];
 		} else {
-			if ($config['diag']) {
-				if ($config['diag']['ipv6nat']) {
-					unset($config['diag']['ipv6nat']['enable']);
-					unset($config['diag']['ipv6nat']['ipaddr']);
-				}
+			if (is_array($config['diag']) &&
+			    is_array($config['diag']['ipv6nat'])) {
+				unset($config['diag']['ipv6nat']['enable']);
+				unset($config['diag']['ipv6nat']['ipaddr']);
 			}
 		}
 
