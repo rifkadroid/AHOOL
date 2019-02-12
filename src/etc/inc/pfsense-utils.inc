@@ -2763,7 +2763,7 @@ function xml2array($contents, $get_attributes = 1, $priority = 'tag') {
 	return ($xml_array);
 }
 
-function get_country_name($country_code) {
+function get_country_name($country_code = "ALL") {
 	if ($country_code != "ALL" && strlen($country_code) != 2) {
 		return "";
 	}
@@ -2788,6 +2788,26 @@ function get_country_name($country_code) {
 		}
 	}
 	return "";
+}
+
+/* Return the list of country codes to be used on CAs and certs */
+function get_cert_country_codes() {
+	$countries = get_country_name();
+
+	$country_codes = array();
+	foreach ($countries as $country) {
+		$country_codes[$country['code']] = $country['code'];
+	}
+	ksort($country_codes);
+
+	/* Preserve historical order: None, US, CA, other countries */
+	$first_items[''] = gettext("None");
+	$first_items['US'] = $country_codes['US'];
+	$first_items['CA'] = $country_codes['CA'];
+	unset($country_codes['US']);
+	unset($country_codes['CA']);
+
+	return array_merge($first_items, $country_codes);
 }
 
 /* sort by interface only, retain the original order of rules that apply to
