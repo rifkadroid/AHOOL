@@ -9,7 +9,6 @@
 /dist
 /etc/ascii-art/pfsense-logo-small.txt
 /etc/auth.conf
-/etc/ca_countries
 /etc/current-supfile
 /etc/defaults/pccard.conf
 /etc/fbtab
