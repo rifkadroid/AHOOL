@@ -322,6 +322,18 @@ if ($savemsg) {
 	print_info_box($savemsg, 'success');
 }
 
+// Load valid country codes
+$dn_cc = array();
+if (file_exists("/etc/ca_countries")) {
+	$dn_cc_file=file("/etc/ca_countries");
+	$dn_cc[''] = gettext("None");
+	foreach ($dn_cc_file as $line) {
+		if (preg_match('/^(\S*)\s(.*)$/', $line, $matches)) {
+			$dn_cc[$matches[1]] = $matches[1];
+		}
+	}
+}
+
 $tab_array = array();
 $tab_array[] = array(gettext("CAs"), true, "system_camanager.php");
 $tab_array[] = array(gettext("Certificates"), false, "system_certmanager.php");
@@ -568,7 +580,7 @@ $section->addInput(new Form_Select(
 	'dn_country',
 	'Country Code',
 	$pconfig['dn_country'],
-	get_cert_country_codes()
+	$dn_cc
 ));
 
 $section->addInput(new Form_Input(
