@@ -47,7 +47,7 @@ $copyrightfile = "{$g['cf_conf_path']}/copyright";
 				require_once($copyrightfile);
 			} else {
 				print("<div class=\"modal-body\" style=\"background-color:#1e3f75; color:white;\">");
-				print(gettext("<p align=\"center\"><font size=\"3\">Copyright &copy; 2016-2018. Kontrol Tecnologia EPP. All Rights Reserved.</p>
+				print(gettext("<p align=\"center\"><font size=\"3\">Copyright &copy; 2016-20189. Kontrol Tecnologia EPP. All Rights Reserved.</p>
 					<p align=\"center\"><strong>NO COMMERCIAL DISTRIBUTION IS ALLOWED.</strong>
 					</p>
 					<p>Kontrol is a federally and internationally registered trademark and service mark of Kontrol Tecnologia, and is exclusively licensed to Kontrol Tecnologia EPP.</p>
