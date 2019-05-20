@@ -5,7 +5,7 @@
  * part of pfSense (https://www.pfsense.org)
  * Copyright (c) 2005 Bill Marquette
  * Copyright (c) 2006 Peter Allgeyer
- * Copyright (c) 2008-2018 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2008-2019 Rubicon Communications, LLC (Netgate)
  * All rights reserved.
  *
  * originally part of m0n0wall (http://m0n0.ch/wall)
@@ -1369,7 +1369,7 @@ function filter_generate_reflection_nat($rule, &$route_table, $nat_ifs, $protoco
 				/* Do not generate a rule with an interface source if that interface has no IP address.
 				 * See https://redmine.pfsense.org/issues/8604 */
 				if (!empty(get_interface_ip($subnet_if))) {
-					$natrules .= "no nat on {$subnet_if}{$protocol_text} from {$subnet_if} to {$target}\n";
+					$natrules .= "no nat on {$subnet_if}{$protocol_text} from ({$subnet_if}) to {$target}\n";
 				}
 				$natrules .= "nat on {$subnet_if}{$protocol_text} from {$subnet} to {$target} -> {$ifsubnet_ip}{$static_port}\n";
 			}
