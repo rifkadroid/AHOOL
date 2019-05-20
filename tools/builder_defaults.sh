@@ -70,7 +70,7 @@ export PRODUCT_NAME_SUFFIX=${PRODUCT_NAME_SUFFIX:-"-CE"}
 export REPO_BRANCH_PREFIX=${REPO_BRANCH_PREFIX:-""}
 export PRODUCT_URL=${PRODUCT_URL:-""}
 export PRODUCT_SRC=${PRODUCT_SRC:-"${BUILDER_ROOT}/src"}
-export PRODUCT_EMAIL=${PRODUCT_EMAIL:-"contato@kontrolsecurity.com.br"}
+export PRODUCT_EMAIL=${PRODUCT_EMAIL:-"coreteam@pfsense.org"}
 export XML_ROOTOBJ=${XML_ROOTOBJ:-$(echo "${PRODUCT_NAME}" | tr '[[:upper:]]' '[[:lower:]]')}
 
 if [ "${PRODUCT_NAME}" = "pfSense" -a "${BUILD_AUTHORIZED_BY_NETGATE}" != "yes" ]; then
@@ -88,7 +88,7 @@ if [ -z "${PRODUCT_VERSION}" ]; then
 
 	export PRODUCT_VERSION=$(head -n 1 ${PRODUCT_SRC}/etc/version)
 fi
-export PRODUCT_REVISION=${PRODUCT_REVISION:-"5"}
+export PRODUCT_REVISION=${PRODUCT_REVISION:-"3"}
 
 # Product repository tag to build
 _cur_git_repo_branch_or_tag=$(git -C ${BUILDER_ROOT} rev-parse --abbrev-ref HEAD)
