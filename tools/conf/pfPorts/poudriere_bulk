@@ -101,11 +101,11 @@ sysutils/tmux
 sysutils/usb_modeswitch
 sysutils/vm-bhyve
 sysutils/xe-guest-utilities
+www/sarg
+www/Kontrol-pkg-sarg
+www/e2guardian
+www/Kontrol-pkg-e2guardian5
 www/%%PRODUCT_NAME%%-pkg-Lightsquid
 www/%%PRODUCT_NAME%%-pkg-squid
 www/%%PRODUCT_NAME%%-pkg-squidGuard
 www/pound
-www/e2guardian
-www/sarg
-www/%%PRODUCT_NAME%%-pkg-e2guardian5
-www/%%PRODUCT_NAME%%-pkg-sarg
