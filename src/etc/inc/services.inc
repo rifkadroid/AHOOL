@@ -24,8 +24,8 @@
  */
 
 
-define('DYNDNS_PROVIDER_VALUES', 'all-inkl azure azurev6 citynetwork cloudflare cloudflare-v6 cloudns custom custom-v6 digitalocean dnsexit dnsimple dnsmadeeasy dnsomatic dreamhost dreamhost-v6 duiadns duiadns-v6 dyndns dyndns-custom dyndns-static dyns easydns eurodns freedns freedns-v6 glesys godaddy godaddy-v6 googledomains gratisdns he-net he-net-v6 he-net-tunnelbroker hover loopia namecheap noip noip-free ods opendns ovh-dynhost route53 route53-v6 selfhost spdyn spdyn-v6 zoneedit');
-define('DYNDNS_PROVIDER_DESCRIPTIONS', 'All-Inkl.com,Azure DNS,Azure DNS (v6),City Network,Cloudflare,Cloudflare (v6),ClouDNS,Custom,Custom (v6),DigitalOcean,DNSexit,DNSimple,DNS Made Easy,DNS-O-Matic,DreamHost,Dreamhost (v6),DuiaDns.net,DuiaDns.net (v6),DynDNS (dynamic),DynDNS (custom),DynDNS (static),DyNS,easyDNS,Euro Dns,freeDNS,freeDNS (v6),GleSYS,GoDaddy,GoDaddy (v6),Google Domains,GratisDNS,HE.net,HE.net (v6),HE.net Tunnelbroker,Hover,Loopia,Namecheap,No-IP,No-IP (free),ODS.org,OpenDNS,OVH DynHOST,Route 53,Route 53 (v6),SelfHost,SPDYN,SPDYN (v6),ZoneEdit');
+define('DYNDNS_PROVIDER_VALUES', 'all-inkl azure azurev6 citynetwork cloudflare cloudflare-v6 cloudns custom custom-v6 digitalocean digitalocean-v6 dnsexit dnsimple dnsmadeeasy dnsomatic dreamhost dreamhost-v6 duiadns duiadns-v6 dyndns dyndns-custom dyndns-static dyns easydns eurodns freedns freedns-v6 glesys godaddy godaddy-v6 googledomains gratisdns he-net he-net-v6 he-net-tunnelbroker hover linode linode-v6 loopia namecheap noip noip-free ods opendns ovh-dynhost route53 route53-v6 selfhost spdyn spdyn-v6 zoneedit');
+define('DYNDNS_PROVIDER_DESCRIPTIONS', 'All-Inkl.com,Azure DNS,Azure DNS (v6),City Network,Cloudflare,Cloudflare (v6),ClouDNS,Custom,Custom (v6),DigitalOcean,DigitalOcean (v6),DNSexit,DNSimple,DNS Made Easy,DNS-O-Matic,DreamHost,Dreamhost (v6),DuiaDns.net,DuiaDns.net (v6),DynDNS (dynamic),DynDNS (custom),DynDNS (static),DyNS,easyDNS,Euro Dns,freeDNS,freeDNS (v6),GleSYS,GoDaddy,GoDaddy (v6),Google Domains,GratisDNS,HE.net,HE.net (v6),HE.net Tunnelbroker,Hover,Linode,Linode (v6),Loopia,Namecheap,No-IP,No-IP (free),ODS.org,OpenDNS,OVH DynHOST,Route 53,Route 53 (v6),SelfHost,SPDYN,SPDYN (v6),ZoneEdit');
 
 /* implement ipv6 route advertising daemon */
 function services_radvd_configure($blacklist = array()) {
@@ -1013,6 +1013,12 @@ EOD;
 		// max-lease-time
 		if ($dhcpifconf['maxleasetime']) {
 			$dhcpdconf .= "	max-lease-time {$dhcpifconf['maxleasetime']};\n";
+		}
+
+		if (!isset($dhcpifconf['disablepingcheck'])) {
+			$dhcpdconf .= "	ping-check true;\n";
+		} else {
+			$dhcpdconf .= "	ping-check false;\n";
 		}
 
 		// netbios-name*
@@ -2327,10 +2333,17 @@ trap := "{$config['snmpd']['trapstring']}"
 
 EOD;
 		}
-
-		$sysDescr = "{$g['product_name']} " . php_uname("n") .
-			" {$g['product_version']} {$g['platform']} " . php_uname("s") .
-			" " . php_uname("r") . " " . php_uname("m");
+		
+		if ($g['product_version_string']) {
+			$sysDescr = "{$g['product_name']} {$config['system']['hostname']}.{$config['system']['domain']}" .
+				" {$g['product_version_string']} {$g['platform']} " . php_uname("s") .
+				" " . php_uname("r") . " " . php_uname("m");
+		}
+		else {
+			$sysDescr = "{$g['product_name']} {$config['system']['hostname']}.{$config['system']['domain']}" .
+				" {$g['product_version']} {$g['platform']} " . php_uname("s") .
+				" " . php_uname("r") . " " . php_uname("m");
+		}
 
 		$snmpdconf .= <<<EOD
 system := 1     # pfSense

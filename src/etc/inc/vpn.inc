@@ -105,6 +105,15 @@ function vpn_ipsec_convert_to_modp($index) {
 		case '24':
 			$conversion = "modp2048s256";
 			break;
+		case '25':
+			$conversion = "ecp192";
+			break;
+		case '26':
+			$conversion = "ecp224";
+			break;
+		case '27':
+			$conversion = "ecp224bp";
+			break;
 		case '28':
 			$conversion = "ecp256bp";
 			break;
@@ -843,6 +852,12 @@ EOD;
 			$ikeid = $ph1ent['ikeid'];
 			$keyexchange = "ikev1";
 			$passive = "route";
+
+			$closeaction = "";
+			if (!empty($ph1ent['closeaction'])) {
+				$closeaction = "closeaction = {$ph1ent['closeaction']}";
+			}
+
 			if (!empty($ph1ent['iketype'])) {
 				if ($ph1ent['iketype'] == "ikev2") {
 					$keyexchange = "ikev2";
@@ -916,19 +931,9 @@ EOD;
 			}
 
 			list ($myid_type, $myid_data) = ipsec_find_id($ph1ent, 'local');
-			if ($myid_type != 'address' && $myid_type != 'keyid' && $myid_type != 'asn1dn') {
-				$myid_data = "{$myid_type}:{$myid_data}";
-			} elseif ($myid_type == "asn1dn" && !empty($myid_data)) {
-				if ($myid_data[0] == '#') {
-				/* asn1dn needs double quotes */
-					$myid_data = "\"{$myid_type}:{$myid_data}\"";
-				} else {
-					$myid_data = "\"{$myid_data}\"";
-				}
-			}
-			$leftid = '';
-			if (!empty($myid_data)) {
-				$leftid = "leftid = {$myid_data}";
+			$leftid = ipsec_fixup_id($myid_type, $myid_data);
+			if (!empty($leftid)) {
+				$leftid = "leftid = {$leftid}";
 			}
 
 			$peerid_spec = '';
@@ -936,20 +941,7 @@ EOD;
 				// Only specify peer ID if we are not dealing with mobile PSK
 			} else {
 				list ($peerid_type, $peerid_data) = ipsec_find_id($ph1ent, 'peer', $rgmap);
-				if ($peerid_type == 'any') {
-					$peerid_spec = '';
-				} elseif ($peerid_type != 'address' && $peerid_type != 'keyid' && $peerid_type != 'asn1dn') {
-					$peerid_spec = "{$peerid_type}:{$peerid_data}";
-				} elseif ($peerid_type == "asn1dn") {
-					/* asn1dn needs double quotes */
-					if ($peerid_data[0] == '#') {
-						$peerid_spec = "\"{$peerid_type}:{$peerid_data}\"";
-					} elseif (!empty($peerid_data)) {
-						$peerid_spec = "\"{$peerid_data}\"";
-					}
-				} else {
-					$peerid_spec = $peerid_data;
-				}
+				$peerid_spec = ipsec_fixup_id($peerid_type, $peerid_data);
 			}
 
 			$ealgosp1 = '';
@@ -1375,6 +1367,7 @@ EOD;
 	{$installpolicy}
 	{$tunneltype}
 	{$dpdline}
+	{$closeaction}
 	auto = {$passive}
 	left = {$left_spec}
 	right = {$right_spec}

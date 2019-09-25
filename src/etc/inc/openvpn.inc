@@ -499,6 +499,16 @@ function openvpn_remap_digest($digest) {
 	return $digest;
 }
 
+function openvpn_get_keydirlist() {
+	$keydirs = array(
+		''  => gettext('Use default direction'),
+		'0' => gettext('Direction 0'),
+		'1' => gettext('Direction 1'),
+		'2' => gettext('Both directions'),
+	);
+	return $keydirs;
+}
+
 function openvpn_get_engines() {
 	$openssl_engines = array('none' => gettext('No Hardware Crypto Acceleration'));
 	exec("/usr/bin/openssl engine -t -c", $openssl_engine_output);
@@ -1188,9 +1198,29 @@ function openvpn_reconfigure($mode, $settings) {
 				} else {
 					$tls_directive = "tls-auth";
 					if ($mode == "server") {
-						$tlsopt = 0;
+						switch($settings['tlsauth_keydir']){
+							case '1':
+								$tlsopt = 1;
+								break;
+							case '2':
+								$tlsopt = '';
+								break;
+							default:
+								$tlsopt = 0;
+								break;
+						}
 					} else {
-						$tlsopt = 1;
+						switch($settings['tlsauth_keydir']){
+							case '0':
+								$tlsopt = 0;
+								break;
+							case '2':
+								$tlsopt = '';
+								break;
+							default:
+								$tlsopt = 1;
+								break;
+						}
 					}
 				}
 				openvpn_add_keyfile($settings['tls'], $conf, $mode_id, $tls_directive, $tlsopt);
@@ -1575,21 +1605,28 @@ function openvpn_resync_all($interface = "") {
 		log_error(gettext("Resyncing OpenVPN instances."));
 	}
 
-	if (is_array($config['openvpn']['openvpn-server'])) {
-		foreach ($config['openvpn']['openvpn-server'] as & $settings) {
-			if ($interface <> "" && $interface != $settings['interface']) {
-				continue;
-			}
-			openvpn_resync('server', $settings);
+	// Check if OpenVPN clients and servers require a resync.
+	foreach (array("server", "client") as $type) {
+		if (!is_array($config['openvpn']["openvpn-{$type}"])) {
+			continue;
 		}
-	}
+		foreach ($config['openvpn']["openvpn-{$type}"] as & $settings) {
+			$fpath = "{$g['varetc_path']}/openvpn/{$type}" .
+			    $settings['vpnid'] . ".interface";
+			$gw_group_change = FALSE;
+			$ip_change = ($interface === "") ||
+			    ($interface === $settings['interface']);
 
-	if (is_array($config['openvpn']['openvpn-client'])) {
-		foreach ($config['openvpn']['openvpn-client'] as & $settings) {
-			if ($interface <> "" && $interface != $settings['interface']) {
-				continue;
+			if (!$ip_change && file_exists($fpath)) {
+				$gw_group_change =
+				    (trim(file_get_contents($fpath), " \t\n") !=
+				    get_failover_interface(
+					$settings['interface']));
 			}
-			openvpn_resync('client', $settings);
+
+			if ($ip_change || $gw_group_change) {
+				openvpn_resync($type, $settings);
+			}
 		}
 	}
 

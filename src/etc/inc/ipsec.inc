@@ -161,6 +161,9 @@ $p1_dhgroups = array(
 	22 => '22 (1024(sub 160) bit)',
 	23 => '23 (2048(sub 224) bit)',
 	24 => '24 (2048(sub 256) bit)',
+	25 => '25 (nist ecp192)',
+	26 => '26 (nist ecp224)',
+	27 => '27 (brainpool ecp224)',
 	28 => '28 (brainpool ecp256)',
 	29 => '29 (brainpool ecp384)',
 	30 => '30 (brainpool ecp512)'
@@ -194,6 +197,15 @@ $ipsec_preshared_key_type = array(
 	'EAP' => 'EAP'
 );
 
+global $ipsec_closeactions;
+$ipsec_closeactions = array(
+	'' => gettext('Default'),
+	'none' => gettext('No action'),
+	'restart' => gettext('Restart/Reconnect'),
+	'clear' => gettext('Close connection and clear SA'),
+	'hold' => gettext('Close connection and reconnect on demand'),
+);
+
 global $p2_modes;
 $p2_modes = array(
 	'tunnel' => gettext('Tunnel IPv4'),
@@ -225,6 +237,9 @@ $p2_pfskeygroups = array(
 	22 => gettext('22 (1024(sub 160) bit)'),
 	23 => gettext('23 (2048(sub 224) bit)'),
 	24 => gettext('24 (2048(sub 256) bit)'),
+	25 => gettext('25 (nist ecp192)'),
+	26 => gettext('26 (nist ecp224)'),
+	27 => gettext('27 (brainpool ecp224)'),
 	28 => gettext('28 (brainpool ecp256)'),
 	29 => gettext('29 (brainpool ecp384)'),
 	30 => gettext('30 (brainpool ecp512)')
@@ -811,6 +826,36 @@ function ipsec_find_id(& $ph1ent, $side = "local", $rgmap = array()) {
 	return array($thisid_type, $thisid_data);
 }
 
+/*
+ * Fixup ID type/data to include prefix when necessary, add quotes, etc.
+ */
+function ipsec_fixup_id($type, $data) {
+	/* List of types to pass through as-is without changes or adding prefix */
+	$auto_types = array('address');
+	/* List of types which need the resulting string double quoted. */
+	$quote_types = array('keyid', 'asn1dn');
+
+	/* If the first character of asn1dn type data is not #, then rely on
+	 * automatic parsing https://redmine.pfsense.org/issues/4792 */
+	if (($type == 'asn1dn') && !empty($data) && ($data[0] != '#')) {
+		$auto_types[] = 'asn1dn';
+	}
+
+	if ($type == 'any') {
+		$idstring = "";
+	} elseif (!in_array($type, $auto_types)) {
+		$idstring = "{$type}:{$data}";
+	} else {
+		$idstring = $data;
+	}
+
+	if (in_array($type, $quote_types)) {
+		$idstring = "\"{$idstring}\"";
+	}
+
+	return $idstring;
+}
+
 function ipsec_fixup_network($network) {
 	if (substr($network, -3) == '|/0') {
 		$result = substr($network, 0, -3);
@@ -895,6 +940,32 @@ function ipsec_vti($ph1ent, $returnaddresses = false) {
 		}
 	}
 	return ($returnaddresses) ? $vtisubnet_spec : $is_vti;
+}
+
+/* Called when IPsec is reloaded through rc.newipsecdns and similar, gives
+ * packages an opportunity to execute custom code when IPsec reloads.
+ */
+function ipsec_reload_package_hook() {
+	global $g, $config;
+	foreach ($config['installedpackages']['package'] as $package) {
+		if (!file_exists("/usr/local/pkg/" . $package['configurationfile'])) {
+			continue;
+		}
+
+		$pkg_config = parse_xml_config_pkg("/usr/local/pkg/" . $package['configurationfile'], 'packagegui');
+		if (!empty($pkg_config['include_file']) &&
+		    file_exists($pkg_config['include_file'])) {
+			require_once($pkg_config['include_file']);
+		}
+		if (empty($pkg_config['ipsec_reload_function'])) {
+			continue;
+		}
+		$pkg_ipsec_reload = $pkg_config['ipsec_reload_function'];
+		if (!function_exists($pkg_ipsec_reload)) {
+			continue;
+		}
+		$pkg_ipsec_reload();
+	}
 }
 
 ?>
