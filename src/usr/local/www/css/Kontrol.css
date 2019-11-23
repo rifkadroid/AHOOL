@@ -1,5 +1,5 @@
 /*
- * Kontrol.css
+ * pfSense.css
  *
  * part of pfSense (https://www.pfsense.org)
  * Copyright (c) 2016-2018 Rubicon Communications, LLC (Netgate)
@@ -451,7 +451,7 @@ form .btn + .btn {
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 60px;
+    height: 40px;
     background-color: #212121;
     padding-top: 10px;
     text-align: center;
