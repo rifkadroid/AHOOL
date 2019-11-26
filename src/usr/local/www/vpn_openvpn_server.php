@@ -109,7 +109,7 @@ if ($act == "new") {
 	$pconfig['compression'] = "none";
 }
 
-if ($act == "edit") {
+if (($act == "edit") || ($act == "dup")) {
 
 	if (isset($id) && $a_server[$id]) {
 		$pconfig['disable'] = isset($a_server[$id]['disable']);
@@ -253,7 +253,24 @@ if ($act == "edit") {
 		$pconfig['udp_fast_io'] = $a_server[$id]['udp_fast_io'];
 		$pconfig['sndrcvbuf'] = $a_server[$id]['sndrcvbuf'];
 		$pconfig['push_register_dns'] = $a_server[$id]['push_register_dns'];
+
+		$pconfig['ping_method'] = $a_server[$id]['ping_method'];
+		$pconfig['keepalive_interval'] = $a_server[$id]['keepalive_interval'];
+		$pconfig['keepalive_timeout'] = $a_server[$id]['keepalive_timeout'];
+		$pconfig['ping_seconds'] = $a_server[$id]['ping_seconds'];
+		$pconfig['ping_push'] = empty($a_server[$id]['ping_push']) ? '' : 'yes';
+		$pconfig['ping_action'] = $a_server[$id]['ping_action'];
+		$pconfig['ping_action_seconds'] = $a_server[$id]['ping_action_seconds'];
+		$pconfig['ping_action_push'] = empty($a_server[$id]['ping_action_push']) ? '' : 'yes';
+		$pconfig['inactive_seconds'] = $a_server[$id]['inactive_seconds'] ?: 0;
 	}
+}
+
+if ($act == "dup") {
+	$act = "new";
+	$pconfig['local_port'] = openvpn_port_next('UDP');
+	$vpnid = 0;
+	unset($id);
 }
 
 if ($_POST['save']) {
@@ -490,6 +507,28 @@ if ($_POST['save']) {
 		$input_errors[] = gettext("The supplied Send/Receive Buffer size is invalid.");
 	}
 
+	if (!empty($pconfig['ping_method']) && !array_key_exists($pconfig['ping_method'], $openvpn_ping_method)) {
+		$input_errors[] = gettext("The supplied Ping Method is invalid.");
+	}
+	if (!empty($pconfig['ping_action']) && !array_key_exists($pconfig['ping_action'], $openvpn_ping_action)) {
+		$input_errors[] = gettext("The supplied Ping Action is invalid.");
+	}
+	if (!empty($pconfig['keepalive_interval']) && !is_numericint($pconfig['keepalive_interval'])) {
+		$input_errors[] = gettext("The supplied Keepalive Interval value is invalid.");
+	}
+	if (!empty($pconfig['keepalive_timeout']) && !is_numericint($pconfig['keepalive_timeout'])) {
+		$input_errors[] = gettext("The supplied Keepalive Timeout value is invalid.");
+	}
+	if (!empty($pconfig['ping_seconds']) && !is_numericint($pconfig['ping_seconds'])) {
+		$input_errors[] = gettext("The supplied Ping Seconds value is invalid.");
+	}
+	if (!empty($pconfig['ping_action_seconds']) && !is_numericint($pconfig['ping_action_seconds'])) {
+		$input_errors[] = gettext("The supplied Ping Restart or Exit Seconds value is invalid.");
+	}
+	if (!empty($pconfig['inactive_seconds']) && !is_numericint($pconfig['inactive_seconds'])) {
+		$input_errors[] = gettext("The supplied Inactive Seconds value is invalid.");
+	}
+
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
 
 	if (!$input_errors) {
@@ -629,6 +668,16 @@ if ($_POST['save']) {
 		}
 
 		$server['ncp_enable'] = $pconfig['ncp_enable'] ? "enabled":"disabled";
+
+		$server['ping_method'] = $pconfig['ping_method'];
+		$server['keepalive_interval'] = $pconfig['keepalive_interval'];
+		$server['keepalive_timeout'] = $pconfig['keepalive_timeout'];
+		$server['ping_seconds'] = $pconfig['ping_seconds'];
+		$server['ping_push'] = $pconfig['ping_push'];
+		$server['ping_action'] = $pconfig['ping_action'];
+		$server['ping_action_seconds'] = $pconfig['ping_action_seconds'];
+		$server['ping_action_push'] = $pconfig['ping_action_push'];
+		$server['inactive_seconds'] = $pconfig['inactive_seconds'];
 
 		if (isset($id) && $a_server[$id]) {
 			$a_server[$id] = $server;
@@ -1187,6 +1236,94 @@ if ($act=="new" || $act=="edit"):
 
 	$form->add($section);
 
+	$section = new Form_Section("Ping settings");
+
+	$section->addInput(new Form_Input(
+		'inactive_seconds',
+		'Inactive',
+		'number',
+		$pconfig['inactive_seconds'] ?: 0,
+		['min' => '0']
+	    ))->setHelp('Causes OpenVPN to exit after n seconds of ' .
+	    'inactivity on the TUN/TAP device.%1$s' .
+	    'The time length of inactivity is measured since the last ' .
+	    'incoming or outgoing tunnel packet.%1$s' .
+	    '0 disables this feature.%1$s', '<br />');
+
+	$section->addInput(new Form_Select(
+		'ping_method',
+		'Ping method',
+		$pconfig['ping_method'],
+		$openvpn_ping_method
+	))->setHelp('keepalive helper uses interval and timeout parameters ' .
+	    'to define ping and ping-restart values as follows:%1$s' .
+	    'ping = interval%1$s' .
+	    'ping-restart = timeout*2%1$s' .
+	    'push ping = interval%1$s' .
+	    'push ping-restart = timeout%1$s',
+	    '<br />');
+
+	$section->addInput(new Form_Input(
+		'keepalive_interval',
+		'Interval',
+		'number',
+		$pconfig['keepalive_interval']
+		    ?: $openvpn_default_keepalive_interval,
+		['min' => '0']
+	));
+
+	$section->addInput(new Form_Input(
+		'keepalive_timeout',
+		'Timeout',
+		'number',
+		$pconfig['keepalive_timeout']
+		    ?: $openvpn_default_keepalive_timeout,
+		['min' => '0']
+	));
+
+	$section->addInput(new Form_Input(
+		'ping_seconds',
+		'Ping',
+		'number',
+		$pconfig['ping_seconds'] ?: $openvpn_default_keepalive_interval,
+		['min' => '0']
+	))->setHelp('Ping remote over the TCP/UDP control channel if no ' .
+	    'packets have been sent for at least n seconds.%1$s',
+	    '<br />');
+
+	$section->addInput(new Form_Checkbox(
+		'ping_push',
+		'Push ping to client',
+		'Push ping to VPN client',
+		$pconfig['ping_push']
+	));
+
+	$section->addInput(new Form_Select(
+		'ping_action',
+		'Ping restart or exit',
+		$pconfig['ping_action'],
+		$openvpn_ping_action
+	))->setHelp('Exit or restart OpenVPN after timeout from remote%1$s',
+	    '<br />');
+
+	$section->addInput(new Form_Input(
+		'ping_action_seconds',
+		'Ping restart or exit seconds',
+		'number',
+		$pconfig['ping_action_seconds']
+		    ?: $openvpn_default_keepalive_timeout,
+		['min' => '0']
+	));
+
+	$section->addInput(new Form_Checkbox(
+		'ping_action_push',
+		'Push to client',
+		'Push ping-restart/ping-exit to VPN client',
+		$pconfig['ping_action_push']
+	));
+
+	$form->add($section);
+
 	$section = new Form_Section("Advanced Client Settings");
 	$section->addClass("clientadv");
 
@@ -1422,7 +1559,7 @@ else:
 			<thead>
 				<tr>
 					<th><?=gettext("Interface")?></th>
-					<th><?=gettext("Protocol / Port")?></th>
+					<th data-sortable-type="alpha"><?=gettext("Protocol / Port")?></th>
 					<th><?=gettext("Tunnel Network")?></th>
 					<th><?=gettext("Crypto")?></th>
 					<th><?=gettext("Description")?></th>
@@ -1439,7 +1576,7 @@ else:
 					<td>
 						<?=convert_openvpn_interface_to_friendly_descr($server['interface'])?>
 					</td>
-					<td>
+					<td data-value="<?=htmlspecialchars($server['local_port']) . '-' . htmlspecialchars($server['protocol'])?>">
 						<?=htmlspecialchars($server['protocol'])?> / <?=htmlspecialchars($server['local_port'])?>
 					</td>
 					<td>
@@ -1458,8 +1595,9 @@ else:
 						<?=htmlspecialchars(sprintf('%1$s (%2$s)', $server['description'], $server['dev_mode']))?>
 					</td>
 					<td>
-						<a class="fa fa-pencil"	title="<?=gettext('Edit server')?>" href="vpn_openvpn_server.php?act=edit&amp;id=<?=$i?>"></a>
-						<a class="fa fa-trash"	title="<?=gettext('Delete server')?>" href="vpn_openvpn_server.php?act=del&amp;id=<?=$i?>" usepost></a>
+						<a class="fa fa-pencil"	title="<?=gettext('Edit Server')?>"	href="vpn_openvpn_server.php?act=edit&amp;id=<?=$i?>"></a>
+						<a class="fa fa-clone"	title="<?=gettext("Copy Server")?>"	href="vpn_openvpn_server.php?act=dup&amp;id=<?=$i?>" usepost></a>
+						<a class="fa fa-trash"	title="<?=gettext('Delete Server')?>"	href="vpn_openvpn_server.php?act=del&amp;id=<?=$i?>" usepost></a>
 					</td>
 				</tr>
 <?php
@@ -1625,11 +1763,8 @@ events.push(function() {
 	}
 
 	function protocol_change() {
-		if ($('#protocol').val().substring(0, 3).toLowerCase() == 'udp') {
-			hideCheckbox('udp_fast_io', false);
-		} else {
-			hideCheckbox('udp_fast_io', true);
-		}
+		hideInput('interface', (($('#protocol').val().toLowerCase() == 'udp') || ($('#protocol').val().toLowerCase() == 'tcp')));
+		hideCheckbox('udp_fast_io', !($('#protocol').val().substring(0, 3).toLowerCase() == 'udp'));
 	}
 
 	// Process "Enable authentication of TLS packets" checkbox
@@ -1800,6 +1935,20 @@ events.push(function() {
 		}
 	}
 
+	function ping_method_change() {
+		pvalue = $('#ping_method').val();
+
+		keepalive = (pvalue == 'keepalive');
+
+		hideInput('keepalive_interval', !keepalive);
+		hideInput('keepalive_timeout', !keepalive);
+		hideInput('ping_seconds', keepalive);
+		hideCheckbox('ping_push', keepalive);
+		hideInput('ping_action', keepalive);
+		hideInput('ping_action_seconds', keepalive);
+		hideCheckbox('ping_action_push', keepalive);
+	}
+
 	// ---------- Monitor elements for change and call the appropriate display functions ------------------------------
 
 	// NTP
@@ -1866,6 +2015,11 @@ events.push(function() {
 	 // Tun/tap mode
 	$('#dev_mode, #serverbridge_dhcp').change(function () {
 		tuntap_change();
+	});
+
+	// ping
+	$('#ping_method').change(function () {
+		ping_method_change();
 	});
 
 	// Certref
@@ -1935,6 +2089,7 @@ events.push(function() {
 	ntp_server_change();
 	netbios_change();
 	tuntap_change();
+	ping_method_change();
 });
 //]]>
 </script>
