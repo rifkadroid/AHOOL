@@ -251,7 +251,7 @@ function display_login_form() {
 	// For the login form, get the settings of no particular user.
 	// That ensures we will use the system default theme for the login form.
 	$user_settings = get_user_settings("");
-	$cssfile = "/css/pfSense.css";
+	$cssfile = "/css/Kontrol.css";
 
 	if (isset($user_settings['webgui']['webguicss'])) {
 		if (file_exists("/usr/local/www/css/" . $user_settings['webgui']['webguicss'])) {
@@ -270,7 +270,7 @@ function display_login_form() {
 		$login_title = gettext(htmlspecialchars($config['system']['hostname'] . " - Login"));
 	} else {
 		$loginbannerstr = sprintf(gettext('Login to %1$s'), $g['product_name']);
-		$login_title = gettext("pfSense - Login");
+		$login_title = gettext("Kontrol - Login");
 	}
 
 	$loginautocomplete = isset($config['system']['webgui']['loginautocomplete']) ? '' : 'autocomplete="off"';

@@ -164,7 +164,7 @@ EOD;
 		<input type="submit" name="accept" class="login login-submit" value="Login" id="login" {$disabled}>
 	  </form>
 	  <br  />
-	  <span> <i>Made with &hearts; by</i> <strong>Netgate</strong></span>
+	  <span> <i>Made with &hearts; by</i> <strong>Kontrol</strong></span>
 	</div>
 	<div id="terms">
 		<textarea readonly>{$termsconditions}</textarea>
@@ -633,7 +633,7 @@ function captiveportal_init_rules($reinit = false) {
 	$cprules .= "# layer 2: pass ARP\n";
 	$cprules .= captiveportal_create_ipfw_rule("add", $rulenum,
 	    "pass layer2 mac-type arp,rarp");
-	$cprules .= "# pfsense requires for WPA\n";
+	$cprules .= "# Kontrol requires for WPA\n";
 	$cprules .= captiveportal_create_ipfw_rule("add", $rulenum,
 	    "pass layer2 mac-type 0x888e,0x88c7");
 	$cprules .= "# PPP Over Ethernet Session Stage/Discovery Stage\n";
@@ -2231,8 +2231,8 @@ function portal_allow($clientip, $clientmac, $username, $password = null, $attri
 	}
 
 	$writecfg = false;
-	/* If both "Add MAC addresses of connected users as pass-through MAC" and "Disable concurrent logins" are checked, 
-	then we need to check if the user was already authenticated using another MAC Address, and if so remove the previous Pass-Through MAC. */	
+	/* If both "Add MAC addresses of connected users as pass-through MAC" and "Disable concurrent logins" are checked,
+	then we need to check if the user was already authenticated using another MAC Address, and if so remove the previous Pass-Through MAC. */
 	if ((isset($config['captiveportal'][$cpzone]['noconcurrentlogins'])) && ($username != 'unauthenticated') && isset($config['captiveportal'][$cpzone]['passthrumacadd'])) {
 		$mac = captiveportal_passthrumac_findbyname($username);
 		if (!empty($mac)) {

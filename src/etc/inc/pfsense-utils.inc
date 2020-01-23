@@ -2804,7 +2804,7 @@ function get_country_name($country_code = "ALL") {
 		return "";
 	}
 
-	$country_names_xml = "/usr/local/share/pfSense/iso_3166-1_list_en.xml";
+	$country_names_xml = "/usr/local/share/Kontrol/iso_3166-1_list_en.xml";
 	$country_names_contents = file_get_contents($country_names_xml);
 	$country_names = xml2array($country_names_contents);
 
@@ -3476,12 +3476,12 @@ function compare_by_name($a, $b) {
  * NAME
  *   getarraybyref
  * INPUTS
- *   $array the array of which a items array needs to be found. 
+ *   $array the array of which a items array needs to be found.
  *   $args.. the sub-items to be retrieved/created
  * RESULT
  *   returns the array that was retrieved from configuration, its created if it does not exist
  * NOTES
- *   Used by haproxy / acme / others.?. . 
+ *   Used by haproxy / acme / others.?. .
  *   can be used like this:  $a_certificates = getarraybyref($config, 'installedpackages', 'acme', 'certificates', 'item');
  ******/
 function &getarraybyref(&$array) {
