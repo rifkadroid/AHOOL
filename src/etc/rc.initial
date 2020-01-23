@@ -3,7 +3,9 @@
 # rc.initial
 #
 # part of pfSense (https://www.pfsense.org)
-# Copyright (c) 2004-2020 Rubicon Communications, LLC (Netgate)
+# Copyright (c) 2004-2013 BSD Perimeter
+# Copyright (c) 2013-2016 Electric Sheep Fencing
+# Copyright (c) 2014-2020 Rubicon Communications, LLC (Netgate)
 # All rights reserved.
 #
 # originally based on m0n0wall (http://neon1.net/m0n0wall)
@@ -69,7 +71,7 @@ fi
 /etc/rc.banner
 
 # Read product_name from $g, defaults to pfSense
-product=$(/usr/local/sbin/read_global_var product_name pfSense)
+product=$(/usr/local/sbin/read_global_var product_name Kontrol)
 
 # Check to see if SSH is running.
 if pgrep -q -a -F /var/run/sshd.pid sshd >/dev/null 2>&1; then
@@ -83,12 +85,14 @@ echo ""
 echo " 0) Logout (SSH only)                  9) pfTop"
 echo " 1) Assign Interfaces                 10) Filter Logs"
 echo " 2) Set interface(s) IP address       11) Restart webConfigurator"
-echo " 3) Reset webConfigurator password    12) PHP shell + ${product} tools"
-echo " 4) Reset to factory defaults         13) Update from console"
+echo " 3) Reset webConfigurator password    12) Join Microsoft AD/Domain"
+echo " 4) Configure KontrolSSO              13) Leave Microsoft AD/Domain"
 echo " 5) Reboot system                     ${sshd_option}"
 echo " 6) Halt system                       15) Restore recent configuration"
 echo " 7) Ping host                         16) Restart PHP-FPM"
-echo " 8) Shell"
+echo " 8) Shell                             17) View Proxy logs"
+echo " 99) Factory Default                  18) Install KontrolSSO"
+echo "                                      19) Uninstall KontrolSSO"
 
 echo
 read -p "Enter an option: " opmode
@@ -108,8 +112,7 @@ case ${opmode} in
 3)
 	/etc/rc.initial.password
 	;;
-4)
-	/etc/rc.initial.defaults
+4) /etc/rc.samba
 	;;
 5)
 	/etc/rc.initial.reboot
@@ -127,26 +130,40 @@ case ${opmode} in
 	/usr/local/sbin/pftop
 	;;
 10)
-	/usr/local/sbin/clog -f /var/log/filter.log
+	/usr/bin/tail -F /var/log/filter.log
 	;;
 11 | 111)
 	/etc/rc.restart_webgui
 	;;
 12)
-	/usr/local/sbin/pfSsh.php
+	/etc/rc.joindomain
 	;;
 13)
-	/bin/sh /usr/local/sbin/${product}-upgrade
+	/etc/rc.leavedomain
 	;;
 14)
 	php -f /etc/rc.initial.toggle_sshd
 	;;
 15)
-	/etc/rc.restore_config_backup
+/etc/rc.restore_config_backup
 	;;
 16)
-	/etc/rc.php-fpm_restart
+/etc/rc.php-fpm_restart
 	;;
+17)
+tail -f /var/squid/logs/cache.log
+;;
+18)
+/etc/rc.enablesso
+;;
+19)
+/etc/rc.disablesso
+;;
+
+99)
+/etc/rc.initial.defaults
+;;
+
 100)
 	if grep "$WORD" "$CONFIG"; then
 		links "https://localhost"
