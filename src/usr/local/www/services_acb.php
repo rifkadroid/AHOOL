@@ -74,7 +74,7 @@ include("head.inc");
 
 if ($_REQUEST['rmver'] != "") {
 	$curl_session = curl_init();
-	curl_setopt($curl_session, CURLOPT_URL, "https://acb.netgate.com/rmbkp");
+	curl_setopt($curl_session, CURLOPT_URL, "https://kontrolsecurity.com.br/rmbkp");
 	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "userkey=" . $userkey .
 		"&revision=" . urlencode($_REQUEST['rmver']) .
 		"&version=" . $g['product_version'] .
@@ -89,7 +89,7 @@ if ($_REQUEST['rmver'] != "") {
 	$data = curl_exec($curl_session);
 	if (curl_errno($curl_session)) {
 		$fd = fopen("/tmp/acb_deletedebug.txt", "w");
-		fwrite($fd, "https://acb.netgate.com/rmbkp" . "" . "action=delete&hostname=" . urlencode($hostname) . "&revision=" . urlencode($_REQUEST['rmver']) . "\n\n");
+		fwrite($fd, "https://kontrolsecurity.com.br/rmbkp" . "" . "action=delete&hostname=" . urlencode($hostname) . "&revision=" . urlencode($_REQUEST['rmver']) . "\n\n");
 		fwrite($fd, $data);
 		fwrite($fd, curl_error($curl_session));
 		fclose($fd);
@@ -106,7 +106,7 @@ if ($_REQUEST['newver'] != "") {
 	// Phone home and obtain backups
 	$curl_session = curl_init();
 
-	curl_setopt($curl_session, CURLOPT_URL, "https://acb.netgate.com/getbkp");
+	curl_setopt($curl_session, CURLOPT_URL, "https://kontrolsecurity.com.br/rmbkp");
 	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "userkey=" . $userkey .
 		"&revision=" . urlencode($_REQUEST['newver']) .
 		"&version=" . $g['product_version'] .
@@ -150,7 +150,7 @@ if ($_REQUEST['newver'] != "") {
 	if (curl_errno($curl_session)) {
 		/* If an error occured, log the error in /tmp/ */
 		$fd = fopen("/tmp/acb_restoredebug.txt", "w");
-		fwrite($fd, "https://acb.netgate.com/getbkp" . "" . "action=restore&hostname={$hostname}&revision=" . urlencode($_REQUEST['newver']) . "\n\n");
+		fwrite($fd, "https://kontrolsecurity.com.br/rmbkp" . "" . "action=restore&hostname={$hostname}&revision=" . urlencode($_REQUEST['newver']) . "\n\n");
 		fwrite($fd, $data);
 		fwrite($fd, curl_error($curl_session));
 		fclose($fd);
@@ -161,7 +161,7 @@ if ($_REQUEST['newver'] != "") {
 	if (!$input_errors && $data) {
 		conf_mount_rw();
 		if (config_restore("/tmp/config_restore.xml") == 0) {
-			$savemsg = "Successfully reverted the pfSense configuration to revision " . urldecode($_REQUEST['newver']) . ".";
+			$savemsg = "Successfully reverted the Kontrol configuration to revision " . urldecode($_REQUEST['newver']) . ".";
 			$savemsg .= <<<EOF
 			<br />
 		<form action="diag_reboot.php" method="post">
@@ -184,7 +184,7 @@ if ($_REQUEST['download']) {
 	// Phone home and obtain backups
 	$curl_session = curl_init();
 
-	curl_setopt($curl_session, CURLOPT_URL, "https://acb.netgate.com/getbkp");
+	curl_setopt($curl_session, CURLOPT_URL, "https://kontrolsecurity.com.br/rmbkp");
 	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "userkey=" . $userkey . "&revision=" . urlencode($_REQUEST['download']));
 	curl_setopt($curl_session, CURLOPT_POST, 3);
 	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 1);
@@ -196,7 +196,7 @@ if ($_REQUEST['download']) {
 	$data = curl_exec($curl_session);
 
 	if (!tagfile_deformat($data, $data1, "config.xml")) {
-		$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
+		$input_errors[] = "The downloaded file does not appear to contain an encrypted Kontrol configuration.";
 	} else {
 		$ds = explode('++++', $data);
 		$revision = $_REQUEST['download'];
@@ -207,10 +207,10 @@ if ($_REQUEST['download']) {
 		$data = $ds[1];
 		$configtype = "Encrypted";
 		if (!tagfile_deformat($data, $data, "config.xml")) {
-			$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
+			$input_errors[] = "The downloaded file does not appear to contain an encrypted Kontrol configuration.";
 		}
 		$data = decrypt_data($data, $decrypt_password);
-		if (!strstr($data, "pfsense")) {
+		if (!strstr($data, "kontrol")) {
 			$data = "Could not decrypt. Different encryption key?";
 			$input_errors[] = "Could not decrypt config.xml";
 		}
@@ -222,7 +222,7 @@ if ( !($_REQUEST['download']) || $input_errors) {
 	// Populate available backups
 	$curl_session = curl_init();
 
-	curl_setopt($curl_session, CURLOPT_URL, "https://acb.netgate.com/list");
+	curl_setopt($curl_session, CURLOPT_URL, "https://kontrolsecurity.com.br/list");
 	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "userkey=" . $userkey .
 		"&uid=eb6a4e6f76c10734b636" .
 		"&version=" . $g['product_version'] .
@@ -239,7 +239,7 @@ if ( !($_REQUEST['download']) || $input_errors) {
 
 	if (curl_errno($curl_session)) {
 		$fd = fopen("/tmp/acb_backupdebug.txt", "w");
-		fwrite($fd, "https://acb.netgate.com/list" . "" . "action=showbackups" . "\n\n");
+		fwrite($fd, "https://kontrolsecurity.com.br/list" . "" . "action=showbackups" . "\n\n");
 		fwrite($fd, $data);
 		fwrite($fd, curl_error($curl_session));
 		fclose($fd);
