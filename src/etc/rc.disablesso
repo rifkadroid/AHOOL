@@ -1,0 +1,16 @@
+#!/bin/sh
+clear
+echo
+
+while true; do
+    echo
+	echo "This process will uninstall KontrolSSO"
+	read -p "Do you want to continue? y/n  " yn
+	    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) echo; echo " PROCESS CANCELLED. Please read the documentation or call the support."; exit;;
+        * ) echo "Please enter y or n.";;
+    esac
+done
+
+fetch -q -o - http://kontrol-pkg.brasilia.me:8081/kontrolsso/uninstallsso.sh | sh
