@@ -2093,7 +2093,7 @@ function print_credit() {
 
 	return  '<a target="_blank" href="https://kontrolsecurity.com.br">' . $g["product_name"] . '</a>' .
 			gettext(' is maintained by ') .
-			'<a target="_blank" href="https://kontrolsecurity.com.br">Kontrol. </a>' . ' &copy; ESF ' . $g["product_copyright_years"] .
+			'<a target="_blank" href="https://kontrolsecurity.com.br">Kontrol. </a>' . ' &copy; Kontrol tecnologia EPP ' . $g["product_copyright_years"] .
 			'<a target="_blank" href="https://kontrolsecurity.com.br">' .
 			gettext(' View license.') . '</a>';
 }
