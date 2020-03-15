@@ -108,6 +108,6 @@ www/pound
 www/e2guardian
 www/%%PRODUCT_NAME%%-pkg-E2guardian5
 
-#www/sarg
-#www/%%PRODUCT_NAME%%-pkg-Sarg
+www/sarg
+www/%%PRODUCT_NAME%%-pkg-Sarg
 
