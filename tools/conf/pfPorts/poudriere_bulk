@@ -105,3 +105,8 @@ www/%%PRODUCT_NAME%%-pkg-Lightsquid
 www/%%PRODUCT_NAME%%-pkg-squid
 www/%%PRODUCT_NAME%%-pkg-squidGuard
 www/pound
+www/e2guardian
+www/%%PRODUCT_NAME%%-pkg-E2guardian5
+www/sarg
+www/%%PRODUCT_NAME%%-pkg-Sarg
+
