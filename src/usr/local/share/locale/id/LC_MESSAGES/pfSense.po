@@ -32561,7 +32561,7 @@ msgid "Login to %1$s"
 msgstr "Masuk ke %1$s"
 
 #: src/etc/inc/authgui.inc:275
-msgid "pfSense - Login"
+msgid "Kontrol - Login"
 msgstr ""
 
 #: src/etc/inc/authgui.inc:334

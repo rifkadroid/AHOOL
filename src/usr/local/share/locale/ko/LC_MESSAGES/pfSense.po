@@ -33569,7 +33569,7 @@ msgid "Login to %1$s"
 msgstr " %1$s에 로그인"
 
 #: src/etc/inc/authgui.inc:275
-msgid "pfSense - Login"
+msgid "Kontrol - Login"
 msgstr ""
 
 #: src/etc/inc/authgui.inc:334
