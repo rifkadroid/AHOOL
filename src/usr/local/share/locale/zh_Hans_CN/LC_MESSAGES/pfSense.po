@@ -32075,7 +32075,7 @@ msgid "Login to %1$s"
 msgstr "登陆到 %1$s"
 
 #: src/etc/inc/authgui.inc:273
-msgid "pfSense - Login"
+msgid "Kontrol - Login"
 msgstr ""
 
 #: src/etc/inc/authgui.inc:332
