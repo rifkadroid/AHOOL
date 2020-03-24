@@ -32495,7 +32495,7 @@ msgid "Login to %1$s"
 msgstr "Iniciar sesión en %1$s"
 
 #: src/etc/inc/authgui.inc:275
-msgid "Kontrol - Login"
+msgid "pfSense - Login"
 msgstr ""
 
 #: src/etc/inc/authgui.inc:334

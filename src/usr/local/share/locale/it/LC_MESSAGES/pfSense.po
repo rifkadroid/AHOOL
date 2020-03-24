@@ -36210,8 +36210,8 @@ msgid "Login to %1$s"
 msgstr "Accesso a %1$s"
 
 #: src/etc/inc/authgui.inc:275
-msgid "Kontrol - Login"
-msgstr "Kontrol - Login"
+msgid "pfSense - Login"
+msgstr "pfSense - Login"
 
 #: src/etc/inc/authgui.inc:334
 msgid ""
