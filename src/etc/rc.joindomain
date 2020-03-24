@@ -72,7 +72,7 @@ chown root:proxy /var/db/samba4/winbindd_privileged
 chmod -R 0750 /var/db/samba4/winbindd_privileged
 echo
 #restarting Samba Service
-/usr/local/etc/rc.d/samba_server restart
+#/usr/local/etc/rc.d/samba_server restart
 
 # Getting the PID of the Winbindd process and kill it
 PID=`pgrep winbindd`
@@ -115,7 +115,7 @@ echo
 ad_hostname=`hostname -s`
 
 echo "SMB / WINBIND STATUS"
-/usr/local/etc/rc.d/samba_server status
+#/usr/local/etc/rc.d/samba_server status
 echo
 echo
 #/usr/local/etc/rc.d/squid.sh restart

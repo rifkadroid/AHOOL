@@ -111,7 +111,7 @@ sed -i "" "22s/.*/   ${smb_domain} = ${smb_realm} /" /usr/local/etc/krb5.conf
 
 
 #Restarting SMBD and NMBD
-/usr/local/etc/rc.d/samba_server restart
+#/usr/local/etc/rc.d/samba_server restart
 
 # RESTARTING WINBINDD Getting the PID of the Winbindd process and kill it
 PID=`pgrep winbindd`
@@ -147,7 +147,7 @@ echo
 chown root:proxy /var/db/samba4/winbindd_privileged
 #chmod -R 0770 /var/db/samba4/winbindd_privileged
 echo
-/usr/local/etc/rc.d/samba_server status
+#/usr/local/etc/rc.d/samba_server status
 echo
 echo
 echo

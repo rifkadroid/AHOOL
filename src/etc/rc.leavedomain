@@ -28,7 +28,7 @@ echo
 rm /etc/krb5.keytab  2> /dev/null
 echo
 
-/usr/local/etc/rc.d/samba_server restart
+#/usr/local/etc/rc.d/samba_server restart
 
 # Getting the PID of the Winbindd process and kill it
 PID=`pgrep winbindd`
