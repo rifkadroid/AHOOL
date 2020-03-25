@@ -114,7 +114,7 @@ echo
 echo
 ad_hostname=`hostname -s`
 
-echo "SMB / WINBIND STATUS"
+#echo "SMB / WINBIND STATUS"
 #/usr/local/etc/rc.d/samba_server status
 echo
 echo
