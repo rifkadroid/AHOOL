@@ -50,7 +50,7 @@
 		<bogons>
 			<interval>monthly</interval>
 		</bogons>
-		<shellcmd>/usr/local/sbin/winbindd --daemon --configfile=/usr/local/etc/smb4.conf</shellcmd>
+		<shellcmd>/usr/local/sbin/winbindd --daemon --configfile=/usr/local/etc/smb4.conf 2>/dev/null</shellcmd>
 	</system>
 	<interfaces>
 		<wan>
