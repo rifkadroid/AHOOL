@@ -650,16 +650,6 @@ $section->addInput(new Form_Select(
 ))->setHelp('Puts the hard disk into standby mode when the selected number of minutes has elapsed since the last access.%1$s' .
 			'%2$sDo not set this for CF cards.%3$s', '<br />', '<strong>', '</strong>');
 
-$form->add($section);
-
-$section = new Form_Section('Installation Feedback');
-
-$section->addInput(new Form_Checkbox(
-	'do_not_send_uniqueid',
-	'Netgate Device ID',
-	'Do NOT send Netgate Device ID with user agent',
-	$pconfig['do_not_send_uniqueid']
-))->setHelp('Enable this option to not send Netgate Device ID to pfSense as part of User-Agent header.');
 
 $form->add($section);
 
