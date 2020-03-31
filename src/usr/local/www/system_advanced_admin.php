@@ -202,7 +202,7 @@ if ($_POST) {
 
 			unset($config['system']['webgui']['ocsp-staple']);
 		}
-		
+
 		if ($_POST['webgui-login-messages'] == "yes") {
 			$config['system']['webgui']['quietlogin'] = true;
 		} else {
@@ -476,7 +476,7 @@ $section->addInput(new Form_Checkbox(
 	'only HTTPS for future requests to the firewall FQDN. Check this box to disable HSTS. '.
 	'(NOTE: Browser-specific steps are required for disabling to take effect when the browser '.
 	'already visited the FQDN while HSTS was enabled.)');
-	
+
 $section->addInput(new Form_Checkbox(
 	'ocsp-staple',
 	'OCSP Must-Staple',
@@ -657,7 +657,7 @@ while ($counter < $numaddrs) {
 	))->addClass('btn-warning btn-xs');
 
 	if ($counter == ($numaddrs - 1)) {
-		$group->setHelp(gettext(sprintf("%sAddresses added to the whitelist will bypass login protection.%s", 
+		$group->setHelp(gettext(sprintf("%sAddresses added to the whitelist will bypass login protection.%s",
 			'<span class="text-danger">', '</span>')));
 	}
 
@@ -704,7 +704,7 @@ if (!$g['enableserial_force'] && !$g['primaryconsole_force']) {
 			'video' => gettext('VGA Console'),
 		)
 	))->setHelp('Select the preferred console if multiple consoles are present. '.
-		'The preferred console will show pfSense boot script output. All consoles '.
+		'The preferred console will show Kontrol boot script output. All consoles '.
 		'display OS boot messages, console messages, and the console menu.');
 }
 
@@ -732,7 +732,7 @@ events.push(function() {
 	// ---------- On initial page load ------------------------------------------------------------
 	hideInput('ssl-certref', $('input[name=webguiproto]:checked').val() == 'http');
 	hideCheckbox('webgui-hsts', $('input[name=webguiproto]:checked').val() == 'http');
-	hideCheckbox('ocsp-staple', "<?php 
+	hideCheckbox('ocsp-staple', "<?php
 			$cert_temp = lookup_cert($config['system']['webgui']['ssl-certref']);
 			echo (cert_get_ocspstaple($cert_temp['crt']) ? "true" : "false");
 			?>" === "true");

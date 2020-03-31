@@ -665,7 +665,7 @@ $section->addInput(new Form_Input(
 	'State or Province',
 	'text',
 	$pconfig['dn_state'],
-	['placeholder' => 'e.g. Texas']
+	['placeholder' => 'e.g. SP']
 ));
 
 $section->addInput(new Form_Input(
@@ -673,7 +673,7 @@ $section->addInput(new Form_Input(
 	'City',
 	'text',
 	$pconfig['dn_city'],
-	['placeholder' => 'e.g. Austin']
+	['placeholder' => 'e.g. Sao Paulo']
 ));
 
 $section->addInput(new Form_Input(

@@ -1055,7 +1055,7 @@ events.push(function() {
 
 	// Handle displaying a warning message if a user-created theme is selected.
 	function setThemeWarning() {
-		if ($('#webguicss').val().startsWith("pfSense")) {
+		if ($('#webguicss').val().startsWith("Kontrol")) {
 			$('#csstxt').html("").addClass("text-default");
 		} else {
 			$('#csstxt').html("<?=$csswarning?>").addClass("text-danger");
