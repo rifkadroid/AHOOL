@@ -164,7 +164,7 @@ EOD;
 		<input type="submit" name="accept" class="login login-submit" value="Login" id="login" {$disabled}>
 	  </form>
 	  <br  />
-	  <span> <i>Made with &hearts; by</i> <strong>Netgate</strong></span>
+	  <span> <i>Made with &hearts; by</i> <strong>Kontrol</strong></span>
 	</div>
 	<div id="terms">
 		<textarea readonly>{$termsconditions}</textarea>
@@ -2231,8 +2231,8 @@ function portal_allow($clientip, $clientmac, $username, $password = null, $attri
 	}
 
 	$writecfg = false;
-	/* If both "Add MAC addresses of connected users as pass-through MAC" and "Disable concurrent logins" are checked, 
-	then we need to check if the user was already authenticated using another MAC Address, and if so remove the previous Pass-Through MAC. */	
+	/* If both "Add MAC addresses of connected users as pass-through MAC" and "Disable concurrent logins" are checked,
+	then we need to check if the user was already authenticated using another MAC Address, and if so remove the previous Pass-Through MAC. */
 	if ((isset($config['captiveportal'][$cpzone]['noconcurrentlogins'])) && ($username != 'unauthenticated') && isset($config['captiveportal'][$cpzone]['passthrumacadd'])) {
 		$mac = captiveportal_passthrumac_findbyname($username);
 		if (!empty($mac)) {
