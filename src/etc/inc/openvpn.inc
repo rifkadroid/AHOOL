@@ -1046,7 +1046,8 @@ function openvpn_reconfigure($mode, $settings) {
 				$conf .= "verify-client-cert none\n";
 			case 'server_tls_user':
 				/* username-as-common-name is not compatible with server-bridge */
-				if (stristr($conf, "server-bridge") === false) {
+				if ((stristr($conf, "server-bridge") === false) &&
+				    ($settings['username_as_common_name'] != 'disabled')) {
 					$conf .= "username-as-common-name\n";
 				}
 				if (!empty($settings['authmode'])) {
@@ -1137,7 +1138,8 @@ function openvpn_reconfigure($mode, $settings) {
 		$conf .= "management {$g['varetc_path']}/openvpn/{$mode_id}.sock unix\n";
 
 		// The remote server
-		$conf .= "remote {$settings['server_addr']} {$settings['server_port']}\n";
+		$remoteproto = strtolower($settings['protocol']);
+		$conf .= "remote {$settings['server_addr']} {$settings['server_port']} {$remoteproto}\n";
 
 		if (!empty($settings['use_shaper'])) {
 			$conf .= "shaper {$settings['use_shaper']}\n";

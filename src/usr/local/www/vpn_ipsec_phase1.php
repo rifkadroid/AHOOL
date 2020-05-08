@@ -445,7 +445,7 @@ if ($_POST['save']) {
 			}
 		}
 	}
-	if (is_array($old_ph1ent) && ipsec_vti($old_ph1ent) && $pconfig['disabled']) {
+	if (is_array($old_ph1ent) && ipsec_vti($old_ph1ent, false, false) && $pconfig['disabled']) {
 		$input_errors[] = gettext("Cannot disable a Phase 1 with a child Phase 2 while the interface is assigned. Remove the interface assignment before disabling this P2.");
 	}
 
@@ -861,7 +861,7 @@ foreach($pconfig['encryption']['item'] as $key => $p1enc) {
 	$section->add($group);
 	$counter += 1;
 }
-$section->addInput(new Form_StaticText('', ''))->setHelp('Note: Blowfish, 3DES, CAST128, MD5, SHA1, and DH groups 1, 2, 22, 23, and 24 provide weak security and should be avoided.');
+$section->addInput(new Form_StaticText('', ''))->setHelp('Note: Blowfish, 3DES, CAST128, MD5, SHA1, and DH groups 1, 2, 5, 22, 23, and 24 provide weak security and should be avoided.');
 $form->add($section);
 
 $btnaddopt = new Form_Button(

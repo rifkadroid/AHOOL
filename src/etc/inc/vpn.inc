@@ -2006,6 +2006,13 @@ l2tps:
 	set link enable incoming
 
 EOD;
+			if (isset($l2tpcfg['secret'])) {
+				$secret = str_replace('"', '\"', base64_decode($l2tpcfg['secret']));
+				$mpdconf .=<<<EOD
+	set l2tp secret "{$secret}"
+
+EOD;
+			}
 
 
 			if (isset ($l2tpcfg['radius']['enable'])) {
@@ -2030,29 +2037,7 @@ EOD;
 			fclose($fd);
 			unset($mpdconf);
 
-			/* write mpd.secret */
-			$fd = fopen("{$g['varetc_path']}/l2tp-vpn/mpd.secret", "w");
-			if (!$fd) {
-				printf(gettext("Error: cannot open mpd.secret in vpn_l2tp_configure().") . "\n");
-				return 1;
-			}
-
-			$mpdsecret = "\n\n";
-
-			if (is_array($l2tpcfg['user'])) {
-				foreach ($l2tpcfg['user'] as $user) {
-					/* Escape double quotes, do not allow password to start with '!'
-					 * https://redmine.pfsense.org/issues/10275 */
-					$pass = str_replace('"', '\"', ltrim($user['password'], '!'));
-					$mpdsecret .= "{$user['name']} \"{$pass}\" {$user['ip']}\n";
-				}
-			}
-
-			fwrite($fd, $mpdsecret);
-			fclose($fd);
-			unset($mpdsecret);
-			chmod("{$g['varetc_path']}/l2tp-vpn/mpd.secret", 0600);
-
+			vpn_l2tp_updatesecret();
 			vpn_netgraph_support();
 
 			/* fire up mpd */
@@ -2067,6 +2052,35 @@ EOD;
 	if (platform_booting()) {
 		echo "done\n";
 	}
+
+	return 0;
+}
+
+function vpn_l2tp_updatesecret() {
+	global $config, $g;
+	$l2tpcfg = $config['l2tp'];
+
+	$fd = fopen("{$g['varetc_path']}/l2tp-vpn/mpd.secret", "w");
+	if (!$fd) {
+		printf(gettext("Error: cannot open mpd.secret in vpn_l2tp_updatesecret().") . "\n");
+		return 1;
+	}
+
+	$mpdsecret = "\n\n";
+
+	if (is_array($l2tpcfg['user'])) {
+		foreach ($l2tpcfg['user'] as $user) {
+			/* Escape double quotes, do not allow password to start with '!'
+			 * https://redmine.pfsense.org/issues/10275 */
+			$pass = str_replace('"', '\"', ltrim($user['password'], '!'));
+			$mpdsecret .= "{$user['name']} \"{$pass}\" {$user['ip']}\n";
+		}
+	}
+
+	fwrite($fd, $mpdsecret);
+	fclose($fd);
+	unset($mpdsecret);
+	chmod("{$g['varetc_path']}/l2tp-vpn/mpd.secret", 0600);
 
 	return 0;
 }
