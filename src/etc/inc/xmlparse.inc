@@ -216,11 +216,12 @@ function parse_xml_config_raw($cffile, $rootobj, $isstring = "false") {
 /* Return true if a field should be cdata encoded */
 function is_cdata_entity($ent) {
 	$cdata_fields = array(
-		'auth_prompt', 'certca', 'certname', 'city', 'common_name',
+		'auth_pass', 'auth_prompt', 'auth_user', 'certca', 'certname', 'city', 'common_name',
 		'descr', 'detail', 'email', 'encryption_password', 'ldap_attr',
-		'ldap_authcn', 'ldap_basedn', 'ldap_bind',
-		'ldap_extended_query', 'login_banner', 'organization', 'state',
-		'text', 'username', 'password', 'auth_user', 'auth_pass'
+		'ldap_authcn', 'ldap_basedn', 'ldap_basedomain', 'ldap_bind', 'ldapbinddn',
+		'ldapbindpass', 'ldap_extended_query', 'ldap_filter', 'ldap_pass', 'ldap_user',
+		'login_banner', 'organization', 'password', 'rangedescr', 'state', 'text',
+		'username', 'varusersusername', 'varuserspassword'
 	);
 
 	/* Check if the entity name starts with any of the strings above */

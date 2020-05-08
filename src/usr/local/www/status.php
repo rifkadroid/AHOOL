@@ -64,10 +64,10 @@ $filtered_tags = array(
 	'barnyard_dbpwd', 'bcrypt-hash', 'cert_key', 'crypto_password',
 	'crypto_password2', 'dns_nsupdatensupdate_key', 'encryption_password',
 	'etpro_code', 'etprocode', 'gold_encryption_password', 'gold_password',
-	'influx_pass', 'ipsecpsk', 'ldap_bindpw', 'lighttpd_ls_password',
-	'lighttpd_ls_password', 'md5-hash', 'md5password', 'md5sigkey',
-	'md5sigpass', 'nt-hash', 'oinkcode', 'oinkmastercode', 'passphrase',
-	'password', 'passwordagain', 'postgresqlpasswordenc', 'pre-shared-key',
+	'influx_pass', 'ipsecpsk', 'ldap_bindpw', 'ldapbindpass', 'ldap_pass',
+	'lighttpd_ls_password',	'md5-hash', 'md5password', 'md5sigkey',	'md5sigpass', 
+	'nt-hash', 'oinkcode', 'oinkmastercode', 'passphrase', 'password', 
+	'passwordagain', 'pkcs11pin', 'postgresqlpasswordenc', 'pre-shared-key',
 	'proxypass', 'proxy_passwd', 'proxyuser', 'proxy_user', 'prv',
 	'radius_secret', 'redis_password', 'redis_passwordagain', 'rocommunity',
 	'secret', 'shared_key', 'tls', 'tlspskidentity', 'tlspskfile',
@@ -332,6 +332,9 @@ defCmdT("IPsec-SAD", "/sbin/setkey -D");
 if (file_exists("/cf/conf/upgrade_log.txt")) {
 	defCmdT("OS-Upgrade Log", "/bin/cat /cf/conf/upgrade_log.txt");
 }
+if (file_exists("/cf/conf/upgrade_log.latest.txt")) {
+	defCmdT("OS-Upgrade Log Latest", "/bin/cat /cf/conf/upgrade_log.latest.txt");
+}
 if (file_exists("/boot/loader.conf")) {
 	defCmdT("OS-Boot Loader Configuration", "/bin/cat /boot/loader.conf");
 }
@@ -340,6 +343,16 @@ if (file_exists("/boot/loader.conf.local")) {
 }
 if (file_exists("/var/etc/filterdns.conf")) {
 	defCmdT("DNS-filterdns Daemon Configuration", "/bin/cat /var/etc/filterdns.conf");
+}
+
+if (is_dir("/var/etc/openvpn")) {
+	foreach(glob('/var/etc/openvpn/*.conf') as $file) {
+		$ovpnfile = explode('/', $file);
+		if (!count($ovpnfile) || (count($ovpnfile) < 5)) {
+			continue;
+		}
+		defCmdT("OpenVPN-Configuration {$ovpnfile[4]}", "/bin/cat " . escapeshellarg($file));
+	}
 }
 
 /* Logs */

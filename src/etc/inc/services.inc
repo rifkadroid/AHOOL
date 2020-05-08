@@ -1177,7 +1177,7 @@ EOD;
 		$dhcpdifs[] = get_real_interface($dhcpif);
 		if ($newzone['domain-name']) {
 			if ($need_ddns_updates) {
-				$newzone['dns-servers'] = array($dhcpifconf['ddnsdomainprimary']);
+				$newzone['dns-servers'] = array($dhcpifconf['ddnsdomainprimary'], $dhcpifconf['ddnsdomainsecondary']);
 				$newzone['ddnsdomainkeyname'] = $dhcpifconf['ddnsdomainkeyname'];
 				$newzone['ddnsdomainkeyalgorithm'] = $dhcpifconf['ddnsdomainkeyalgorithm'];
 				$newzone['ddnsdomainkey'] = $dhcpifconf['ddnsdomainkey'];
@@ -1249,9 +1249,9 @@ function dhcpdzones($ddns_zones) {
 			$primary = $zone['dns-servers'][0];
 			$secondary = empty($zone['dns-servers'][1]) ? "" : $zone['dns-servers'][1];
 
-			// Make sure we aren't using any invalid or IPv6 DNS servers.
-			if (!is_ipaddrv4($primary)) {
-				if (is_ipaddrv4($secondary)) {
+			// Make sure we aren't using any invalid servers.
+			if (!is_ipaddr($primary)) {
+				if (is_ipaddr($secondary)) {
 					$primary = $secondary;
 					$secondary = "";
 				} else {
@@ -1262,9 +1262,15 @@ function dhcpdzones($ddns_zones) {
 			// We don't need to add zones multiple times.
 			if ($zone['domain-name'] && !in_array($zone['domain-name'], $added_zones)) {
 				$dhcpdconf .= "zone {$zone['domain-name']}. {\n";
-				$dhcpdconf .= "	primary {$primary};\n";
+				if (is_ipaddrv4($primary)) {
+					$dhcpdconf .= "	primary {$primary};\n";
+				} else {
+					$dhcpdconf .= "	primary6 {$primary};\n";
+				}
 				if (is_ipaddrv4($secondary)) {
 					$dhcpdconf .= "	secondary {$secondary};\n";
+				} elseif (is_ipaddrv6($secondary)) {
+					$dhcpdconf .= "	secondary6 {$secondary};\n";
 				}
 				if ($zone['ddnsdomainkeyname'] <> "" && $zone['ddnsdomainkey'] <> "") {
 					$dhcpdconf .= "	key {$zone['ddnsdomainkeyname']};\n";
@@ -1274,9 +1280,15 @@ function dhcpdzones($ddns_zones) {
 			}
 			if ($zone['ptr-domain'] && !in_array($zone['ptr-domain'], $added_zones)) {
 				$dhcpdconf .= "zone {$zone['ptr-domain']} {\n";
-				$dhcpdconf .= "	primary {$primary};\n";
+				if (is_ipaddrv4($primary)) {
+					$dhcpdconf .= "	primary {$primary};\n";
+				} else {
+					$dhcpdconf .= "	primary6 {$primary};\n";
+				}
 				if (is_ipaddrv4($secondary)) {
 					$dhcpdconf .= "	secondary {$secondary};\n";
+				} elseif (is_ipaddrv6($secondary)) {
+					$dhcpdconf .= "	secondary6 {$secondary};\n";
 				}
 				if ($zone['ddnsdomainkeyname'] <> "" && $zone['ddnsdomainkey'] <> "") {
 					$dhcpdconf .= "	key {$zone['ddnsdomainkeyname']};\n";
@@ -1400,7 +1412,7 @@ EOD;
 		}
 
 		if ($dhcpv6ifconf['domainsearchlist'] <> "") {
-			$dnscfgv6 .= "	option domain-search \"" . join("\",\"", preg_split("/[ ;]+/", $dhcpv6ifconf['domainsearchlist'])) . "\";\n";
+			$dnscfgv6 .= "	option dhcp6.domain-search \"" . join("\",\"", preg_split("/[ ;]+/", $dhcpv6ifconf['domainsearchlist'])) . "\";\n";
 		}
 
 		if (isset($dhcpv6ifconf['ddnsupdate'])) {
@@ -1445,7 +1457,7 @@ EOD;
 		    !empty($dhcpv6ifconf['ddnsdomain'])) {
 			$newzone = array();
 			$newzone['domain-name'] = $dhcpv6ifconf['ddnsdomain'];
-			$newzone['dns-servers'][] = $dhcpv6ifconf['ddnsdomainprimary'];
+			$newzone['dns-servers'] = array($dhcpv6ifconf['ddnsdomainprimary'], $dhcpv6ifconf['ddnsdomainsecondary']);
 			$newzone['ddnsdomainkeyname'] = $dhcpv6ifconf['ddnsdomainkeyname'];
 			$newzone['ddnsdomainkey'] = $dhcpv6ifconf['ddnsdomainkey'];
 			$ddns_zones[] = $newzone;
@@ -1454,7 +1466,7 @@ EOD;
 				foreach ($ptr_zones as $ptr_zone) {
 					$reversezone = array();
 					$reversezone['ptr-domain'] = $ptr_zone;
-					$reversezone['dns-servers'][] = $dhcpv6ifconf['ddnsdomainprimary'];
+					$reversezone['dns-servers'] = array($dhcpv6ifconf['ddnsdomainprimary'], $dhcpv6ifconf['ddnsdomainsecondary']);
 					$reversezone['ddnsdomainkeyname'] = $dhcpv6ifconf['ddnsdomainkeyname'];
 					$reversezone['ddnsdomainkey'] = $dhcpv6ifconf['ddnsdomainkey'];
 					$ddns_zones[] = $reversezone;
@@ -1615,6 +1627,7 @@ EOD;
 
 	if ($nsupdate) {
 		$dhcpdv6conf .= "ddns-update-style interim;\n";
+		$dhcpdv6conf .= "update-static-leases on;\n";
 	} else {
 		$dhcpdv6conf .= "ddns-update-style none;\n";
 	}
@@ -1750,12 +1763,11 @@ function services_dhcrelay_configure() {
 	$dhcrelayifs = array();
 	$dhcifaces = explode(",", $dhcrelaycfg['interface']);
 	foreach ($dhcifaces as $dhcrelayif) {
-		if (!isset($iflist[$dhcrelayif]) ||
-		    link_interface_to_bridge($dhcrelayif)) {
+		if (!isset($iflist[$dhcrelayif])) {
 			continue;
 		}
 
-		if (is_ipaddr(get_interface_ip($dhcrelayif))) {
+		if (get_interface_ip($dhcrelayif)) {
 			$dhcrelayifs[] = get_real_interface($dhcrelayif);
 		}
 	}
@@ -1773,28 +1785,44 @@ function services_dhcrelay_configure() {
 	$srvifaces = array();
 	foreach ($srvips as $srcidx => $srvip) {
 		$destif = guess_interface_from_ip($srvip);
-		if (!empty($destif)) {
+		if (!empty($destif) && !is_pseudo_interface($destif)) {
 			$srvifaces[] = $destif;
 		}
 	}
 	$srvifaces = array_unique($srvifaces);
 
+	/* Check for relays in the same subnet as clients so they can bind for
+	 * either direction (up or down) */
+	$srvrelayifs = array_intersect($dhcrelayifs, $srvifaces);
+
 	/* The server interface(s) should not be in this list */
 	$dhcrelayifs = array_diff($dhcrelayifs, $srvifaces);
 
+	/* Remove the dual-role interfaces from up and down lists */
+	$srvifaces = array_diff($srvifaces, $srvrelayifs);
+	$dhcrelayifs = array_diff($dhcrelayifs, $srvrelayifs);
+
 	/* fire up dhcrelay */
-	if (empty($dhcrelayifs)) {
+	if (empty($dhcrelayifs) && empty($srvrelayifs)) {
 		log_error(gettext("No suitable downstream interfaces found for running dhcrelay!"));
 		return; /* XXX */
 	}
-	if (empty($srvifaces)) {
+	if (empty($srvifaces) && empty($srvrelayifs)) {
 		log_error(gettext("No suitable upstream interfaces found for running dhcrelay!"));
 		return; /* XXX */
 	}
 
 	$cmd = "/usr/local/sbin/dhcrelay";
-	$cmd .= " -id " . implode(" -id ", $dhcrelayifs);
-	$cmd .= " -iu " . implode(" -iu ", $srvifaces);
+
+	if (!empty($dhcrelayifs)) {
+		$cmd .= " -id " . implode(" -id ", $dhcrelayifs);
+	}
+	if (!empty($srvifaces)) {
+		$cmd .= " -iu " . implode(" -iu ", $srvifaces);
+	}
+	if (!empty($srvrelayifs)) {
+		$cmd .= " -i " . implode(" -i ", $srvrelayifs);
+	}
 
 	if (isset($dhcrelaycfg['agentoption'])) {
 		$cmd .= " -a -m replace";
@@ -1836,12 +1864,11 @@ function services_dhcrelay6_configure() {
 
 	$dhcifaces = explode(",", $dhcrelaycfg['interface']);
 	foreach ($dhcifaces as $dhcrelayif) {
-		if (!isset($iflist[$dhcrelayif]) ||
-		    link_interface_to_bridge($dhcrelayif)) {
+		if (!isset($iflist[$dhcrelayif])) {
 			continue;
 		}
 
-		if (is_ipaddrv6(get_interface_ipv6($dhcrelayif))) {
+		if (get_interface_ipv6($dhcrelayif)) {
 			$dhcrelayifs[] = get_real_interface($dhcrelayif);
 		}
 	}
@@ -1855,7 +1882,7 @@ function services_dhcrelay6_configure() {
 	$srvifaces = array();
 	foreach ($srvips as $srcidx => $srvip) {
 		$destif = guess_interface_from_ip($srvip);
-		if (!empty($destif)) {
+		if (!empty($destif) && !is_pseudo_interface($destif)) {
 			$srvifaces[] = "{$srvip}%{$destif}";
 		}
 	}

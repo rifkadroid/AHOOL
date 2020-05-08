@@ -363,6 +363,8 @@ function ipsec_idinfo_to_cidr(& $idinfo, $addrbits = false, $mode = "") {
 			if ($addrbits) {
 				if ($mode == "tunnel6") {
 					return $idinfo['address']."/128";
+				} elseif (($mode == "vti") && is_ipaddrv4($idinfo['address'])) {
+					return $idinfo['address']."/30";
 				} elseif (($mode == "vti") && is_ipaddrv6($idinfo['address'])) {
 					return $idinfo['address']."/64";
 				} else {
@@ -919,7 +921,7 @@ function ipsec_get_loglevels() {
 	return $levels;
 }
 
-function ipsec_vti($ph1ent, $returnaddresses = false) {
+function ipsec_vti($ph1ent, $returnaddresses = false, $skipdisabled = true) {
 	global $config;
 	if (empty($ph1ent) || !is_array($ph1ent) || !is_array($config['ipsec']['phase2'])) {
 		return false;
@@ -940,7 +942,11 @@ function ipsec_vti($ph1ent, $returnaddresses = false) {
 					'descr' => $ph2ent['descr'],
 				);
 			}
-			$is_vti = true;
+			if (!$skipdisabled && isset($ph2ent['disabled'])) {
+				continue;
+			} else {
+				$is_vti = true;
+			}
 		}
 	}
 	return ($returnaddresses) ? $vtisubnet_spec : $is_vti;
