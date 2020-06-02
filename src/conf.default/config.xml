@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<kontrol>
+<konntrol>
 	<version>18.0</version>
 	<lastchange/>
 	<system>
@@ -281,4 +281,4 @@
 		<hideversion/>
 		<dnssecstripped/>
 	</unbound>
-</kontrol>
+</konntrol>
