@@ -137,7 +137,7 @@ if (function_exists("display_error_form") && !isset($config['system']['webgui'][
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<link rel="stylesheet" href="/css/Konntrol.css" />
+	<link rel="stylesheet" href="/css/Kontrol.css" />
 	<title><?=gettext("Redirecting..."); ?></title>
 </head>
 <body id="error" class="no-menu">
@@ -2104,10 +2104,10 @@ function session_auth() {
 function print_credit() {
 	global $g;
 
-	return  '<a target="_blank" href="https://konntrol.com.br">' . $g["product_name"] . '</a>' .
+	return  '<a target="_blank" href="https://kontrolsecurity.com.br">' . $g["product_name"] . '</a>' .
 			gettext(' is maintained by ') .
-			'<a target="_blank" href="https://konntrol.com.br">Konntrol. </a>' . ' &copy; Konntrol tecnologia EPP ' . $g["product_copyright_years"] .
-			'<a target="_blank" href="https://konntrol.com.br">' .
+			'<a target="_blank" href="https://kontrolsecurity.com.br">Kontrol. </a>' . ' &copy; Kontrol tecnologia EPP ' . $g["product_copyright_years"] .
+			'<a target="_blank" href="https://kontrolsecurity.com.br">' .
 			gettext(' View license.') . '</a>';
 }
 function get_user_remote_address() {

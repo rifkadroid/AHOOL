@@ -1,11 +1,11 @@
 #!/bin/sh
 clear
 echo
-echo "*** Checking if KonntrolSSO is Installed ***"
+echo "*** Checking if KontrolSSO is Installed ***"
 echo
-if [ ! -f /usr/local/etc/smb4.conf ]; then  echo "KonntrolSSO not installed - Please install it first."; sleep 5; echo; exit
+if [ ! -f /usr/local/etc/smb4.conf ]; then  echo "KontrolSSO not installed - Please install it first."; sleep 5; echo; exit
 else
-echo "KonntrolSSO is installed"
+echo "KontrolSSO is installed"
 fi
 
 echo
@@ -19,7 +19,7 @@ echo
 while true; do
 
 	echo
-	echo "In order to configure the SMB/KERBEROS, this Konntrol Box "
+	echo "In order to configure the SMB/KERBEROS, this Kontrol Box "
 	echo " must be previously configured using the WEBGUI Interface."
 	echo "The Hostname, DNS, NTP, IP Address and Gateway must be "
 	echo " already configured to continue..."
@@ -38,10 +38,10 @@ done
 iface_avail=`ifconfig -l`
 
 echo "********************* ATTENTION **********************"
-echo "**DO NOT ENABLE KONNTROLSSO ON WAN/LINK INTERFACES!!!**"
+echo "**DO NOT ENABLE KONTROLSSO ON WAN/LINK INTERFACES!!!**"
 echo "******************************************************"
 echo ""
-echo "Enter the interfaces you want to enable KonntrolSSO on:"
+echo "Enter the interfaces you want to enable KontrolSSO on:"
 echo "eg. re0 em0  -   use space between multiple values."
 echo "Available Interfaces are: ${iface_avail} "
 echo "loopback/lo0 is set automatically "

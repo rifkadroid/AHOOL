@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
-<konntrol>
+<kontrol>
 	<version>18.0</version>
 	<lastchange/>
 	<system>
 		<optimization>normal</optimization>
-		<hostname>Konntrol</hostname>
+		<hostname>Kontrol</hostname>
 		<domain>localdomain</domain>
 		<dnsserver/>
 		<dnsallowoverride/>
@@ -281,4 +281,4 @@
 		<hideversion/>
 		<dnssecstripped/>
 	</unbound>
-</konntrol>
+</kontrol>

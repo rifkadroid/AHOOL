@@ -164,7 +164,7 @@ EOD;
 		<input type="submit" name="accept" class="login login-submit" value="Login" id="login" {$disabled}>
 	  </form>
 	  <br  />
-	  <span> <i>Made with &hearts; by</i> <strong>Konntrol</strong></span>
+	  <span> <i>Made with &hearts; by</i> <strong>Kontrol</strong></span>
 	</div>
 	<div id="terms">
 		<textarea readonly>{$termsconditions}</textarea>
@@ -633,7 +633,7 @@ function captiveportal_init_rules($reinit = false) {
 	$cprules .= "# layer 2: pass ARP\n";
 	$cprules .= captiveportal_create_ipfw_rule("add", $rulenum,
 	    "pass layer2 mac-type arp,rarp");
-	$cprules .= "# Konntrol requires for WPA\n";
+	$cprules .= "# Kontrol requires for WPA\n";
 	$cprules .= captiveportal_create_ipfw_rule("add", $rulenum,
 	    "pass layer2 mac-type 0x888e,0x88c7");
 	$cprules .= "# PPP Over Ethernet Session Stage/Discovery Stage\n";

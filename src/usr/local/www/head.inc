@@ -36,7 +36,7 @@ if ($user_settings['webgui']['pagenamefirst']) {
 	$tabtitle = htmlspecialchars($system_url) . " - " . $pagetitle;
 }
 
-$cssfile = "/css/Konntrol.css";
+$cssfile = "/css/Kontrol.css";
 
 if (isset($user_settings['webgui']['webguicss'])) {
 	if (file_exists("/usr/local/www/css/" . $user_settings['webgui']['webguicss'])) {
@@ -421,16 +421,16 @@ $diagnostics_menu = msort(array_merge($diagnostics_menu, return_ext_menu("Diagno
 if (!$g['disablehelpmenu']) {
 	$help_menu = array();
 	$help_menu[] = array(gettext("About this Page"), $helpurl);
-	if ($g['product_name'] == "Konntrol") {
-		$help_menu[] = array(gettext("Bug Database"), "https://konntrol.com.br/");
+	if ($g['product_name'] == "Kontrol") {
+		$help_menu[] = array(gettext("Bug Database"), "https://kontrolsecurity.com.br/");
 	}
 
-	$help_menu[] = array(gettext("User Forum"), "https://konntrol.com.br/");
-	$help_menu[] = array(gettext("Documentation"), "https://konntrol.com.br/");
-	$help_menu[] = array(gettext("Paid Support"), "https://konntrol.com.br/");
-	$help_menu[] = array(gettext("Konntrol Book"), "https://konntrol.com.br/");
-	$help_menu[] = array(gettext("FreeBSD Handbook"), "https://konntrol.com.br/");
-	$help_menu[] = array(gettext("User survey"), "https://konntrol.com.br/");
+	$help_menu[] = array(gettext("User Forum"), "https://kontrolsecurity.com.br/");
+	$help_menu[] = array(gettext("Documentation"), "https://kontrolsecurity.com.br/");
+	$help_menu[] = array(gettext("Paid Support"), "https://kontrolsecurity.com.br/");
+	$help_menu[] = array(gettext("Kontrol Book"), "https://kontrolsecurity.com.br/");
+	$help_menu[] = array(gettext("FreeBSD Handbook"), "https://kontrolsecurity.com.br/");
+	$help_menu[] = array(gettext("User survey"), "https://kontrolsecurity.com.br/");
 	$help_menu = msort(array_merge($help_menu, return_ext_menu("Help")), 0);
 }
 
@@ -472,7 +472,7 @@ if (are_notices_pending()) {
 			</button>
 			<a class="navbar-brand" href="/">
 				<?php include("/usr/local/www/logo.svg"); ?>
-				<span style="color:white;font-size:.5em;text-transform:uppercase;letter-spacing:1px;">KONNTROL - UTM</span>
+				<span style="color:white;font-size:.5em;text-transform:uppercase;letter-spacing:1px;">KONTROL - UTM</span>
 			</a>
 		</div>
 		<div class="collapse navbar-collapse" id="pf-navbar">

@@ -71,7 +71,7 @@ fi
 /etc/rc.banner
 
 # Read product_name from $g, defaults to pfSense
-product=$(/usr/local/sbin/read_global_var product_name Konntrol)
+product=$(/usr/local/sbin/read_global_var product_name Kontrol)
 
 # Check to see if SSH is running.
 if pgrep -q -a -F /var/run/sshd.pid sshd >/dev/null 2>&1; then
@@ -86,13 +86,13 @@ echo " 0) Logout (SSH only)                  9) pfTop"
 echo " 1) Assign Interfaces                 10) Filter Logs"
 echo " 2) Set interface(s) IP address       11) Restart webConfigurator"
 echo " 3) Reset webConfigurator password    12) Join Microsoft AD/Domain"
-echo " 4) Configure KonntrolSSO              13) Leave Microsoft AD/Domain"
+echo " 4) Configure KontrolSSO              13) Leave Microsoft AD/Domain"
 echo " 5) Reboot system                     ${sshd_option}"
 echo " 6) Halt system                       15) Restore recent configuration"
 echo " 7) Ping host                         16) Restart PHP-FPM"
 echo " 8) Shell                             17) View Proxy logs"
-echo " 99) Factory Default                  18) Install KonntrolSSO"
-echo "                                      19) Uninstall KonntrolSSO"
+echo " 99) Factory Default                  18) Install KontrolSSO"
+echo "                                      19) Uninstall KontrolSSO"
 
 echo
 read -p "Enter an option: " opmode

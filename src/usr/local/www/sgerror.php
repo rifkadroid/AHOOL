@@ -3,7 +3,7 @@ include "globals.inc";
 include "config.inc";
 $page_info = <<<EOD
 # ----------------------------------------------------------------------------------------------------------------------
-# KONNTROL (C) is Copyright -  SquidGuard error page generator
+# KONTROL (C) is Copyright -  SquidGuard error page generator
 # This script was based on the original script by (C)2006-2007 Serg Dvoriancev
 # ----------------------------------------------------------------------------------------------------------------------
 # This programm processed redirection to specified URL or generated error page for standart HTTP error code.
@@ -217,7 +217,7 @@ $str[] = '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/T
 $str[] = '<html>';
 $str[] = '<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title></title></head>';
 
-# Added the 2 lines below to make squidGuard put denied pages into the squid log. (by Konntrol (C) )
+# Added the 2 lines below to make squidGuard put denied pages into the squid log. (by Kontrol (C) )
 $sge_prefix=(preg_match("/\?/",$cl['u'])?"&":"?");
 $str[] = '<iframe src="'.$cl['u'].$sge_prefix.'sgr=ACCESSDENIED" width="1" height="1"></iframe>';
 
@@ -245,14 +245,14 @@ $str[] = '<ul>';
 $str[] = '<li><font size="1" face="Verdana, Arial, Helvetica, sans-serif">A página tem conteúdo inapropriado.</font></li>';
 $str[] = '<li><font size="1" face="Verdana, Arial, Helvetica, sans-serif">Seu usuário ID está em um grupo com políticas de restrição.</font></li>';
 $str[] = '<li><font size="1" face="Verdana, Arial, Helvetica, sans-serif">Por favor Clique <a href="javascript:history.back()">aqui</a> para voltar.</font></li>';
-$str[] = '<li id="list3"><font size="1" face="Verdana, Arial, Helvetica, sans-serif"> Se você acredita, por alguma razão, que este bloqueio é indevido, entre em contato com o administrador <a href="mailto:administrator@corporation.corp?Subject=Website blocked by Konntrol">E-mail Administrador</a></font></li>';
+$str[] = '<li id="list3"><font size="1" face="Verdana, Arial, Helvetica, sans-serif"> Se você acredita, por alguma razão, que este bloqueio é indevido, entre em contato com o administrador <a href="mailto:administrator@corporation.corp?Subject=Website blocked by Kontrol">E-mail Administrador</a></font></li>';
 $str[] = '<li><font size="1" face="Verdana, Arial, Helvetica, sans-serif">Por favor, inclua detalhes sobre a página bloqueada.</font></li>';
 $str[] = '</ul>';
 
 $str[] = '<p><img style="padding-top:20px;display: block;margin: 0px auto" src="http://'. $_SERVER['HTTP_HOST'] .'/blocked.png" alt="geblockt"></p>';
 $str[] = '<p><img style="padding-top:20px;display: block;margin: 0px auto" src="http://'. $_SERVER['HTTP_HOST'] .'/logo.png" </p></div></div>';
 
-$str[] = '<div style="padding:5px; background-color:#C0C0C0; text-align:right; color:#FFFFFF; font-size:60%; font-family:verdana,arial,sans serif;">Filtered by <a style="color:#FFFFFF;"><b>Konntrol</b></a></div></div>';
+$str[] = '<div style="padding:5px; background-color:#C0C0C0; text-align:right; color:#FFFFFF; font-size:60%; font-family:verdana,arial,sans serif;">Filtered by <a style="color:#FFFFFF;"><b>Kontrol</b></a></div></div>';
 $str[] = "</body>";
 $str[] = "</html>";
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
-# KONNTROL UTM - LCDd Daemon monitoring script
+# KONTROL UTM - LCDd Daemon monitoring script
 
 # Cheking if LCDd daemon service is installed.
-if [ ! -d /usr/local/share/Konntrol-pkg-LCDproc ]; then {
+if [ ! -d /usr/local/share/Kontrol-pkg-LCDproc ]; then {
 echo "Service not installed";
 exit;
 }
