@@ -52,7 +52,7 @@ if ($config['notifications']['growl']['notification_name']) {
 if ($config['notifications']['growl']['name']) {
 	$pconfig['name'] = $config['notifications']['growl']['name'];
 } else {
-  $pconfig['name'] = 'Kontrol-Growl';
+  $pconfig['name'] = 'Konntrol-Growl';
 }
 
 
@@ -355,7 +355,7 @@ $section->addInput(new Form_Input(
 	'Registration Name',
 	'text',
 	$pconfig['name'],
-	['placeholder' => 'Kontrol-Growl']
+	['placeholder' => 'Konntrol-Growl']
 ))->setHelp('Enter the name to register with the Growl server.');
 
 $section->addInput(new Form_Input(

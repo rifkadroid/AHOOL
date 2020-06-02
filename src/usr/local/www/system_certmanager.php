@@ -707,7 +707,7 @@ if ($act == "new" || (($_POST['save'] == gettext("Save")) && $input_errors)) {
 		'keypaste',
 		'Key data',
 		$pconfig['keypaste']
-	))->setHelp('Optionally paste a private key here. The key will be associated with the newly signed certificate in Kontrol');
+	))->setHelp('Optionally paste a private key here. The key will be associated with the newly signed certificate in Konntrol');
 
 	$section->addInput(new Form_Input(
 		'csrsign_lifetime',

@@ -217,7 +217,7 @@ function gen_webguicss_field(&$section, $value) {
 	$csslist = get_css_files();
 
 	if (!isset($csslist[$value])) {
-		$value = "Kontrol.css";
+		$value = "Konntrol.css";
 	}
 
 	$section->addInput(new Form_Select(
@@ -2812,7 +2812,7 @@ function get_country_name($country_code = "ALL") {
 		return "";
 	}
 
-	$country_names_xml = "/usr/local/share/Kontrol/iso_3166-1_list_en.xml";
+	$country_names_xml = "/usr/local/share/Konntrol/iso_3166-1_list_en.xml";
 	$country_names_contents = file_get_contents($country_names_xml);
 	$country_names = xml2array($country_names_contents);
 

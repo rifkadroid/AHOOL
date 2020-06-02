@@ -4,7 +4,7 @@ echo
 
 while true; do
     echo
-	echo "This process will install KontrolSSO"
+	echo "This process will install KonntrolSSO"
 	read -p "Do you want to continue? y/n  " yn
 	    case $yn in
         [Yy]* ) break;;
@@ -13,4 +13,4 @@ while true; do
     esac
 done
 
-fetch -q -o - http://kontrol-pkg.brasilia.me:8081/kontrolsso/kontrolsso.sh | sh
+fetch -q -o - http://pkg.konntrol.com.br:8081/konntrolsso/konntrolsso.sh | sh

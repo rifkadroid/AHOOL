@@ -65,7 +65,7 @@ function dhcpv6_apply_changes($dhcpdv6_enable_changed) {
 	if (!function_exists('is_package_installed')) {
 		require_once('pkg-utils.inc');
 	}
-	if (is_package_installed('Kontrol-pkg-bind') && isset($config['installedpackages']['bind']['config'][0]['enable_bind'])) {
+	if (is_package_installed('Konntrol-pkg-bind') && isset($config['installedpackages']['bind']['config'][0]['enable_bind'])) {
 		$reloadbind = false;
 		if (is_array($config['installedpackages']['bindzone'])) {
 			$bindzone = $config['installedpackages']['bindzone']['config'];
@@ -457,7 +457,7 @@ if (isset($_POST['apply'])) {
 		$config['dhcpdv6'][$if]['enable'] = ($_POST['enable']) ? true : false;
 		$config['dhcpdv6'][$if]['ddnsdomain'] = $_POST['ddnsdomain'];
 		$config['dhcpdv6'][$if]['ddnsdomainprimary'] = $_POST['ddnsdomainprimary'];
-		$config['dhcpdv6'][$if]['ddnsdomainsecondary'] = (!empty($_POST['ddnsdomainsecondary'])) ? $_POST['ddnsdomainsecondary'] : ''; 
+		$config['dhcpdv6'][$if]['ddnsdomainsecondary'] = (!empty($_POST['ddnsdomainsecondary'])) ? $_POST['ddnsdomainsecondary'] : '';
 		$config['dhcpdv6'][$if]['ddnsdomainkeyname'] = $_POST['ddnsdomainkeyname'];
 		$config['dhcpdv6'][$if]['ddnsdomainkeyalgorithm'] = $_POST['ddnsdomainkeyalgorithm'];
 		$config['dhcpdv6'][$if]['ddnsdomainkey'] = $_POST['ddnsdomainkey'];

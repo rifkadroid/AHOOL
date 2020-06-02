@@ -2,13 +2,13 @@
 clear
 echo
 
-if [ ! -d /var/db/samba4/ ]; then echo "KontrolSSO not installed. Install it first."; sleep 3; echo; exit
+if [ ! -d /var/db/samba4/ ]; then echo "KonntrolSSO not installed. Install it first."; sleep 3; echo; exit
 else
-echo "KontrolSSO is installed"
+echo "KonntrolSSO is installed"
 fi
 
 echo
-echo "** This process will join this KONTROL box to a Windows Domain **"
+echo "** This process will join this KONNTROL box to a Windows Domain **"
 echo "**  The hostname, IP address, DNS and NTP must be previously   **"
 echo "**          configured using the WEBGUI interface              **"
 echo
@@ -37,7 +37,7 @@ echo "This is the DOMAIN NAME to Join --> $ad_domain_upper "
 echo
 echo "This is the FQDN-Hostname that will be used to Join --> $host_var "
 echo
-echo "Enter the ID with permissions to Join this Kontrol Box"
+echo "Enter the ID with permissions to Join this Konntrol Box"
 echo "to your Windows Domain (eg. Administrator)"
 read ad_account
 echo
@@ -54,7 +54,7 @@ fi
 
 echo
 echo
-echo "Adding Kontrol-UTM to Windows Domain using credential--> $ad_account with the hostname--> $host_var "
+echo "Adding Konntrol-UTM to Windows Domain using credential--> $ad_account with the hostname--> $host_var "
 echo
 net ads join createupn=HTTP/$host_var@$ad_domain_upper -k
 echo
@@ -127,7 +127,7 @@ echo "********************************************"
 echo "****************    DONE    ****************"
 echo "********************************************"
 echo
-echo "You can now find your Kontrol box --> $ad_hostname on your Windows Domain"
+echo "You can now find your Konntrol box --> $ad_hostname on your Windows Domain"
 echo
 echo "If you can't see this Box on your Windows Domain, please check for HOSTNAME duplicity and restart the process"
 echo
