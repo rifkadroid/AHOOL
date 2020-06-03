@@ -67,16 +67,16 @@ include("head.inc");
 
 
 
-	<p><strong><?=gettext("KONNTROL is &copy; by Konntrol Tecnologia - Brazil - 2020 - All rights reserved.")?></strong></p>
+	<p><strong><?=gettext("KONTROL-UTM is &copy; by Konntrol Tecnologia - Brazil - 2020 - All rights reserved.")?></strong></p>
 
 		<p><?=gettext("*************************************************************************************************************")?></p>
-		<p><?=gettext("KONNTROL UTM - This product includes software developed by the pfSense Project for use in the pfSense software distribution")?></p>
+		<p><?=gettext("KONTROL-UTM - This product includes software developed by the pfSense Project for use in the pfSense software distribution")?></p>
 		<p><?=gettext("pfSense is Copyright &copy; 2004-2018 Rubicon Communications, LLC (Netgate). All Rights Reserved.")?></p>
 		<p><?=gettext("m0n0wall is Copyright &copy; 2002-2015 by Manuel Kasper (mk@neon1.net). All rights reserved.")?></p>
 		<p><?=gettext("*************************************************************************************************************")?></p>
 
 
-		<p class="text-uppercase"><?php printf(gettext("THIS SOFTWARE IS PROVIDED BY THE Konntrol Security Appliances ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES "
+		<p class="text-uppercase"><?php printf(gettext("THIS SOFTWARE IS PROVIDED BY THE Konntrol Tecnologia, EPP ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES "
 			. "OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE KONNTROL TEAM OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, "
 			. "INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, "
 			. "DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING "
@@ -87,9 +87,9 @@ include("head.inc");
 	<div class="panel-heading"><h2 class="panel-title"><?=gettext("Third Party Credits")?></h2></div>
 	<div class="panel-body content">
 		<p>
-			<?php printf(gettext("Konntrol is based upon/includes various free software packages, listed below. Konntrol team would like to thank the authors of these software packages for their efforts."), $g['product_name'], $g['product_name'])?><br />
+			<?php printf(gettext("KONTROL-UTM is based upon/includes various free software packages, listed below. Konntrol team would like to thank the authors of these software packages for their efforts."), $g['product_name'], $g['product_name'])?><br />
 		</p>
-		<ul class="list-group">
+		<ul class="list-group"
 			<li class="list-group-item">
 				<strong>FreeBSD</strong> (<a href="http://www.freebsd.org" target="_blank">http://www.freebsd.org</a>)<br />
 				<?=gettext("Copyright")?> &copy;<?=gettext("1992-2017 The FreeBSD Project. All rights reserved.")?>

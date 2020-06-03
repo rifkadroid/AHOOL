@@ -43,9 +43,9 @@ if (isset($user_settings['webgui']['logincss']) && strlen($user_settings['webgui
 
 			<div class="modal-body" style="background-color:<?=$logincssfile?>; color:white;">
 <?php
-			print(gettext("<p><font size=\"4\"><strong>KONNTROL</strong>&reg;</font><font size=\"3\"> is Copyright 2016" .
+			print(gettext("<p><font size=\"4\"><strong>KONTROL-UTM</strong>&reg;</font><font size=\"3\"> is Copyright 2016" .
 				"-2020 Konntrol Tecnologia, EPP</p>" .
-				"<p>KONNTROL is a federally registered trademark of Konntrol Tecnologia, EPP. Any unauthorized use of this trademark is " .
+				"<p>KONTROL UTM is a federally registered trademark of Konntrol Tecnologia, EPP. Any unauthorized use of this trademark is " .
 				"prohibited by state and federal law and by international law. Refer to our Trademark Usage Guidelines for how to properly " .
 				"use the marks. All rights reserved.</p>" .
 				"<p align=\"center\"><strong>No Commercial Distribution Is Allowed</strong></font></p>"));

@@ -24,14 +24,14 @@
 <totalsteps>10</totalsteps>
 <step>
 	<id>1</id>
-	<title>Konntrol Setup</title>
+	<title>KONTROL-UTM Setup</title>
 	<disableheader>true</disableheader>
 	<description>
 		<![CDATA[
-		<p><h4>Welcome to Konntrol® software!</h4></p>
-		<p>This wizard will provide guidance through the initial configuration of Konntrol.</p>
+		<p><h4>Welcome to KONTROL-UTM® software!</h4></p>
+		<p>This wizard will provide guidance through the initial configuration of KONTROL.</p>
 		<p>The wizard may be stopped at any time by clicking the logo image at the top of the screen.</p>
-		<p><strong>Konntrol® software is maintained by Konntrol Appliances EPP®<strong></p>
+		<p><strong>KONTROL-UTM® software is maintained by Konntrol Tecnologia, EPP®<strong></p>
 		<br />
 		<p><a href="https://konntrol.com.br" class="btn btn-info" target="_blank">Learn more</a></p>
 		]]>
@@ -49,7 +49,7 @@
 </step>
 <step>
 	<id>2</id>
-	<title>Konntrol® Support is available 24/7</title>
+	<title>KONTROL-UTM® Support is available 24/7</title>
 	<disableheader>true</disableheader>
 	<description>
 	<![CDATA[
@@ -74,7 +74,7 @@
 <step>
 	<id>3</id>
 	<title>General Information</title>
-	<description>On this screen the general Konntrol parameters will be set.</description>
+	<description>On this screen the general KONTROL parameters will be set.</description>
 	<fields>
 		<field>
 			<name>Hostname</name>
@@ -576,7 +576,7 @@
 			} else {
 				$_POST['ipaddress'] = $_POST['selectedtype'];
 				$config['interfaces']['wan']['ipaddr'] = $_POST['selectedtype'];
-				write_config(gettext("WAN interface configuration saved via Konntrol setup wizard."));
+				write_config(gettext("WAN interface configuration saved via KONTROL-UTM setup wizard."));
 			}
 			if (!$config['interfaces']['lan']) {
 				header("Location: /wizard.php?xml=setup_wizard.xml&stepid=6&next=Next");
@@ -720,7 +720,7 @@
 			$admin_user =& getUserEntryByUID(0);
 			local_user_set_password($admin_user, $_POST['adminpassword']);
 			local_user_set($admin_user);
-			write_config(gettext("Admin WebGUI password saved via Konntrol setup wizard."));
+			write_config(gettext("Admin WebGUI password saved via KONTROL-UTM setup wizard."));
 		} else {
 			print_info_box("Passwords do not match! Please press back in the browser window and correct.");
 			die;
@@ -733,7 +733,7 @@
 	<id>8</id>
 	<title>Reload configuration</title>
 	<disableheader>true</disableheader>
-	<description>Click 'Reload' to reload Konntrol with new changes.</description>
+	<description>Click 'Reload' to reload KONTROL with new changes.</description>
 	<fields>
 		<field>
 			<name>Reload</name>
@@ -784,7 +784,7 @@
 		unset($config['wizardtemp']);
 		/* See https://redmine.pfsense.org/issues/8524 */
 		$config['system']['webgui']['althostnames'] = $althosts_before;
-		write_config(gettext("Configuration saved on completion of the Konntrol setup wizard."));
+		write_config(gettext("Configuration saved on completion of the KONTROL setup wizard."));
 		reload_all();
 		mwexec_bg("/etc/rc.update_bogons.sh now");
 		touch("{$g['cf_conf_path']}/copynotice_display");
@@ -805,21 +805,21 @@
 	<description>
 	<![CDATA[
 	<div style="padding-right:25px;">
-		<p><h4>Congratulations! Konntrol is now configured.</h4></p>
+		<p><h4>Congratulations! KONTROL-UTM is now configured.</h4></p>
 		<p>
 		We recommend that you check to see if there are any software updates available. Keeping your software up to date is
 		one of the most important things you can do to maintain the security of your network.</p>
 		<input type="button" onclick="window.location.href='$myurlpkg_mgr_install.php?id=firmware'" class="btn btn-xs btn-success" value="Check for updates"/>
 		</br></br>
 		<p><h4>Remember, we're here to help.</h4></p>
-		<p><a target='_blank' href='https://konntrol.com.br'><strong><span style="font-size:16px">Click here</span></strong></a> to learn about Konntrol support services.</p>
+		<p><a target='_blank' href='https://konntrol.com.br'><strong><span style="font-size:16px">Click here</span></strong></a> to learn about KONTROL-UTM support services.</p>
 		<br />
 
 		<p><h4>Useful resources.</h4></p>
 		<p>
 			<ul>
-				<li>Learn more about Konntrol's product line, services, and Konntrol software from our <a target='_blank' href='https://konntrol.com.br'>website</a></li>
-				<li>To learn about Konntrol appliances and other offers, <a target='_blank' href='https://konntrol.com.br'>visit our store</a></li>
+				<li>Learn more about Konntrol's product line, services, and KONTROL-UTM software from our <a target='_blank' href='https://konntrol.com.br'>website</a></li>
+				<li>To learn about Konntrol's appliances and other offers, <a target='_blank' href='https://konntrol.com.br'>visit our store</a></li>
 				</ul>
 		</p>
 		</br>

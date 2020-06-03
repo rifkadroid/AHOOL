@@ -25,9 +25,9 @@
 	<totalsteps>9</totalsteps>
 	<step>
 		<id>1</id>
-		<title>Konntrol Traffic Shaper</title>
+		<title>KONTROL-UTM Traffic Shaper</title>
 		<disableheader>true</disableheader>
-		<description>This wizard will provide guidance through setting up the Konntrol traffic shaper. &lt;br/&gt;&lt;br/&gt; The wizard may be stopped at any time by clicking the logo image at the top of the screen.
+		<description>This wizard will provide guidance through setting up the KONTROL-UTM traffic shaper. &lt;br/&gt;&lt;br/&gt; The wizard may be stopped at any time by clicking the logo image at the top of the screen.
 			&lt;br/&gt;&lt;br/&gt; Please be aware that Custom Bandwidths should not exceed 30% of the interface/link bandwidth. Keep this in mind during the wizard.
 		</description>
 		<fields>

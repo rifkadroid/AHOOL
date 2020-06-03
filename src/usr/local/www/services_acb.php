@@ -161,7 +161,7 @@ if ($_REQUEST['newver'] != "") {
 	if (!$input_errors && $data) {
 		conf_mount_rw();
 		if (config_restore("/tmp/config_restore.xml") == 0) {
-			$savemsg = "Successfully reverted the Konntrol configuration to revision " . urldecode($_REQUEST['newver']) . ".";
+			$savemsg = "Successfully reverted the KONTROL-UTM configuration to revision " . urldecode($_REQUEST['newver']) . ".";
 			$savemsg .= <<<EOF
 			<br />
 		<form action="diag_reboot.php" method="post">
@@ -207,7 +207,7 @@ if ($_REQUEST['download']) {
 		$data = $ds[1];
 		$configtype = "Encrypted";
 		if (!tagfile_deformat($data, $data, "config.xml")) {
-			$input_errors[] = "The downloaded file does not appear to contain an encrypted Konntrol configuration.";
+			$input_errors[] = "The downloaded file does not appear to contain an encrypted KONTROL-UTM configuration.";
 		}
 		$data = decrypt_data($data, $decrypt_password);
 		if (!strstr($data, "kontrol")) {

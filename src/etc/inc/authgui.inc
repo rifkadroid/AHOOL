@@ -269,8 +269,8 @@ function display_login_form() {
 		$loginbannerstr = sprintf(gettext('%1$s.%2$s'), htmlspecialchars($config['system']['hostname']), htmlspecialchars($config['system']['domain']));
 		$login_title = gettext(htmlspecialchars($config['system']['hostname'] . " - Login"));
 	} else {
-		$loginbannerstr = sprintf(gettext('Login to %1$s'), $g['product_name']);
-		$login_title = gettext("Kontrol - Login");
+		$loginbannerstr = sprintf(gettext('Login to KONTROL-UTM'), $g['product_name']);
+		$login_title = gettext("KONTROL-UTM - Login");
 	}
 
 	$loginautocomplete = isset($config['system']['webgui']['loginautocomplete']) ? '' : 'autocomplete="off"';

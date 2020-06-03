@@ -2104,10 +2104,10 @@ function session_auth() {
 function print_credit() {
 	global $g;
 
-	return  '<a target="_blank" href="https://kontrolsecurity.com.br">' . $g["product_name"] . '</a>' .
+	return  '<a target="_blank" href="https://konntrol.com.br">' . 'KONTROL-UTM' . '</a>' .
 			gettext(' is maintained by ') .
-			'<a target="_blank" href="https://kontrolsecurity.com.br">Kontrol. </a>' . ' &copy; Kontrol tecnologia EPP ' . $g["product_copyright_years"] .
-			'<a target="_blank" href="https://kontrolsecurity.com.br">' .
+			'<a target="_blank" href="https://konntrol.com.br"> &copy; Konntrol Tecnologia, EPP. </a>' . $g["product_copyright_years"] .
+			'<a target="_blank" href="https://konntrol.com.br/empresa/">' .
 			gettext(' View license.') . '</a>';
 }
 function get_user_remote_address() {
