@@ -3,9 +3,7 @@
  * services_captiveportal.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2004-2013 BSD Perimeter
- * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2020 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2004-2020 Rubicon Communications, LLC (Netgate)
  * All rights reserved.
  *
  * originally based on m0n0wall (http://m0n0.ch/wall)
@@ -129,7 +127,6 @@ if ($a_cp[$cpzone]) {
 	$pconfig['radmac_secret'] = $a_cp[$cpzone]['radmac_secret'];
 	$pconfig['radmac_fallback'] = isset($a_cp[$cpzone]['radmac_fallback']);
 	$pconfig['reauthenticate'] = isset($a_cp[$cpzone]['reauthenticate']);
-	$pconfig['preservedb'] = isset($a_cp[$cpzone]['preservedb']);
 	$pconfig['reauthenticateacct'] = $a_cp[$cpzone]['reauthenticateacct'];
 	$pconfig['httpslogin_enable'] = isset($a_cp[$cpzone]['httpslogin']);
 	$pconfig['httpsname'] = $a_cp[$cpzone]['httpsname'];
@@ -340,7 +337,6 @@ if ($_POST['save']) {
 		$newcp['localauth_priv'] = isset($_POST['localauth_priv']);
 		$newcp['radacct_enable'] = $_POST['radacct_enable'] ? true : false;
 		$newcp['reauthenticate'] = $_POST['reauthenticate'] ? true : false;
-		$newcp['preservedb'] = $_POST['preservedb'] ? true : false;
 		$newcp['radmac_secret'] = $_POST['radmac_secret'] ? $_POST['radmac_secret'] : false;
 		$newcp['radmac_fallback'] = $_POST['radmac_fallback'] ? true : false;
 		$newcp['reauthenticateacct'] = $_POST['reauthenticateacct'];
@@ -352,21 +348,15 @@ if ($_POST['save']) {
 		$newcp['httpsname'] = $_POST['httpsname'];
 		$newcp['preauthurl'] = $_POST['preauthurl'];
 		$newcp['blockedmacsurl'] = $_POST['blockedmacsurl'];
-		if ($_POST['peruserbw']) {
-			$newcp['peruserbw'] = true;
-			if (isset($_POST['bwdefaultdn'])) {
-				$newcp['bwdefaultdn'] = $_POST['bwdefaultdn'];
-			} else {
-				unset($newcp['bwdefaultdn']);
-			}
-			if (isset($_POST['bwdefaultup'])) {
-				$newcp['bwdefaultup'] = $_POST['bwdefaultup'];
-			} else {
-				unset($newcp['bwdefaultup']);
-			}
+		$newcp['peruserbw'] = $_POST['peruserbw'] ? true : false;
+		if (isset($_POST['bwdefaultdn'])) {
+			$newcp['bwdefaultdn'] = $_POST['bwdefaultdn'];
 		} else {
-			unset($newcp['peruserbw']);
 			unset($newcp['bwdefaultdn']);
+		}
+		if (isset($_POST['bwdefaultup'])) {
+			$newcp['bwdefaultup'] = $_POST['bwdefaultup'];
+		} else {
 			unset($newcp['bwdefaultup']);
 		}
 		$newcp['certref'] = $_POST['certref'];
@@ -475,6 +465,18 @@ if ($_POST['save']) {
 	}
 }
 
+function build_cert_list() {
+	global $a_cert;
+
+	$list = array();
+
+	foreach ($a_cert as $cert) {
+		$list[$cert['refid']] = $cert['descr'];
+	}
+
+	return($list);
+}
+
 function build_authserver_list() {
 
 	$authlist = auth_get_authserver_list();
@@ -501,7 +503,6 @@ $tab_array[] = array(gettext("MACs"), false, "services_captiveportal_mac.php?zon
 $tab_array[] = array(gettext("Allowed IP Addresses"), false, "services_captiveportal_ip.php?zone={$cpzone}");
 $tab_array[] = array(gettext("Allowed Hostnames"), false, "services_captiveportal_hostname.php?zone={$cpzone}");
 $tab_array[] = array(gettext("Vouchers"), false, "services_captiveportal_vouchers.php?zone={$cpzone}");
-$tab_array[] = array(gettext("High Availability"), false, "services_captiveportal_hasync.php?zone={$cpzone}");
 $tab_array[] = array(gettext("File Manager"), false, "services_captiveportal_filemanager.php?zone={$cpzone}");
 display_top_tabs($tab_array, true);
 
@@ -617,22 +618,6 @@ $section->addInput(new Form_Input(
 	$pconfig['blockedmacsurl']
 ))->setHelp('Blocked MAC addresses will be redirected to this URL when attempting access.');
 
-if (captiveportal_xmlrpc_sync_get_details($tmpsyncip, $tmpport, $tmpusername, $tmppassword)) {
-	$section->addInput(new Form_Checkbox(
-	'preservedb_disabled',
-	'Preserve users database',
-	'Preserve connected users across reboot',
-	'yes'
-	))->setDisabled()->setHelp("If enabled, connected users won't be disconnected during a pfSense reboot. This setting is not editable because High Availability is enabled.");
-} else {
-	$section->addInput(new Form_Checkbox(
-	'preservedb',
-	'Preserve users database',
-	'Preserve connected users across reboot',
-	$pconfig['preservedb']
-	))->setHelp("If enabled, connected users won't be disconnected during a pfSense reboot.");
-}
-
 $section->addInput(new Form_Checkbox(
 	'noconcurrentlogins',
 	'Concurrent user logins',
@@ -647,7 +632,7 @@ $section->addInput(new Form_Checkbox(
 	'Disable MAC filtering',
 	$pconfig['nomacfilter']
 ))->setHelp('If enabled no attempts will be made to ensure that the MAC address of clients stays the same while they are logged in. ' .
-			'This is required when the MAC address of the client cannot be determined (usually because there are routers between pfSense and the clients). ' .
+			'This is required when the MAC address of the client cannot be determined (usually because there are routers between KONTROL-UTM and the clients). ' .
 			'If this is enabled, RADIUS MAC authentication cannot be used.');
 
 $section->addInput(new Form_Checkbox(
@@ -819,7 +804,7 @@ if ($pconfig['page']['logouttext']) {
 	))->addClass('btn btn-danger btn-xs')->setAttribute("target", "_blank");
 	$section->add($group);
 }
-$form->addGlobal(new Form_Input(
+$section->addInput(new Form_Input(
 	'zone',
 	null,
 	'hidden',
@@ -966,17 +951,17 @@ $section->addInput(new Form_Checkbox(
 $section->addInput(new Form_Checkbox(
 	'radiustraffic_quota',
 	'Traffic quota',
-	'Use RADIUS pfSense-Max-Total-Octets attribute',
+	'Use RADIUS Kontrol-Max-Total-Octets attribute',
 	$pconfig['radiustraffic_quota']
-))->setHelp('When enabled, clients will be disconnected after exceeding the amount of traffic, inclusive of both downloads and uploads, retrieved from the RADIUS pfSense-Max-Total-Octets attribute.');
+))->setHelp('When enabled, clients will be disconnected after exceeding the amount of traffic, inclusive of both downloads and uploads, retrieved from the RADIUS Kontrol-Max-Total-Octets attribute.');
 
 $section->addInput(new Form_Checkbox(
 	'radiusperuserbw',
 	'Per-user bandwidth restrictions',
-	'Use RADIUS pfSense-Bandwidth-Max-Up and pfSense-Bandwidth-Max-Down attributes',
+	'Use RADIUS Kontrol-Bandwidth-Max-Up and Kontrol-Bandwidth-Max-Down attributes',
 	$pconfig['radiusperuserbw']
-))->setHelp('When enabled, the bandwidth assigned to a client will be limited to the values retrieved from the RADIUS pfSense-Bandwidth-Max-Up and ' .
-			'pfSense-Bandwidth-Max-Down attributes or from the comparable WISPr attributes.');
+))->setHelp('When enabled, the bandwidth assigned to a client will be limited to the values retrieved from the RADIUS Kontrol-Bandwidth-Max-Up and ' .
+			'Kontrol-Bandwidth-Max-Down attributes or from the comparable WISPr attributes.');
 
 $section->addInput(new Form_Select(
 	'radmac_format',
@@ -1104,14 +1089,14 @@ $section->addInput(new Form_Input(
 	$pconfig['httpsname']
 ))->setHelp('This name will be used in the form action for the HTTPS POST and should match the Common Name (CN) in the certificate ' .
 			'(otherwise, the client browser will most likely display a security warning). ' .
-			'Make sure captive portal clients can resolve this name in DNS and verify on the client that the IP resolves to the correct interface IP on pfSense.');
+			'Make sure captive portal clients can resolve this name in DNS and verify on the client that the IP resolves to the correct interface IP on KONTROL.');
 
 $section->addInput(new Form_Select(
 	'certref',
 	'*SSL/TLS Certificate',
 	$pconfig['certref'],
-	cert_build_list('cert', 'HTTPS')
-))->setHelp('Certificates known to be incompatible with use for HTTPS are not included in this list. If no certificates are defined, one may be defined here: %1$sSystem &gt; Cert. Manager%2$s', '<a href="system_certmanager.php">', '</a>');
+	build_cert_list()
+))->setHelp('If no certificates are defined, one may be defined here: %1$sSystem &gt; Cert. Manager%2$s', '<a href="system_certmanager.php">', '</a>');
 
 $section->addInput(new Form_Checkbox(
 	'nohttpsforwards',
@@ -1178,8 +1163,6 @@ events.push(function() {
 		hideInput('preauthurl', hide);
 		hideInput('redirurl', hide);
 		hideInput('blockedmacsurl', hide);
-		hideCheckbox('preservedb', hide);
-		hideCheckbox('preservedb_disabled', hide);
 		hideCheckbox('noconcurrentlogins', hide);
 		hideCheckbox('nomacfilter', hide);
 		hideCheckbox('passthrumacadd', hide);
