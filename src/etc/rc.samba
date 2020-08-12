@@ -1,4 +1,6 @@
 #!/bin/sh
+# KONNTROL TECNOLOGIA EPP - 2016 - 2020 - All rights reserved
+#
 clear
 echo
 echo "*** Checking if KontrolSSO is Installed ***"
@@ -14,15 +16,15 @@ echo "*******   WARNING    *******"
 echo "****************************"
 echo
 echo "This process will change the existing data on your"
-echo "smb4.conf (SMBD file) and krb5.conf (Kerberos File)"
+echo "KONTROLSSO configuration files"
 echo
 while true; do
 
 	echo
-	echo "In order to configure the SMB/KERBEROS, this Kontrol Box "
-	echo " must be previously configured using the WEBGUI Interface."
+	echo "In order to configure KONTROLSSO and Transparent Authentication"
+	echo "this machine must be previously configured using the WEBGUI"
 	echo "The Hostname, DNS, NTP, IP Address and Gateway must be "
-	echo " already configured to continue..."
+	echo "already configured to continue..."
 	echo
     read -p "Are you sure you want to continue? y/n  " yn
     case $yn in
@@ -32,17 +34,52 @@ while true; do
     esac
 done
 
-#echo "Enter the WORKGROUP name you want to Join --> (eg. WORKGROUP or NETBIOS DOMAIN name ) "
-#read smb_workgroup
+echo
+echo
+echo
+	while true; do
+	read -p "Will you use Transparent Proxy with Authentication? y/n  " yn
+    case $yn in
+        [Yy]* ) echo
+				echo "Enter the ID used to retrieve information from desktops"
+				echo "The account MUST have administrator permissions on local desktops"
+				echo "or must be a DOMAIN admin account e.g. DOMAIN\account or account"
+				echo
+				read -r account
+				echo
+				echo "Enter the password for: $account"
+				stty -echo
+				printf "Password: "
+				read -r password
+				stty echo
+				printf "\n"
+				echo
+				accountsafe=$(printf '%s\n' "$account" | sed 's/[\&/]/\\&/g')
+				passwordsafe=$(printf '%s\n' "$password" | sed 's/[\&/]/\\&/g')
+				sed -i "" s/.*/"$accountsafe"%"$passwordsafe"/ /root/credential
+				echo
+				echo "All Set. Transparent Authentication is configured"
+				echo "Check SQUID config now"
+				echo
+				echo
+				sleep 3
+				exit;;
+
+		[Nn]* ) break;;
+        * ) echo "Please enter y or n.";;
+    esac
+done
 
 iface_avail=`ifconfig -l`
 
+echo
+echo
 echo "********************* ATTENTION **********************"
 echo "**DO NOT ENABLE KONTROLSSO ON WAN/LINK INTERFACES!!!**"
 echo "******************************************************"
 echo ""
 echo "Enter the interfaces you want to enable KontrolSSO on:"
-echo "eg. re0 em0  -   use space between multiple values."
+echo "eg. re0 em0 igb0 -   use space between multiple values."
 echo "Available Interfaces are: ${iface_avail} "
 echo "loopback/lo0 is set automatically "
 read iface_input
@@ -107,12 +144,6 @@ sed -i "" "21s/.*/  .${smb_domain} = ${smb_realm} /" /usr/local/etc/krb5.conf
 sed -i "" "22s/.*/   ${smb_domain} = ${smb_realm} /" /usr/local/etc/krb5.conf
 
 
-
-
-
-#Restarting SMBD and NMBD
-#/usr/local/etc/rc.d/samba_server restart
-
 # RESTARTING WINBINDD Getting the PID of the Winbindd process and kill it
 PID=`pgrep winbindd`
 
@@ -146,8 +177,6 @@ echo
 echo
 chown root:proxy /var/db/samba4/winbindd_privileged
 #chmod -R 0770 /var/db/samba4/winbindd_privileged
-echo
-#/usr/local/etc/rc.d/samba_server status
 echo
 echo
 echo
