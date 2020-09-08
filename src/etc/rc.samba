@@ -58,6 +58,20 @@ echo
 				passwordsafe=$(printf '%s\n' "$password" | sed 's/[\&/]/\\&/g')
 				sed -i "" s/.*/"$accountsafe"%"$passwordsafe"/ /root/credential
 				echo
+				echo
+
+	domain=`hostname -d`
+	echo
+	echo "Enter the AD/KDC FQDN or IP Address:"
+	echo "Typically that is the AD Controller FQDN (eg. servername.domain.com)"
+	echo "Just press <ENTER> if you don't have any AD Domain server"
+	echo
+	read ad_srv
+
+	sed -i "" "9s/.*/define('DOMAIN_FQDN', '$domain');/" /usr/local/www/login2.php
+	sed -i "" "10s/.*/define('LDAP_SERVER', '$ad_srv');/" /usr/local/www/login2.php
+	echo
+
 				echo "All Set. Transparent Authentication is configured"
 				echo "Check SQUID config now"
 				echo
