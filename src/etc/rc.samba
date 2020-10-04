@@ -56,7 +56,8 @@ echo
 				echo
 				accountsafe=$(printf '%s\n' "$account" | sed 's/[\&/]/\\&/g')
 				passwordsafe=$(printf '%s\n' "$password" | sed 's/[\&/]/\\&/g')
-				sed -i "" s/.*/"$accountsafe"%"$passwordsafe"/ /root/credential
+				cryptocred=`/usr/local/bin/kontrolencrypt "$accountsafe%$passwordsafe"`
+				echo $cryptocred > /root/credential
 				echo
 				echo
 
