@@ -80,19 +80,25 @@ else
 	sshd_option="14) Enable Secure Shell (sshd)";
 fi
 
+if [ -f /usr/local/www/ad_domain.php ]; then
+	kontrolid_option="12) Uninstall Kontrol-ID";
+else
+	kontrolid_option="12) Install Kontrol-ID";
+fi
+
 # display a cheap menu
 echo ""
 echo " 0) Logout (SSH only)                  9) pfTop"
 echo " 1) Assign Interfaces                 10) Filter Logs"
 echo " 2) Set interface(s) IP address       11) Restart webConfigurator"
-echo " 3) Reset webConfigurator password    12) Join Microsoft AD/Domain"
-echo " 4) Configure KontrolSSO              13) Leave Microsoft AD/Domain"
+echo " 3) Reset webConfigurator password    ${kontrolid_option}"
+echo " 4) Configure Kontrol-ID              13) Reserved"
 echo " 5) Reboot system                     ${sshd_option}"
 echo " 6) Halt system                       15) Restore recent configuration"
 echo " 7) Ping host                         16) Restart PHP-FPM"
 echo " 8) Shell                             17) View Proxy logs"
-echo " 99) Factory Default                  18) Install KontrolSSO"
-echo "                                      19) Uninstall KontrolSSO"
+echo " 99) Factory Default"
+
 
 echo
 read -p "Enter an option: " opmode
@@ -136,10 +142,10 @@ case ${opmode} in
 	/etc/rc.restart_webgui
 	;;
 12)
-	/etc/rc.joindomain
+	/etc/rc.enablesso
 	;;
 13)
-	/etc/rc.leavedomain
+
 	;;
 14)
 	php -f /etc/rc.initial.toggle_sshd
@@ -152,12 +158,6 @@ case ${opmode} in
 	;;
 17)
 tail -f /var/squid/logs/cache.log
-;;
-18)
-/etc/rc.enablesso
-;;
-19)
-/etc/rc.disablesso
 ;;
 
 99)
