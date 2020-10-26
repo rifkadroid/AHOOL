@@ -77,7 +77,7 @@ sysutils/%%PRODUCT_NAME%%-builder
 sysutils/%%PRODUCT_NAME%%-pkg-Backup
 sysutils/%%PRODUCT_NAME%%-pkg-Cron
 sysutils/%%PRODUCT_NAME%%-pkg-LCDproc
- 
+
 sysutils/%%PRODUCT_NAME%%-pkg-Notes
 sysutils/%%PRODUCT_NAME%%-pkg-RRD_Summary
 sysutils/%%PRODUCT_NAME%%-pkg-Service_Watchdog
@@ -109,4 +109,4 @@ www/e2guardian
 www/%%PRODUCT_NAME%%-pkg-E2guardian5
 www/sarg
 www/%%PRODUCT_NAME%%-pkg-sarg
-
+net-mgmt/wmi-client
