@@ -386,7 +386,7 @@ if (!isvalidpid($gui_pidfile) && !$confirmed && !$completed &&
 
 		// Check to see if any new repositories have become available. This data is cached and
 		// refreshed evrey 24 hours
-		update_repos();
+		//update_repos(); //commented out as this is NOT Kontrol repo.
 		$repopath = "/usr/local/share/{$g['product_name']}/pkg/repos";
 		$helpfilename = "{$repopath}/{$g['product_name']}-repo-custom.help";
 
