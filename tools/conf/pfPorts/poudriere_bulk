@@ -102,10 +102,10 @@ sysutils/tmux
 sysutils/usb_modeswitch
 sysutils/vm-bhyve
 sysutils/xe-guest-utilities
-www/Kontrol-pkg-squid
+www/%%PRODUCT_NAME%%-pkg-squid
 www/pound
 www/e2guardian
-www/Kontrol-pkg-E2guardian5
+www/%%PRODUCT_NAME%%-pkg-E2guardian5
 www/sarg
-www/Kontrol-pkg-sarg
+www/%%PRODUCT_NAME%%-pkg-sarg
 net-mgmt/wmi-client
