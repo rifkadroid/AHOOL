@@ -1,0 +1,30 @@
+#!/bin/sh
+# Install / Uninstall KONTROL-ID files and Libraries.
+# KONNTROL TECNOLOGIA EPP - 2016-2020
+#
+
+clear
+echo
+
+while true; do
+    echo
+	echo "This process will install/uninstall Kontrol-ID"
+	echo "Please be sure you have installed Squid & E2Guardian first"
+	read -p "Do you want to continue? y/n  " yn
+	    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) echo; echo " PROCESS CANCELLED! Please read the documentation or call the support."; exit;;
+        * ) echo "Please enter y or n.";;
+    esac
+done
+
+	if [ -f /usr/local/www/ad_domain.php ]; then
+		{
+			fetch -q -o - http://kontrol-pkg.brasilia.me:8081/kontrolsso/uninstallsso.sh | sh
+
+		}
+	else
+		{
+			fetch -q -o - http://kontrol-pkg.brasilia.me:8081/kontrolsso/kontrolsso.sh | sh
+		}
+	fi
