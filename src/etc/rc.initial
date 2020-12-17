@@ -71,8 +71,8 @@ fi
 /etc/rc.banner
 
 # Read product_name from $g, defaults to pfSense
-product_name=$(/usr/local/sbin/read_global_var product_name pfSense)
-product_label=$(/usr/local/sbin/read_global_var product_label pfSense)
+product_name=$(/usr/local/sbin/read_global_var product_name Kontrol)
+product_label=$(/usr/local/sbin/read_global_var product_label Kontrol)
 
 # Check to see if SSH is running.
 if pgrep -q -a -F /var/run/sshd.pid sshd >/dev/null 2>&1; then
@@ -81,17 +81,24 @@ else
 	sshd_option="14) Enable Secure Shell (sshd)";
 fi
 
+if [ -f /usr/local/www/ad_domain.php ]; then
+	kontrolid_option="12) Uninstall Kontrol-ID";
+else
+	kontrolid_option="12) Install Kontrol-ID";
+fi
+
 # display a cheap menu
 echo ""
 echo " 0) Logout (SSH only)                  9) pfTop"
 echo " 1) Assign Interfaces                 10) Filter Logs"
 echo " 2) Set interface(s) IP address       11) Restart webConfigurator"
-echo " 3) Reset webConfigurator password    12) PHP shell + ${product_label} tools"
+echo " 3) Reset webConfigurator password    12)${kontrolid_option}"
 echo " 4) Reset to factory defaults         13) Update from console"
 echo " 5) Reboot system                     ${sshd_option}"
 echo " 6) Halt system                       15) Restore recent configuration"
 echo " 7) Ping host                         16) Restart PHP-FPM"
-echo " 8) Shell"
+echo " 8) Shell															17) View Proxy logs"
+echo " 99) Configure Kontrol-ID"
 
 echo
 read -p "Enter an option: " opmode
@@ -136,7 +143,7 @@ case ${opmode} in
 	/etc/rc.restart_webgui
 	;;
 12)
-	/usr/local/sbin/pfSsh.php
+	/etc/rc.enablesso
 	;;
 13)
 	/bin/sh /usr/local/sbin/${product_name}-upgrade
@@ -149,6 +156,9 @@ case ${opmode} in
 	;;
 16)
 	/etc/rc.php-fpm_restart
+	;;
+99)
+	/etc/rc.samba
 	;;
 100)
 	if grep "$WORD" "$CONFIG"; then
