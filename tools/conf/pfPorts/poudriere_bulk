@@ -72,10 +72,10 @@ security/%%PRODUCT_NAME%%-pkg-tinc
 security/%%PRODUCT_NAME%%-pkg-zeek
 security/%%PRODUCT_NAME%%
 sysutils/%%PRODUCT_NAME%%-builder
-sysutils/%%PRODUCT_NAME%%-pkg-Backup
+#sysutils/%%PRODUCT_NAME%%-pkg-Backup
 sysutils/%%PRODUCT_NAME%%-pkg-Cron
 sysutils/%%PRODUCT_NAME%%-pkg-LCDproc
-sysutils/%%PRODUCT_NAME%%-pkg-Netgate_Coreboot_Upgrade
+#sysutils/%%PRODUCT_NAME%%-pkg-Netgate_Coreboot_Upgrade
 sysutils/%%PRODUCT_NAME%%-pkg-Notes
 sysutils/%%PRODUCT_NAME%%-pkg-RRD_Summary
 sysutils/%%PRODUCT_NAME%%-pkg-Service_Watchdog
@@ -100,6 +100,10 @@ sysutils/usb_modeswitch
 sysutils/vm-bhyve
 sysutils/xe-guest-utilities
 www/%%PRODUCT_NAME%%-pkg-Lightsquid
-www/%%PRODUCT_NAME%%-pkg-squid
+www/Kontrol-pkg-squid
 www/%%PRODUCT_NAME%%-pkg-squidGuard
 www/pound
+www/sarg
+www/Kontrol-pkg-sarg
+www/e2guardian
+www/%%PRODUCT_NAME%%-pkg-e2guardian
