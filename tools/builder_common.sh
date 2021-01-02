@@ -1490,9 +1490,9 @@ poudriere_possible_archs() {
 			# Make sure binmiscctl is ok
 			/usr/local/etc/rc.d/qemu_user_static forcestart >/dev/null 2>&1
 
-			if binmiscctl lookup armv7 >/dev/null 2>&1; then
-				_archs="${_archs} arm.armv7"
-			fi
+#			if binmiscctl lookup armv7 >/dev/null 2>&1; then
+#				_archs="${_archs} arm.armv7"
+#			fi
 		fi
 	fi
 
