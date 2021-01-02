@@ -2114,14 +2114,29 @@ function ipsec_setup_tunnels() {
 		 * not per-connection like the delay and timeout. */
 		if ($ph1ent['dpd_delay'] && $ph1ent['dpd_maxfail']) {
 			if ($start_action == "trap") {
-				$child_params['dpd_action'] = "restart";
+				$child_params['dpd_action'] = "trap";
 			} else {
 				$child_params['dpd_action'] = "clear";
 			}
 			$conn['dpd_delay'] = "{$ph1ent['dpd_delay']}s";
 			$conn['dpd_timeout'] =  $ph1ent['dpd_delay'] * ($ph1ent['dpd_maxfail'] + 1) . "s";
+
+			/* Adjust dpd_action if the close_action is explicitly set */
+			if (!empty($child_params['close_action'])) {
+				switch ($ph1ent['closeaction']) {
+					case 'trap':
+						$child_params['dpd_action'] = 'trap';
+						break;
+					case 'start':
+						$child_params['dpd_action'] = 'restart';
+						break;
+					case 'none':
+					default:
+						$child_params['dpd_action'] = 'clear';
+				}
+			}
 		} else {
-			$child_params['dpd_action'] = "none";
+			$child_params['dpd_action'] = "clear";
 		}
 
 		/* Reauth (Any) */
@@ -2227,6 +2242,9 @@ function ipsec_setup_tunnels() {
 				$child['policies'] = "no";
 				/* VTI cannot use trap policies, so start automatically instead */
 				$start_action = 'start';
+				if ($child_params['dpd_action'] == "trap") {
+					$child_params['dpd_action'] = "restart";
+				}
 				$localid_type = $ph2ent['localid']['type'];
 				$localsubnet_data = ipsec_idinfo_to_cidr($ph2ent['localid'], false, $ph2ent['mode']);
 				$local_ts = $localsubnet_data;
@@ -2267,6 +2285,10 @@ function ipsec_setup_tunnels() {
 
 			if (!empty($ph2ent['lifetime'])) {
 				$child['life_time'] = intval($ph2ent['lifetime']);
+				/* Rekey at 90% of lifetime */
+				$child['rekey_time'] = intval($child['life_time'] * 0.9);
+				/* Random rekey fuzz time */
+				$child['rand_time'] = intval($child['life_time'] * 0.1);
 			}
 
 			/* If we are to act only as a responder, disable the start action */
@@ -2504,8 +2526,8 @@ function ipsec_setup_secrets() {
 					$myid = "@{$myid}";
 				}
 
-				$myid = isset($ph1ent['mobile']) ? trim($myid_data) : "%any";
-				$peerid = ($peerid_data != 'allusers') ? trim($peerid_data) : '';
+				$myid = isset($ph1ent['mobile']) ? ipsec_fixup_id($myid_type, trim($myid_data)) : "%any";
+				$peerid = ($peerid_data != 'allusers') ? ipsec_fixup_id($peerid_type, trim($peerid_data)) : '';
 
 				if ($peerid_type == 'fqdn' && !empty($peerid)) {
 					$peerid = "@{$peerid}";
