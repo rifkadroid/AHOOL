@@ -1657,11 +1657,11 @@ function system_ntp_setup_gps($serialport) {
 
 	$gpsbaud = '4800';
 	$speeds = array(
-		0 => '4800', 
-		16 => '9600', 
-		32 => '19200', 
-		48 => '38400', 
-		64 => '57600', 
+		0 => '4800',
+		16 => '9600',
+		32 => '19200',
+		48 => '38400',
+		64 => '57600',
 		80 => '115200'
 	);
 	if (!empty($config['ntpd']['gps']['speed']) && array_key_exists($config['ntpd']['gps']['speed'], $speeds)) {
@@ -2579,7 +2579,7 @@ function system_identify_specific_platform() {
 				if (stripos($bios[0], "Hyper") !== false) {
 					return (array('name' => 'Hyper-V', 'descr' => 'Hyper-V Virtual Machine'));
 				} else {
-					return (array('name' => 'Azure', 'descr' => 'Microsoft Azure'));
+					return (array('name' => 'Azure', 'descr' => 'Microsoft Azure/Hyper-V'));
 				}
 			}
 			break;
