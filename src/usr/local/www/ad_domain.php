@@ -108,7 +108,7 @@ if (!file_exists($file))
 ?>
 	<h3> Transparent Proxy Kontrol-ID Config </h3>
 <br/>
-	<form name="form_c" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
+	<form name="form_t" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
 	<label>Enter AD-Server or Kontrol-Master IP Address - eg: 192.168.0.10</label><br/>
 	<input type="text" name="tad_srv" size="120" maxlength="120"/>
 	<input type="hidden" name="form" value="transparent">
@@ -158,7 +158,7 @@ switch ($_POST['form']) {
 
 //in case we want to remove kontrol from domain
 case "remove":
-		if (isset($_POST['rad_user']) && ($_POST['rad_pass'])) {
+		if (! empty($_POST['rad_user']) && ($_POST['rad_pass'])) {
 ?>
 
 <div style="height:200px;width:870px;overflow:auto;background-color:gray;color:white;scrollbar-base-color:gold;font-family:sans-serif;padding:10px;">
@@ -177,7 +177,7 @@ case "remove":
 		echo "<br/>";
 		echo "FINISHED";
 		break;
-}
+	   }
 		else
 			{
 ?>
@@ -190,7 +190,7 @@ case "remove":
 //in case we want to join kontrol to a domain
 case "join":
 
-				if (isset($_POST['jad_user']) && ($_POST['jad_pass']))
+				if (! empty ($_POST['jad_user']) && ($_POST['jad_pass']))
 				{
 ?>
 
@@ -261,10 +261,11 @@ case "join":
 			}
 
 
+
 // In case we want to configure Transparent Proxy credentials
 case "transparent":
 
-	if (isset($_POST['tad_srv'])) {
+	if (! empty($_POST['tad_srv'])) {
 ?>
 <div style="height:200px;width:870px;overflow:auto;background-color:gray;color:white;scrollbar-base-color:gold;font-family:sans-serif;padding:10px;">
 <?php
@@ -277,24 +278,23 @@ case "transparent":
 			{
 			touch($file);
 			}
-
 			file_put_contents($file, $tadsrvname);     // Save our content to the file.
 
 			echo "FINISHED";
 			echo "<br/>";
 		}
 		else
-			{
+		{
 ?>
 <div style="height:200px;width:870px;overflow:auto;background-color:gray;color:white;scrollbar-base-color:gold;font-family:sans-serif;padding:10px;">
 <?php
-	echo "<h3>Please fullfill the empty field before press submit<h3>";
+	echo "<h3>Please fullfill all empty fields before press submit<h3>";
 	break;
-			}
+		}
 
 	}
-
 }
+
 
 include("foot.inc");
 ?>
