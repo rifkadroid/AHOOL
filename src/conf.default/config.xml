@@ -51,6 +51,7 @@
 			<interval>monthly</interval>
 		</bogons>
 		<shellcmd>/usr/local/sbin/winbindd --daemon --configfile=/usr/local/etc/smb4.conf 2>/dev/null</shellcmd>
+		<do_not_send_uniqueid></do_not_send_uniqueid>
 	</system>
 	<interfaces>
 		<wan>
