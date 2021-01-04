@@ -191,7 +191,7 @@ if (file_exists('/conf/trigger_initial_wizard')) {
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<link rel="stylesheet" href="/css/pfSense.css" />
+		<link rel="stylesheet" href="/css/Kontrol.css" />
 		<title><?=$g['product_label']?>.home.arpa - <?=$g['product_label']?> first time setup</title>
 		<meta http-equiv="refresh" content="1;url=wizard.php?xml=setup_wizard.xml" />
 	</head>

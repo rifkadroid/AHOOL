@@ -201,7 +201,7 @@ function gen_webguicss_field(&$section, $value) {
 	$csslist = get_css_files();
 
 	if (!isset($csslist[$value])) {
-		$value = "pfSense.css";
+		$value = "Kontrol.css";
 	}
 
 	$section->addInput(new Form_Select(
@@ -526,7 +526,7 @@ function hardware_offloading_applyflags($iface) {
 	/* disable hardware checksum offloading for VirtIO network drivers,
 	 * see https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=165059 */
 	if (isset($config['system']['disablechecksumoffloading']) ||
-	    stristr($iface, "vtnet") || stristr($iface, "ena")) { 
+	    stristr($iface, "vtnet") || stristr($iface, "ena")) {
 		if (isset($options['encaps']['txcsum'])) {
 			$flags_off |= IFCAP_TXCSUM;
 		}

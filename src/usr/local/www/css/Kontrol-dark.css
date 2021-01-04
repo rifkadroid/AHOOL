@@ -1,5 +1,5 @@
 /*
- * pfSense-dark.css
+ * Kontrol-dark.css
  *
  * part of pfSense (https://www.pfsense.org)
  * Copyright (c) 2016 Electric Sheep Fencing
@@ -19,7 +19,7 @@
  * limitations under the License.
  */
 
-@import url("/css/pfSense.css");
+@import url("/css/Kontrol.css");
 @import url("/vendor/jquery-ui/themes/dark-hive/theme.css");
 
 body {
