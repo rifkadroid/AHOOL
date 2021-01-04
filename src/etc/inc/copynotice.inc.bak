@@ -5,7 +5,7 @@
  * part of pfSense (https://www.pfsense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2021 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2020 Rubicon Communications, LLC (Netgate)
  * All rights reserved.
  *
  * originally based on m0n0wall (http://m0n0.ch/wall)
@@ -49,11 +49,11 @@ $copyrightfile = "{$g['cf_conf_path']}/copyright";
 				require_once($copyrightfile);
 			} else {
 				print("<div class=\"modal-body\" style=\"background-color:#1e3f75; color:white;\">");
-				print(gettext("<p align=\"center\"><font size=\"3\">Copyright &copy; 2004-2021. Electric Sheep Fencing LLC (\"ESF\"). All Rights Reserved.</p>
-					<p align=\"center\"><strong>NO COMMERCIAL DISTRIBUTION OF THE PFSENSE&reg; CE SOFTWARE IS ALLOWED.</strong>
+				print(gettext("<p align=\"center\"><font size=\"3\">Copyright &copy; 2016-2021. Konntrol Tecnologia, EPP. All Rights Reserved.</p>
+					<p align=\"center\"><strong>NO COMMERCIAL DISTRIBUTION OF THE KONTROL-UTM&reg; SOFTWARE IS ALLOWED.</strong>
 					</p>
-					<p>pfSense&reg; is a federally and internationally registered trademark and service mark of ESF, and is exclusively licensed to Rubicon Communications, LLC (d/b/a Netgate) (\"Netgate\").</p>
-					<p>Any unauthorized use of the pfSense&reg; mark is prohibited by United States and international law. Please refer to the Netgate <a href=\"https://www.pfsense.org/trademarks.html\" target=\"_blank\"> Trademark Usage Guidelines</a> for how to properly use the mark.</p>
+					<p>Kontrol-UTM&reg; is a federally and internationally registered trademark and service mark of Konntrol Tecnologia and is exclusively licensed to Konntrol Tecnologia, EPP.</p>
+					<p>Any unauthorized use of the Kontrol-UTM&reg; mark is prohibited by Brazilian and international laws. Please refer to the Konntrol Tecnologia <a href=\"https://konntrol.com.br/\" target=\"_blank\"> Trademark Usage Guidelines</a> for how to properly use the mark.</p>
 					</div>
 					<div class=\"modal-footer\" style=\"background-color:#1e3f75; color:white;\">
 					<button type=\"button\" class=\"btn btn-xs btn-success\" data-dismiss=\"modal\" aria-label=\"Close\">
