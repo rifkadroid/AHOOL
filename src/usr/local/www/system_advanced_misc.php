@@ -222,11 +222,11 @@ if ($_POST) {
 			unset($config['system']['pkg_nochecksig']);
 		}
 
-		if ($_POST['do_not_send_uniqueid'] == "yes") {
+		//if ($_POST['do_not_send_uniqueid'] == "yes") {
 			$config['system']['do_not_send_uniqueid'] = true;
-		} else {
-			unset($config['system']['do_not_send_uniqueid']);
-		}
+		//} else {
+			//unset($config['system']['do_not_send_uniqueid']);
+		//}
 
 		if ($_POST['powerd_enable'] == "yes") {
 			$config['system']['powerd_enable'] = true;
