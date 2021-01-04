@@ -261,7 +261,6 @@ case "join":
 			}
 
 
-
 // In case we want to configure Transparent Proxy credentials
 case "transparent":
 
@@ -289,7 +288,7 @@ case "transparent":
 ?>
 <div style="height:200px;width:870px;overflow:auto;background-color:gray;color:white;scrollbar-base-color:gold;font-family:sans-serif;padding:10px;">
 <?php
-	echo "<h3>Please fullfill all empty fields before press submit<h3>";
+	echo "<h3>Please fullfill the empty field before press submit<h3>";
 	break;
 			}
 
