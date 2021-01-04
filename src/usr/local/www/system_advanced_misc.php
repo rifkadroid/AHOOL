@@ -653,7 +653,7 @@ $section->addInput(new Form_Select(
 
 $form->add($section);
 
-$section = new Form_Section('Installation Feedback');
+/*$section = new Form_Section('Installation Feedback');
 
 $section->addInput(new Form_Checkbox(
 	'do_not_send_uniqueid',
@@ -664,7 +664,7 @@ $section->addInput(new Form_Checkbox(
 
 $form->add($section);
 
-print $form;
+print $form; */
 
 $ramdisk_msg = gettext('The \"Use Ramdisk\" setting has been changed. This requires the firewall\nto reboot.\n\nReboot now ?');
 $use_mfs_tmpvar_changed = ((($use_mfs_tmpvar_before !== $use_mfs_tmpvar_after) ||
