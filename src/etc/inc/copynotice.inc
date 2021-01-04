@@ -49,7 +49,7 @@ $copyrightfile = "{$g['cf_conf_path']}/copyright";
 				require_once($copyrightfile);
 			} else {
 				print("<div class=\"modal-body\" style=\"background-color:#1e3f75; color:white;\">");
-				print(gettext("<p align=\"center\"><font size=\"3\">Copyright &copy; 2016-2020. Konntrol Tecnologia, EPP. All Rights Reserved.</p>
+				print(gettext("<p align=\"center\"><font size=\"3\">Copyright &copy; 2016-2021. Konntrol Tecnologia, EPP. All Rights Reserved.</p>
 					<p align=\"center\"><strong>NO COMMERCIAL DISTRIBUTION OF THE KONTROL-UTM&reg; SOFTWARE IS ALLOWED.</strong>
 					</p>
 					<p>Kontrol-UTM&reg; is a federally and internationally registered trademark and service mark of Konntrol Tecnologia and is exclusively licensed to Konntrol Tecnologia, EPP.</p>
