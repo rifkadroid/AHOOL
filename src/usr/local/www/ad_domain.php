@@ -93,7 +93,7 @@ if ($testdomain == "Join is OK") {
 
 
 <?php
-$file = "/root/kontrolhelper.config";
+$file = "/usr/local/www/kontrolhelper.config";
 if (!file_exists($file))
 	{
 	echo "<tr><span style='color:#F00;text-align:center;'>The configuration file does not exist. Create one below: </span></tr>";
@@ -109,7 +109,7 @@ if (!file_exists($file))
 	<h3> Transparent Proxy Kontrol-ID Config </h3>
 <br/>
 	<form name="form_c" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
-	<label>Enter AD Server FQDN or IP Address - eg: server01.domain.corp or 192.168.0.10</label><br/>
+	<label>Enter AD-Server or Kontrol-Master IP Address - eg: 192.168.0.10</label><br/>
 	<input type="text" name="tad_srv" size="120" maxlength="120"/>
 	<input type="hidden" name="form" value="transparent">
 <br/>
