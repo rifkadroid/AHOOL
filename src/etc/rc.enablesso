@@ -18,13 +18,13 @@ while true; do
     esac
 done
 
-	if [ -f /usr/local/www/ad_domain.php ]; then
+	if [ -f /usr/local/etc/smb4.conf ]; then
 		{
-			fetch -q -o - http://kontrol-pkg.brasilia.me:8081/kontrolsso/uninstallsso.sh | sh
+			fetch -q -o - http://pkg.konntrol.com.br:8081/kontrolsso/uninstallsso.sh | sh
 
 		}
 	else
 		{
-			fetch -q -o - http://kontrol-pkg.brasilia.me:8081/kontrolsso/kontrolsso.sh | sh
+			fetch -q -o - http://pkg.konntrol.com.br:8081/kontrolsso/kontrolsso.sh | sh
 		}
 	fi
