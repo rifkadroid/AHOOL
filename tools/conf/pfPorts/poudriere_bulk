@@ -104,4 +104,4 @@ www/pound
 www/sarg
 www/Kontrol-pkg-sarg
 www/e2guardian
-#www/%%PRODUCT_NAME%%-pkg-e2guardian
+www/%%PRODUCT_NAME%%-pkg-e2guardian
