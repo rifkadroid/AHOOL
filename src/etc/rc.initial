@@ -157,6 +157,9 @@ case ${opmode} in
 16)
 	/etc/rc.php-fpm_restart
 	;;
+17)
+tail -f /var/squid/logs/cache.log
+	;;
 99)
 	/etc/rc.samba
 	;;
