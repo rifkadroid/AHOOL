@@ -169,7 +169,7 @@ function get_css_files() {
 			    strpos($css, "logo") == 0) {
 				if (strpos($css, "BETA") != 0) {
 					array_push($betacss, $css);
-				} else if (strpos($css, "pfSense") != 0) {
+				} else if (strpos($css, "Kontrol") != 0) {
 					array_push($pfscss, $css);
 				} else {
 					array_push($usrcss, $css);
@@ -931,8 +931,8 @@ function restore_config_section($section_name, $new_contents) {
 	fclose($fout);
 
 	$xml = parse_xml_config($g['tmp_path'] . "/tmpxml", null);
-	if ($xml['pfsense']) {
-		$xml = $xml['pfsense'];
+	if ($xml['kontrol']) {
+		$xml = $xml['kontrol'];
 	}
 	if ($xml[$section_name]) {
 		$section_xml = $xml[$section_name];
