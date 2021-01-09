@@ -2,6 +2,7 @@
 benchmarks/%%PRODUCT_NAME%%-pkg-iperf
 benchmarks/iperf
 benchmarks/iperf3
+converters/base64
 databases/php72-mysqli
 databases/php72-pdo_mysql
 databases/php72-pgsql
@@ -110,4 +111,4 @@ www/e2guardian
 www/%%PRODUCT_NAME%%-pkg-E2guardian5
 www/sarg
 www/%%PRODUCT_NAME%%-pkg-sarg
-net-mgmt/wmi-client
+www/Kontrol-pkg-Kontrolsquid
