@@ -111,5 +111,5 @@ www/e2guardian
 www/%%PRODUCT_NAME%%-pkg-E2guardian5
 www/sarg
 www/%%PRODUCT_NAME%%-pkg-sarg
-#www/Kontrol-pkg-squid
+www/Kontrol-pkg-squid
 #www/Kontrol-pkg-Kontrolsquid
