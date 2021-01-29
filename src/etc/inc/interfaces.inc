@@ -30,6 +30,7 @@ require_once("globals.inc");
 require_once("util.inc");
 require_once("gwlb.inc");
 require_once("ipsec.inc");
+require_once("wg.inc");
 
 function interfaces_bring_up($interface) {
 	if (!$interface) {
@@ -1258,6 +1259,11 @@ function interface_is_type($if = NULL, $type) {
 			$list = 'laggs';
 			$entry = 'lagg';
 			$entif = 'laggif';
+			break;
+		case "wg":
+			$list = 'wireguard';
+			$entry = 'tunnel';
+			$entif = 'name';
 			break;
 		default:
 			break;
@@ -4313,6 +4319,11 @@ function interface_configure($interface = "wan", $reloadall = false, $linkupeven
 	}
 	if (($wantedmtu == 0) && interface_is_type($mtuif, 'gif')) {
 		$wantedmtu = 1280;
+	}
+	/* Default MTU for WireGuard is 1420
+	 * https://redmine.pfsense.org/issues/11291 */
+	if (($wantedmtu == 0) && interface_is_type($mtuif, 'wg')) {
+		$wantedmtu = 1420;
 	}
 
 	/* Set the MTU to 1500 if no explicit MTU configured. */
@@ -7583,6 +7594,10 @@ function create_interface_list() {
 	// add openvpn/tun interfaces
 	if ($config['openvpn']["openvpn-server"] || $config['openvpn']["openvpn-client"]) {
 		$iflist["openvpn"] = gettext("OpenVPN");
+	}
+
+	if (is_wg_enabled() && have_ruleint_access("wireguard")) {
+		$iflist['wireguard'] = 'WireGuard';
 	}
 
 	return($iflist);
