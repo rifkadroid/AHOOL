@@ -106,6 +106,7 @@ sysutils/usb_modeswitch
 sysutils/vm-bhyve
 sysutils/xe-guest-utilities
 www/%%PRODUCT_NAME%%-pkg-squid
+www/%%PRODUCT_NAME%%-pkg-squidGuard
 www/pound
 www/e2guardian
 www/%%PRODUCT_NAME%%-pkg-E2guardian5
