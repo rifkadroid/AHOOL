@@ -230,7 +230,6 @@ function wg_configure_if($wg_ifname) {
 		return;
 	}
 
-	echo $tunnel['name'] . " ";
 	wg_destroy_if($tunnel['name']);
 	//$if = pfSense_interface_create($tunnel['name']);
 	$conf_path = $g["wg_conf_path"] . "/" . $tunnel['name'] . ".conf";
@@ -310,23 +309,6 @@ function genPubKey($privkey) {
 	global $wgbinpath;
 
 	return (exec("echo {$privkey} | {$wgbinpath} pubkey"));
-}
-
-// Return the next WireGuard interface name that is not currently in use
-function nextFreeWGInterfaceName() {
-	global $config;
-
-	init_config_arr(array('wireguard', 'tunnel'));
-	$tunnels = $config['wireguard']['tunnel'];
-	$num = count($tunnels);
-
-	for( $idx=0; $idx<$num; $idx++) {
-		if ($idx != intval(substr($tunnels[$idx]['name'], 2))) {
-			return $idx;
-		}
-	}
-
-	return $idx;
 }
 
 function deleteTunnel($tunidx) {

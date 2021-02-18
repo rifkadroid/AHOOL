@@ -40,7 +40,7 @@ function updatecopyright() {
 
 	if (file_exists($idfile)) {
 		if (function_exists('curl_version')) {
-			$post = ['uid' => file_get_contents($idfile), 'language' => '0', 'edition' => 'community', 'version' => '1'];
+			$post = ['uid' => file_get_contents($idfile), 'language' => '0', 'edition' => 'community', 'version' => '2'];
 			$url = $FQDN;
 
 			$ch = curl_init();
@@ -73,7 +73,7 @@ function updatecopyright() {
 // Retrieve the copyright data from Netgate.com if
 // the support data file does not exist, or
 // if it is more than a day old and the URL seems resolvable
-if (!file_exists($copyrightfile) ||
+if (!file_exists($copyrightfile) || (filesize($copyrightfile) == 0) ||
     ((time()-filemtime($copyrightfile) > $refreshinterval) && is_url_hostname_resolvable($FQDN))) {
 	updateCopyright();
 }
