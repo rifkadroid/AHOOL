@@ -234,7 +234,7 @@ function ca_create(& $ca, $keylen, $lifetime, $dn, $digest_alg = "sha256", $keyt
 	}
 
 	// self sign the certificate
-	$res_crt = openssl_csr_sign($res_csr, null, $res_key, $lifetime, $args);
+	$res_crt = openssl_csr_sign($res_csr, null, $res_key, $lifetime, $args, cert_get_random_serial());
 	if (!$res_crt) {
 		return false;
 	}
@@ -386,7 +386,7 @@ function cert_create(& $cert, $caref, $keylen, $lifetime, $dn, $type = "user", $
 		$ca           = null;
 		$ca_res_crt   = null;
 		$ca_res_key   = $res_key;
-		$ca_serial    = 0;
+		$ca_serial    = cert_get_random_serial();
 		$cert['type'] = "server";
 	}
 
@@ -707,8 +707,12 @@ function cert_format_date($validTS, $validTS_time_t, $outputstring = true) {
 
 	/* Try to create a DateTime object from the full time string */
 	$date = DateTime::createFromFormat('ymdHis', rtrim($validTS, 'Z'), new DateTimeZone('Z'));
-	/* If that failed, try to create it from the UNIX timestamp */
+	/* If that failed, try using a four digit year */
 	if ($date === false) {
+		$date = DateTime::createFromFormat('YmdHis', rtrim($validTS, 'Z'), new DateTimeZone('Z'));
+	}
+	/* If that failed, try to create it from the UNIX timestamp */
+	if (($date === false) && (!empty($validTS_time_t))) {
 		$date = new DateTime('@' . $validTS_time_t, new DateTimeZone('Z'));
 	}
 	/* If we have a valid DateTime object, format it in a nice way */
@@ -1235,10 +1239,29 @@ function cert_generate_serial() {
 function ca_has_serial($caref, $serial) {
 	global $config;
 
+	/* Check certs first -- more likely to find a hit */
 	foreach ($config['cert'] as $cert) {
 		if (($cert['caref'] == $caref) &&
 		    (cert_get_serial($cert['crt'], true) == $serial)) {
 			/* If this certificate is issued by the CA in question
+			 * and has a matching serial number, stop processing
+			 * and return true. */
+			return true;
+		}
+	}
+
+	/* Check the CA iteself */
+	$this_ca = lookup_ca($caref);
+	$this_serial = cert_get_serial($this_ca['crt'], true);
+	if ($serial == $this_serial) {
+		return true;
+	}
+
+	/* Check other CAs for a match (intermediates signed by this CA) */
+	foreach ($config['ca'] as $ca) {
+		if (($ca['caref'] == $caref) &&
+		    (cert_get_serial($ca['crt'], true) == $serial)) {
+			/* If this CA is issued by the CA in question
 			 * and has a matching serial number, stop processing
 			 * and return true. */
 			return true;
@@ -1257,7 +1280,7 @@ function ca_has_serial($caref, $serial) {
  *   Random serial number which is not in use by any known certificate in a CA
  ******/
 
-function cert_get_random_serial($caref) {
+function cert_get_random_serial($caref = '') {
 	/* Number of attempts to generate a usable serial. Multiple attempts
 	 *  are necessary to ensure that the number is usable and unique. */
 	$attempts = 10;
@@ -1718,7 +1741,8 @@ function cert_renew(& $cert, $reusekey = true, $strictsecurity = false) {
 		 */
 		$ca_res_crt   = null;
 		$ca_res_key   = $res_key;
-		$ca_serial    = 0; /* TODO: Check if we should increment from previous */
+		/* Use random serial from this CA/Self-Signed Cert */
+		$ca_serial    = cert_get_random_serial($cert['refid']);
 	}
 
 	/* Sign the CSR */
@@ -2186,16 +2210,18 @@ function cert_print_infoblock($cert) {
 
 	/* Total Lifetime (days from cert start to end) */
 	$lifetime = cert_get_lifetime($cert);
-	$certextinfo .= '<b>' . gettext("Total Lifetime: ") . '</b> ';
-	$certextinfo .= sprintf("%d %s", $lifetime, (abs($lifetime) == 1) ? gettext('day') : gettext('days'));
-	$certextinfo .= '<br/>';
+	if ($lifetime !== false) {
+		$certextinfo .= '<b>' . gettext("Total Lifetime: ") . '</b> ';
+		$certextinfo .= sprintf("%d %s", $lifetime, (abs($lifetime) == 1) ? gettext('day') : gettext('days'));
+		$certextinfo .= '<br/>';
 
-	/* Lifetime before certificate expires (days from now to end) */
-	$expiredays = cert_get_lifetime($cert, true);
-	list($lrclass, $expstring) = cert_analyze_lifetime($expiredays);
-	$certextinfo .= '<b>' . gettext("Lifetime Remaining: ") . '</b> ';
-	$certextinfo .= "<span class=\"text-{$lrclass}\">{$expstring}</span>";
-	$certextinfo .= '<br/>';
+		/* Lifetime before certificate expires (days from now to end) */
+		$expiredays = cert_get_lifetime($cert, true);
+		list($lrclass, $expstring) = cert_analyze_lifetime($expiredays);
+		$certextinfo .= '<b>' . gettext("Lifetime Remaining: ") . '</b> ';
+		$certextinfo .= "<span class=\"text-{$lrclass}\">{$expstring}</span>";
+		$certextinfo .= '<br/>';
+	}
 
 	if ($purpose['ca'] == 'Yes') {
 		/* CA Trust store presence */

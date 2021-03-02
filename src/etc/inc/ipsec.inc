@@ -1881,6 +1881,9 @@ function ipsec_setup_authentication(& $ph1ent, & $conn) {
 	if (in_array($ph1ent['authentication_method'], array('eap-tls', 'xauth_cert_server', 'cert', 'pkcs11')) &&
 	    isset($cafn)) {
 		$remote['cacerts'] = $cafn;
+		if (isset($config['ipsec']['strictcrlpolicy'])) {
+			$remote['revocation'] = "strict";
+		}
 	}
 
 	$conn['local'] = $local;
@@ -2343,7 +2346,13 @@ function ipsec_setup_tunnels() {
 			if (!isset($ph1ent['mobile']) && (($ikeversion == 1) || isset($ph1ent['splitconn']))) {
 				if (!empty($remote_ts)) {
 					/* Setup child sub-connections using unique names with a suffix */
-					$subconname = "con" . get_ipsecifnum($ph1ent['ikeid'], $idx) . $suffix;
+					if (get_ipsecifnum($ph1ent['ikeid'], $idx)) {
+						$subconnum = get_ipsecifnum($ph1ent['ikeid'], $idx);
+					} else {
+						$subconnum = "{$ph1ent['ikeid']}00000";
+					}
+
+					$subconname = "con" . ($subconnum + $suffix);
 					$children[$subconname] = $child;
 					$children[$subconname]['local_ts'] = $local_ts;
 					$children[$subconname]['remote_ts'] = $remote_ts;
@@ -2386,7 +2395,9 @@ function ipsec_setup_tunnels() {
 				}
 			}
 		}
-		$conn['pools'] = implode(', ', $pools);
+		if (!empty($pools)) {
+			$conn['pools'] = implode(', ', $pools);
+		}
 
 		/* For IKEv2 without Split Connections, setup combined sets of
 		 * local/remote traffic selectors and propsals */
@@ -2523,16 +2534,8 @@ function ipsec_setup_secrets() {
 					continue;
 				}
 
-				if ($myid_type == 'fqdn' && !empty($myid)) {
-					$myid = "@{$myid}";
-				}
-
 				$myid = isset($ph1ent['mobile']) ? ipsec_fixup_id($myid_type, trim($myid_data)) : "%any";
 				$peerid = ($peerid_data != 'allusers') ? ipsec_fixup_id($peerid_type, trim($peerid_data)) : '';
-
-				if ($peerid_type == 'fqdn' && !empty($peerid)) {
-					$peerid = "@{$peerid}";
-				}
 
 				if (!empty($ph1ent['pre-shared-key'])) {
 					$scconf['secrets']['ike-' . $suffix++] = array(
@@ -2737,9 +2740,6 @@ function ipsec_configure($restart = false) {
 	if (!empty($config['ipsec']['uniqueids']) &&
 	    array_key_exists($config['ipsec']['uniqueids'], $ipsec_idhandling)) {
 		$conn_defaults['unique'] = $config['ipsec']['uniqueids'];
-	}
-	if (isset($config['ipsec']['strictcrlpolicy'])) {
-		$conn_defaults['strictcrlpolicy'] = "yes";
 	}
 	/* Disable ipcomp for now. redmine #6167
 	if (isset($config['ipsec']['compression'])) {
