@@ -72,7 +72,7 @@ $g = array(
 	"disablehelpicon" => true,
 	"disablecrashreporter" => true,
 	"debug" => false,
-	"latest_config" => "21.4",
+	"latest_config" => "21.5",
 	"minimum_ram_warning" => "101",
 	"minimum_ram_warning_text" => "128 MB",
 	"wan_interface_name" => "wan",
@@ -97,8 +97,7 @@ $g = array(
 		'dhcpd' => "/var/dhcpd/var/db/dhcpd.leases",
 		'dhcpdv6' => "/var/dhcpd/var/db/dhcpd6.leases",
 		'voucher' => "/var/db/voucher_*.db"
-	),
-	"wg_conf_path" => "/etc/wg"
+	)
 );
 
 /* IP TOS flags */

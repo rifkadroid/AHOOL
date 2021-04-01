@@ -494,7 +494,7 @@ function openvpn_validate_curve($curve) {
 /* Obtain the list of digest algorithms supported by openssl and their alternate names */
 function openvpn_get_openssldigestmappings() {
 	$digests = array();
-	$digest_out = shell_exec('/usr/bin/openssl list-message-digest-algorithms | /usr/bin/grep "=>"');
+	$digest_out = shell_exec('/usr/bin/openssl list -digest-algorithms | /usr/bin/grep "=>"');
 	$digest_lines = explode("\n", trim($digest_out));
 	sort($digest_lines);
 	foreach ($digest_lines as $line) {
@@ -853,7 +853,13 @@ function openvpn_reconfigure($mode, $settings) {
 	if (is_ipaddrv6($ipaddr)) {
 		$iface_ipv6 = $ipaddr;
 	} elseif (!empty($interface) && strcmp($interface, "any")) {
-		$iface_ipv6=get_interface_ipv6($interface);
+		/* get correct interface name for 6RD/6to4 interfaces
+		 * see https://redmine.pfsense.org/issues/11674 */
+		if (is_stf_interface($settings['interface'])) {
+			$iface_ipv6=get_interface_ipv6($settings['interface']);
+		} else {
+			$iface_ipv6=get_interface_ipv6($interface);
+		}
 	}
 
 	$conf = "dev {$devname}\n";
@@ -1071,7 +1077,7 @@ function openvpn_reconfigure($mode, $settings) {
 					if ($settings['strictusercn']) {
 						$strictusercn = "true";
 					}
-					$conf .= "plugin /usr/local/lib/openvpn/plugins/openvpn-plugin-auth-script.so /usr/local/sbin/ovpn_auth_verify_async user " . base64_encode($settings['authmode']) . " {$strictusercn} {$mode_id} {$settings['local_port']}\n";
+					$conf .= openvpn_authscript_string($settings['authmode'], $strictusercn, $mode_id, $settings['local_port']);
 				}
 				break;
 		}
@@ -1384,11 +1390,6 @@ function openvpn_reconfigure($mode, $settings) {
 
 	// New client features
 	if ($mode == "client") {
-		// Dont pull routes checkbox
-		if ($settings['route_no_pull']) {
-			$conf .= "route-nopull\n";
-		}
-
 		// Dont add/remove routes checkbox
 		if ($settings['route_no_exec']) {
 			$conf .= "route-noexec\n";
@@ -1419,6 +1420,12 @@ function openvpn_reconfigure($mode, $settings) {
 	}
 
 	openvpn_add_custom($settings, $conf);
+
+	/* add nopull option after custom options, see https://redmine.pfsense.org/issues/11448 */
+	if (($mode == "client") && $settings['route_no_pull']) {
+		// Dont pull routes checkbox
+		$conf .= "route-nopull\n";
+	}
 
 	openvpn_create_dirs();
 	$fpath = "{$g['openvpn_base']}/{$mode_id}/config.ovpn";
@@ -1832,6 +1839,7 @@ function openvpn_get_server_status($server, $socket) {
 				$conn['user_name'] = $list[9];
 				$conn['client_id'] = $list[10];
 				$conn['peer_id'] = $list[11];
+				$conn['cipher'] = $list[12];
 				$server['conns'][] = $conn;
 			}
 			/* parse routing table lines */
@@ -2255,6 +2263,10 @@ function openvpn_build_data_cipher_list($data_ciphers = 'AES-256-GCM,AES-128-GCM
 		$data_ciphers .= ',' . $fallback_cipher;
 	}
 	return $data_ciphers;
+}
+
+function openvpn_authscript_string($authmode, $strictusercn, $mode_id, $local_port) {
+	return "plugin /usr/local/lib/openvpn/plugins/openvpn-plugin-auth-script.so /usr/local/sbin/ovpn_auth_verify_async user " . base64_encode($authmode) . " {$strictusercn} {$mode_id} {$local_port}\n";
 }
 
 ?>

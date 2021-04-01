@@ -1614,14 +1614,16 @@ function update_repos() {
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		curl_setopt($ch, CURLOPT_VERBOSE, 0);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_USERAGENT, $g['product_label'] . '/' .
-		    $g['product_version']);
+		curl_setopt($ch, CURLOPT_USERAGENT, $g['product_label'] . '/' . $g['product_version']);
 		curl_setopt($ch, CURLOPT_URL, $FQDN);
 		curl_setopt($ch, CURLOPT_POST, true);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post));
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT ,4);
+		set_curlproxy($ch);
+
 		$response = curl_exec($ch);
 		$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
 		curl_close($ch);
 
 		if ($status == 200) {

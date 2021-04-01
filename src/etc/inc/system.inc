@@ -213,12 +213,20 @@ function system_resolvconf_generate($dynupdate = false) {
 		}
 		/* dns server array starts at 0 */
 		$dnsserver = $syscfg['dnsserver'][$dnscounter - 1];
+
+		/* specify IP protocol version for correct add/del,
+		 * see https://redmine.pfsense.org/issues/11578 */
+		if (is_ipaddrv4($dnsserver)) {
+			$ipprotocol = 'inet';
+		} else {
+			$ipprotocol = 'inet6';
+		}
 		if (!empty($dnsserver)) {
 			if (is_ipaddr($gatewayip)) {
-				route_add_or_change($dnsserver, $gatewayip);
+				route_add_or_change($dnsserver, $gatewayip, '', '', $ipprotocol);
 			} else {
 				/* Remove old route when disable gw */
-				route_del($dnsserver);
+				route_del($dnsserver, $ipprotocol);
 			}
 		}
 		$dnscounter++;
@@ -922,6 +930,12 @@ function system_staticroutes_configure($interface = "", $update_dns = false) {
 		$gateways_arr = return_gateways_array(false, true);
 
 		foreach ($static_routes as $rtent) {
+			/* Do not delete disabled routes on boot,
+			 * see https://redmine.pfsense.org/issues/3709 */
+			if (isset($rtent['disabled']) && platform_booting()) {
+				continue;
+			}
+
 			if (empty($gateways_arr[$rtent['gateway']])) {
 				log_error(sprintf(gettext("Static Routes: Gateway IP could not be found for %s"), $rtent['network']));
 				continue;

@@ -52,6 +52,8 @@ function updatecopyright() {
 			curl_setopt($ch, CURLOPT_POST, true);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post));
 			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT ,4);
+			set_curlproxy($ch);
+
 			$response = curl_exec($ch);
 			$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 			curl_close($ch);

@@ -680,6 +680,15 @@ function is_ipaddrv6($ipaddr) {
 	return Net_IPv6::checkIPv6($ipaddr);
 }
 
+function is_ipaddrv6_v4map($ipaddr) {
+	/* check RFC4291 par 2.2.2 format, ex: fd00::1.2.3.4
+	 * see https://redmine.pfsense.org/issues/11446 */
+	if (is_ipaddrv6($ipaddr) && preg_match('/^[0-9a-f:]{2,30}[0-9.]{7,15}$/i', $ipaddr)) {
+		return true;
+	}
+	return false;
+}
+
 /* returns true if $ipaddr is a valid dotted IPv4 address */
 function is_ipaddrv4($ipaddr) {
 	if (!is_string($ipaddr) || empty($ipaddr) || ip2long($ipaddr) === FALSE) {
@@ -2382,7 +2391,7 @@ function is_interface_mismatch() {
 		foreach ($config['interfaces'] as $ifname => $ifcfg) {
 			if (interface_is_vlan($ifcfg['if']) != NULL ||
 			    interface_is_qinq($ifcfg['if']) != NULL ||
-			    preg_match("/^enc|^cua|^tun|^tap|^l2tp|^pptp|^ppp|^ovpn|^ipsec|^gif|^gre|^lagg|^bridge|vlan|^wg|_wlan|_\d{0,4}_\d{0,4}$/i", $ifcfg['if'])) {
+			    preg_match("/^enc|^cua|^tun|^tap|^l2tp|^pptp|^ppp|^ovpn|^ipsec|^gif|^gre|^lagg|^bridge|vlan|_wlan|_\d{0,4}_\d{0,4}$/i", $ifcfg['if'])) {
 				// Do not check these interfaces.
 				$i++;
 				continue;
@@ -2649,7 +2658,9 @@ function route_table() {
 }
 
 /* Get static route for specific destination */
-function route_get($target, $ipprotocol = '') {
+function route_get($target, $ipprotocol = '', $useroute = false) {
+	global $config;
+
 	if (!empty($ipprotocol)) {
 		$family = $ipprotocol;
 	} else if (is_v4($target)) {
@@ -2662,17 +2673,45 @@ function route_get($target, $ipprotocol = '') {
 		return array();
 	}
 
-	$rtable = route_table();
+	if ($useroute) {
+		if ($family == 'inet') {
+			$inet = '4';
+		} else {
+			$inet = '6';
+		}
+		$interface = exec("/sbin/route -n{$inet} get {$target} 2>/dev/null | /usr/bin/awk '/interface:/{print $2}'");
+		if (empty($interface)) {
+			return array();
+		} elseif ($interface == 'lo0') {
+			// interface assigned IP address
+			foreach ($config['interfaces'] as $intf => $infconf) {
+				if ((($inet == '4') && (get_interface_ip($intf) == $target)) ||
+				    (($inet == '6') && (get_interface_ipv6($intf) == $target))) {
+					$interface = convert_friendly_interface_to_real_interface_name($intf);
+					$gateway = $interface;
+					break;
+				}
+			}
+		} else {
+			$gateway = exec("/sbin/route -n{$inet} get {$target} 2>/dev/null | /usr/bin/awk '/gateway:/{print $2}'");
+			if (!$gateway) {
+				// non-local gateway
+				$gateway = get_interface_mac($interface);
+			}
+		}
+		$result[] = array('gateway' => $gateway, 'interface-name' => $interface);
+	} else {
+		$rtable = route_table();
+		if (empty($rtable)) {
+			return array();
+		}
 
-	if (empty($rtable)) {
-		return array();
-	}
-
-	$result = array();
-	foreach ($rtable[$family] as $item) {
-		if ($item['destination'] == $target ||
-		    ip_in_subnet($target, $item['destination'])) {
-			$result[] = $item;
+		$result = array();
+		foreach ($rtable[$family] as $item) {
+			if ($item['destination'] == $target ||
+			    ip_in_subnet($target, $item['destination'])) {
+				$result[] = $item;
+			}
 		}
 	}
 
@@ -2686,7 +2725,7 @@ function route_get_default($ipprotocol) {
 		return '';
 	}
 
-	$route = route_get('default', $ipprotocol);
+	$route = route_get('default', $ipprotocol, true);
 
 	if (empty($route)) {
 		return '';
@@ -2712,7 +2751,7 @@ function route_del($target, $ipprotocol = '') {
 		return false;
 	}
 
-	$route = route_get($target, $ipprotocol);
+	$route = route_get($target, $ipprotocol, true);
 
 	if (empty($route)) {
 		return;
@@ -2784,7 +2823,8 @@ function route_add_or_change($target, $gw, $iface = '', $args = '',
 		return false;
 	}
 
-	if (is_subnet($target)) {
+	/* use '-host' for IPv6 /128 routes, see https://redmine.pfsense.org/issues/11594 */
+	if (is_subnetv4($target) || (is_subnetv6($target) && (subnet_size($target) > 1))) {
 		$target_prefix = '-net';
 	} else if (is_ipaddr($target)) {
 		$target_prefix = '-host';
@@ -2806,6 +2846,12 @@ function route_add_or_change($target, $gw, $iface = '', $args = '',
 		$params .= " -iface {$iface}";
 	}
 	if (is_ipaddr($gw)) {
+		/* set correct linklocal gateway address,
+		 * see https://redmine.pfsense.org/issues/11713 */
+		if (is_linklocal($gw) && empty(get_ll_scope($gw))) {
+			$routeget = route_get($gw, 'inet6', true);
+			$gw .= "%" . $routeget[0]['interface-name'];
+		}
 		$params .= " " . $gw;
 	}
 
@@ -3372,7 +3418,8 @@ function parse_cisco_acl_rule($rule, $devname, $dir, $proto) {
 	if (trim($rule[$index]) == "host") {
 		$index++;
 		if ((is_ipaddrv4(trim($rule[$index])) && ($proto == "inet")) ||
-		    (is_ipaddrv6(trim($rule[$index])) && ($proto == "inet6"))) {
+		    (is_ipaddrv6(trim($rule[$index])) && ($proto == "inet6")) ||
+		    (trim($rule[$index]) == "{clientip}")) {
 			$tmprule .= "from {$rule[$index]} ";
 			$index++;
 		} else {
@@ -3396,7 +3443,7 @@ function parse_cisco_acl_rule($rule, $devname, $dir, $proto) {
 				syslog(LOG_WARNING, "Error parsing rule {$rule_orig}: Invalid source netmask '$netmask'.");
 				return;
 			}
-			$tmprule .= "from {$network}/{$netmask}";
+			$tmprule .= "from {$network}/{$netmask} ";
 		} else {
 			syslog(LOG_WARNING, "Error parsing rule {$rule_orig}: Invalid source network '$network'.");
 			return;
@@ -3447,7 +3494,8 @@ function parse_cisco_acl_rule($rule, $devname, $dir, $proto) {
 	if (trim($rule[$index]) == "host") {
 		$index++;
 		if ((is_ipaddrv4(trim($rule[$index])) && ($proto == "inet")) ||
-		    (is_ipaddrv6(trim($rule[$index])) && ($proto == "inet6"))) {
+		    (is_ipaddrv6(trim($rule[$index])) && ($proto == "inet6")) ||
+		    (trim($rule[$index]) == "{clientip}")) {
 			$tmprule .= "to {$rule[$index]} ";
 			$index++;
 		} else {
@@ -3471,7 +3519,7 @@ function parse_cisco_acl_rule($rule, $devname, $dir, $proto) {
 				syslog(LOG_WARNING, "Error parsing rule {$rule_orig}: Invalid destination network '$network'.");
 				return;
 			}
-			$tmprule .= "to {$network}/{$netmask}";
+			$tmprule .= "to {$network}/{$netmask} ";
 		} else {
 			syslog(LOG_WARNING, "Error parsing rule {$rule_orig}: Invalid destination network '$network'.");
 			return;
