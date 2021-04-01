@@ -832,11 +832,6 @@ function return_gateways_array($disabled = false, $localhost = false, $inactive 
 							continue 2;
 						}
 					}
-				} elseif (substr($ifcfg['if'], 0, 2) == "wg") {
-					if (!find_interface_ip($ifcfg['if'])) {
-						continue 2;
-					}
-					$ctype = "WGv4";
 				} elseif ($tunnelif == "gif" || $tunnelif == "gre") {
 					$ctype = "TUNNELv4";
 				}
@@ -980,11 +975,6 @@ function return_gateways_array($disabled = false, $localhost = false, $inactive 
 							continue 2;
 						}
 					}
-				} elseif (substr($ifcfg['if'], 0, 2) == "wg") {
-					if (!find_interface_ipv6($ifcfg['if'])) {
-						continue 2;
-					}
-					$ctype = "WGv6";
 				} else if ($tunnelif == "gif" || $tunnelif == "gre") {
 					$ctype = "TUNNELv6";
 				}
@@ -1133,7 +1123,8 @@ function fixup_default_gateway($ipprotocol, $gateways_status, $gateways_arr) {
 				continue;
 			}
 
-			if ((isset($gwsttng['monitor_disable']) || isset($gwsttng['action_disable']) || $gateways_status[$gwname]['status'] == "none")) {
+			if (isset($gwsttng['monitor_disable']) || isset($gwsttng['action_disable']) ||
+			    ($gateways_status[$gwname]['status'] == "online")) {
 				$set_dfltgwname = $gwname;
 				break;
 			}

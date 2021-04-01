@@ -137,7 +137,7 @@ export KERNEL_BUILD_PATH=${KERNEL_BUILD_PATH:-"${SCRATCHDIR}/kernels"}
 # Do not touch builder /usr/obj
 export MAKEOBJDIRPREFIX=${MAKEOBJDIRPREFIX:-"${SCRATCHDIR}/obj"}
 
-export MODULES_OVERRIDE=${MODULES_OVERRIDE:-"aesni amdtemp amdsmn blake2 coretemp cryptodev cpuctl drm2 fdescfs dummynet hwpmc i2c if_stf if_wg ipdivert ipfw ipfw_nat64 ipmi ix ixv ndis nmdm opensolaris sfxge vmm zfs usb/urndis usb/cdce usb/ipheth"}
+export MODULES_OVERRIDE=${MODULES_OVERRIDE:-"aesni amdtemp amdsmn blake2 coretemp cryptodev cpuctl drm2 fdescfs dummynet hwpmc i2c if_stf ipdivert ipfw ipfw_nat64 ipmi ix ixv ndis nmdm opensolaris sfxge vmm zfs usb/urndis usb/cdce usb/ipheth"}
 
 # gnid
 export GNID_REPO_BASE=${GNID_REPO_BASE:-"${GIT_REPO_BASE}/gnid.git"}
@@ -215,7 +215,7 @@ if [ -z "${REPO_BRANCH_PREFIX}" ]; then
 else
 	export POUDRIERE_PORTS_GIT_URL=${POUDRIERE_PORTS_GIT_URL:-"${GIT_REPO_BASE}/${REPO_BRANCH_PREFIX}ports.git"}
 fi
-export POUDRIERE_PORTS_GIT_BRANCH=${POUDRIERE_PORTS_GIT_BRANCH:-"${REPO_BRANCH_PREFIX}RELENG_2_5_0"}
+export POUDRIERE_PORTS_GIT_BRANCH=${POUDRIERE_PORTS_GIT_BRANCH:-"${REPO_BRANCH_PREFIX}RELENG_2_5_1"}
 
 # Use vX_Y instead of RELENG_X_Y for poudriere to make it shorter
 POUDRIERE_PORTS_BRANCH=$(echo "${POUDRIERE_PORTS_GIT_BRANCH}" | sed 's,RELENG_,v,')
@@ -312,7 +312,7 @@ export CORE_PKG_REAL_PATH="${CORE_PKG_PATH}/.real_${DATESTRING}"
 export CORE_PKG_ALL_PATH="${CORE_PKG_PATH}/All"
 
 export PKG_REPO_BASE=${PKG_REPO_BASE:-"${BUILDER_TOOLS}/templates/pkg_repos"}
-export PFSENSE_DEFAULT_REPO="${PRODUCT_NAME}-repo"
+export PFSENSE_DEFAULT_REPO="${PRODUCT_NAME}-repo-251"
 export PKG_REPO_DEFAULT=${PKG_REPO_DEFAULT:-"${PKG_REPO_BASE}/${PFSENSE_DEFAULT_REPO}.conf"}
 export PFSENSE_BUILD_REPO="${PFSENSE_DEFAULT_REPO}"
 export PKG_REPO_BUILD=${PKG_REPO_BUILD:-"${PKG_REPO_BASE}/${PFSENSE_BUILD_REPO}.conf"}

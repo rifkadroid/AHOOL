@@ -214,6 +214,8 @@ if ($_POST['save']) {
 		$vpnid = 0;
 	}
 
+	$pconfig['ncp_enable'] = ($pconfig['ncp_enable'] == 'yes') ? 'enabled' : 'disabled';
+
 	if (isset($pconfig['custom_options']) &&
 	    ($pconfig['custom_options'] != $a_client[$id]['custom_options']) &&
 	    !$user_can_edit_advanced) {
@@ -226,6 +228,11 @@ if ($_POST['save']) {
 	$cipher_validation_list = array_keys(openvpn_get_cipherlist());
 	if (!in_array($pconfig['data_ciphers_fallback'], $cipher_validation_list)) {
 		$input_errors[] = gettext("The selected Fallback Data Encryption Algorithm is not valid.");
+	}
+
+	/* Maximum option line length = 256, see https://redmine.pfsense.org/issues/11559 */
+	if (!empty($pconfig['data_ciphers']) && (strlen("data-ciphers " . implode(",", $pconfig['data_ciphers'])) > 254)) {
+		$input_errors[] = gettext("Too many Data Encryption Algorithms have been selected.");
 	}
 
 	list($iv_iface, $iv_ip) = explode ("|", $pconfig['interface']);
@@ -521,7 +528,7 @@ if ($_POST['save']) {
 			$client['data_ciphers'] = implode(",", $pconfig['data_ciphers']);
 		}
 
-		$client['ncp_enable'] = $pconfig['ncp_enable'] ? "enabled":"disabled";
+		$client['ncp_enable'] = $pconfig['ncp_enable'];
 
 		$client['ping_method'] = $pconfig['ping_method'];
 		$client['keepalive_interval'] = $pconfig['keepalive_interval'];
@@ -1268,6 +1275,7 @@ events.push(function() {
 		switch ($('#mode').val()) {
 			case "p2p_tls":
 				hideCheckbox('tlsauth_enable', false);
+				hideInput('tlsauth_keydir', false);
 				hideInput('caref', false);
 				hideInput('certref', false);
 				hideClass('authentication', false);
@@ -1280,6 +1288,7 @@ events.push(function() {
 				break;
 			case "p2p_shared_key":
 				hideCheckbox('tlsauth_enable', true);
+				hideInput('tlsauth_keydir', true);
 				hideInput('caref', true);
 				hideInput('certref', true);
 				hideClass('authentication', true);
@@ -1313,7 +1322,7 @@ events.push(function() {
 
 	// Process "Automatically generate a shared key" checkbox
 	function autokey_change() {
-		hideInput('shared_key', $('#autokey_enable').prop('checked'));
+		hideInput('shared_key', ($('#autokey_enable').prop('checked') || ($('#mode').val() == 'p2p_tls')));
 	}
 
 	function useproxy_changed() {

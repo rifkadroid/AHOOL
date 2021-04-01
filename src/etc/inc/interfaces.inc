@@ -30,7 +30,6 @@ require_once("globals.inc");
 require_once("util.inc");
 require_once("gwlb.inc");
 require_once("ipsec.inc");
-require_once("wg.inc");
 
 function interfaces_bring_up($interface) {
 	if (!$interface) {
@@ -1260,11 +1259,6 @@ function interface_is_type($if = NULL, $type) {
 			$entry = 'lagg';
 			$entif = 'laggif';
 			break;
-		case "wg":
-			$list = 'wireguard';
-			$entry = 'tunnel';
-			$entif = 'name';
-			break;
 		default:
 			break;
 	}
@@ -1769,9 +1763,6 @@ function interfaces_configure() {
 
 	interfaces_qinq_configure();
 
-	/* set up IPsec VTI interfaces */
-	interfaces_ipsec_vti_configure();
-
 	$iflist = get_configured_interface_with_descr();
 	$delayed_list = array();
 	$bridge_list = array();
@@ -1801,17 +1792,14 @@ function interfaces_configure() {
 			$track6_list[$if] = $ifname;
 		} else {
 			/* do not run dhcp6c if track interface does not exists
-			 * see https://redmine.pfsense.org/issues/3965 */
+			 * see https://redmine.pfsense.org/issues/3965
+			 * and https://redmine.pfsense.org/issues/11633 */ 
 			if (!empty($config['interfaces'][$if]['ipaddrv6']) &&
 			    $config['interfaces'][$if]['ipaddrv6'] == "dhcp6") {
 				$tr6list = link_interface_to_track6($if);
 				if (is_array($tr6list) && !empty($tr6list)) {
-					foreach ($tr6list as $tr6if) {
-						if (!does_interface_exist($tr6if)) {
-							$dhcp6c_list[$if] = $ifname;
-							continue;
-						}
-					}
+					$dhcp6c_list[$if] = $ifname;
+					continue;
 				}
 			}
 			if (platform_booting()) {
@@ -1920,6 +1908,9 @@ function interfaces_configure() {
 		}
 	}
 
+	/* set up IPsec VTI interfaces */
+	interfaces_ipsec_vti_configure();
+
 	/* configure interface groups */
 	interfaces_group_setup();
 
@@ -1986,14 +1977,6 @@ function interface_bring_down($interface = "wan", $destroy = false, $ifacecfg = 
 	global $config, $g;
 
 	if (!isset($config['interfaces'][$interface])) {
-		return;
-	}
-
-	if (substr($config['interfaces'][$interface]['if'], 0, 2) == 'wg') {
-		require_once('wg.inc');
-		if ($destroy) {
-			wg_destroy_if($config['interfaces'][$interface]['if']);
-		}
 		return;
 	}
 
@@ -4157,11 +4140,6 @@ function interface_configure($interface = "wan", $reloadall = false, $linkupeven
 		return;
 	}
 
-	if (substr($config['interfaces'][$interface]['if'], 0, 2) == 'wg') {
-		require_once('wg.inc');
-		wg_configure_if($config['interfaces'][$interface]['if']);
-	}
-
 	$realif = get_real_interface($interface);
 	$realhwif_array = get_parent_interface($interface);
 	// Need code to handle MLPPP if we ever use $realhwif for MLPPP handling
@@ -4178,10 +4156,7 @@ function interface_configure($interface = "wan", $reloadall = false, $linkupeven
 		}
 	}
 
-	if (!platform_booting() &&
-	    (substr($realif, 0, 4) != "ovpn") &&
-	    (substr($realif, 0, 5) != "ipsec") &&
-	    (substr($realif, 0, 2) != "wg")) {
+	if (!platform_booting() && (substr($realif, 0, 4) != "ovpn") && (substr($realif, 0, 5) != "ipsec")) {
 		/* remove all IPv4 and IPv6 addresses */
 		$tmpifaces = pfSense_getall_interface_addresses($realif);
 		if (is_array($tmpifaces)) {
@@ -4319,11 +4294,6 @@ function interface_configure($interface = "wan", $reloadall = false, $linkupeven
 	}
 	if (($wantedmtu == 0) && interface_is_type($mtuif, 'gif')) {
 		$wantedmtu = 1280;
-	}
-	/* Default MTU for WireGuard is 1420
-	 * https://redmine.pfsense.org/issues/11291 */
-	if (($wantedmtu == 0) && interface_is_type($mtuif, 'wg')) {
-		$wantedmtu = 1420;
 	}
 
 	/* Set the MTU to 1500 if no explicit MTU configured. */
@@ -5052,7 +5022,7 @@ function interface_dhcpv6_configure($interface = "wan", $wancfg) {
 	$dhcp6cscriptwithoutra .= "case \$REASON in\n";
 	$dhcp6cscriptwithoutra .= "REQUEST)\n";
 	$dhcp6cscriptwithoutra .= "/bin/sleep 2\n";
-	$dhcp6cscriptwithoutra .= "/usr/sbin/rtsold -1 -p {$g['varrun_path']}/rtsold_{$wanif}.pid -O {$g['varetc_path']}/rtsold_{$wanif}_script.sh {$wanif}\n";
+	$dhcp6cscriptwithoutra .= "/usr/sbin/rtsold -1 -p {$g['varrun_path']}/rtsold_{$wanif}.pid -M {$g['varetc_path']}/rtsold_{$wanif}_script.sh -O {$g['varetc_path']}/rtsold_{$wanif}_script.sh {$wanif}\n";
 	if ($debugOption == '-D') {
 		$dhcp6cscriptwithoutra .= "/usr/bin/logger -t dhcp6c \"dhcp6c REQUEST on {$wanif} - running rtsold\"\n";
 	}
@@ -5140,11 +5110,16 @@ function interface_dhcpv6_configure($interface = "wan", $wancfg) {
 	unset($dhcp6cscript);
 	@chmod("{$g['varetc_path']}/dhcp6c_{$interface}_script.sh", 0755);
 
-	$rtsoldscript = "#!/bin/sh\n";
-	$rtsoldscript .= "# This shell script launches dhcp6c and configured gateways for this interface.\n";
-	$rtsoldscript .= "echo $2 > {$g['tmp_path']}/{$wanif}_routerv6\n";
-	$rtsoldscript .= "echo $2 > {$g['tmp_path']}/{$wanif}_defaultgwv6\n";
-	$rtsoldscript .= "/usr/bin/logger -t rtsold \"Received RA specifying route \$2 for interface {$interface}({$wanif})\"\n";
+	$rtsoldscript = <<<EOD
+#!/bin/sh
+# This shell script launches dhcp6c and configured gateways for this interface.
+if [ -n "\$2" ]; then
+	echo \$2 > {$g['tmp_path']}/{$wanif}_routerv6
+	echo \$2 > {$g['tmp_path']}/{$wanif}_defaultgwv6
+	/usr/bin/logger -t rtsold "Received RA specifying route \$2 for interface {$interface}({$wanif})"
+fi
+
+EOD;
 
 	/* non ipoe Process */
 	if (!isset($wancfg['dhcp6withoutra'])) {
@@ -6117,7 +6092,7 @@ function guess_interface_from_ip($ipaddress) {
 		return false;
 	}
 
-	$route = route_get($ipaddress);
+	$route = route_get($ipaddress, '', true);
 	if (empty($route)) {
 		return false;
 	}
@@ -6896,9 +6871,6 @@ function get_interfaces_with_gateway() {
 				} elseif (substr($ifname['if'], 0, 5) == "ipsec" ||
 				    !empty($ifname['gateway'])) {
 					$ints[$ifdescr] = $ifdescr;
-				} elseif (substr($ifname['if'], 0, 2) == "wg" ||
-				    !empty($ifname['gateway'])) {
-					$ints[$ifdescr] = $ifdescr;
 				}
 
 				break;
@@ -6923,8 +6895,7 @@ function interface_has_gateway($friendly) {
 			break;
 			default:
 				if ((substr($ifname['if'], 0, 4) == "ovpn") ||
-				    (substr($ifname['if'], 0, 5) == "ipsec") ||
-				    (substr($ifname['if'], 0, 2) == "wg")) {
+				    (substr($ifname['if'], 0, 5) == "ipsec")) {
 					return true;
 				}
 				$tunnelif = substr($ifname['if'], 0, 3);
@@ -6958,8 +6929,7 @@ function interface_has_gatewayv6($friendly) {
 				break;
 			default:
 				if ((substr($ifname['if'], 0, 4) == "ovpn") ||
-				    (substr($ifname['if'], 0, 5) == "ipsec") ||
-				    (substr($ifname['if'], 0, 2) == "wg")) {
+				    (substr($ifname['if'], 0, 5) == "ipsec")) {
 					return true;
 				}
 				$tunnelif = substr($ifname['if'], 0, 3);
@@ -7595,16 +7565,12 @@ function create_interface_list() {
 		$iflist["openvpn"] = gettext("OpenVPN");
 	}
 
-	if (is_wg_enabled() && have_ruleint_access("wireguard")) {
-		$iflist['wireguard'] = 'WireGuard';
-	}
-
 	return($iflist);
 }
 
 function is_pseudo_interface($inf, $tap=true) {
 	global $config;
-	$psifs = array('ovpn', 'ipsec', 'l2tp', 'pptp', 'gif', 'gre', 'ppp', 'pppoe', 'wg');
+	$psifs = array('ovpn', 'ipsec', 'l2tp', 'pptp', 'gif', 'gre', 'ppp', 'pppoe');
 	foreach ($psifs as $pif) {
 		if (substr($inf, 0, strlen($pif)) == $pif) {
 			if (($pif == 'ovpn') && $tap) {

@@ -74,7 +74,7 @@ if ($_REQUEST['act'] == "refresh") {
 // Poll the Netgate server to obtain the JSON/HTML formatted support information
 // and write it to the JSON file
 function updateSupport() {
-	global $g, $supportfile, $idfile, $FQDN;
+	global $g, $supportfile, $idfile, $FQDN, $config;
 
 	if (file_exists($idfile)) {
 		if (function_exists('curl_version')) {
@@ -90,6 +90,8 @@ function updateSupport() {
 			curl_setopt($ch, CURLOPT_POST, true);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post));
 			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT ,4);
+			set_curlproxy($ch);
+
 			$response = curl_exec($ch);
 			$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 			curl_close($ch);
