@@ -59,7 +59,7 @@ net/vnstat
 security/%%PRODUCT_NAME%%-pkg-acme
 security/%%PRODUCT_NAME%%-pkg-nmap
 security/%%PRODUCT_NAME%%-pkg-openvpn-client-export
-security/%%PRODUCT_NAME%%-pkg-snort
+#security/%%PRODUCT_NAME%%-pkg-snort
 security/%%PRODUCT_NAME%%-pkg-stunnel
 security/%%PRODUCT_NAME%%-pkg-sudo
 security/%%PRODUCT_NAME%%-pkg-suricata
@@ -69,8 +69,8 @@ security/%%PRODUCT_NAME%%
 sysutils/%%PRODUCT_NAME%%-builder
 sysutils/%%PRODUCT_NAME%%-pkg-Backup
 sysutils/%%PRODUCT_NAME%%-pkg-Cron
-#sysutils/%%PRODUCT_NAME%%-pkg-LCDproc
-sysutils/%%PRODUCT_NAME%%-pkg-Netgate_Firmware_Upgrade
+sysutils/%%PRODUCT_NAME%%-pkg-LCDproc
+#sysutils/%%PRODUCT_NAME%%-pkg-Netgate_Firmware_Upgrade
 sysutils/%%PRODUCT_NAME%%-pkg-Notes
 sysutils/%%PRODUCT_NAME%%-pkg-RRD_Summary
 sysutils/%%PRODUCT_NAME%%-pkg-Service_Watchdog
