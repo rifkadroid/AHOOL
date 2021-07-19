@@ -169,7 +169,7 @@ function get_css_files() {
 			    strpos($css, "logo") == 0) {
 				if (strpos($css, "BETA") != 0) {
 					array_push($betacss, $css);
-				} else if (strpos($css, "pfSense") != 0) {
+				} else if (strpos($css, "Kontrol") != 0) {
 					array_push($pfscss, $css);
 				} else {
 					array_push($usrcss, $css);
@@ -201,7 +201,7 @@ function gen_webguicss_field(&$section, $value) {
 	$csslist = get_css_files();
 
 	if (!isset($csslist[$value])) {
-		$value = "pfSense.css";
+		$value = "Kontrol.css";
 	}
 
 	$section->addInput(new Form_Select(
@@ -526,7 +526,7 @@ function hardware_offloading_applyflags($iface) {
 	/* disable hardware checksum offloading for VirtIO network drivers,
 	 * see https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=165059 */
 	if (isset($config['system']['disablechecksumoffloading']) ||
-	    stristr($iface, "vtnet") || stristr($iface, "ena")) { 
+	    stristr($iface, "vtnet") || stristr($iface, "ena")) {
 		if (isset($options['encaps']['txcsum'])) {
 			$flags_off |= IFCAP_TXCSUM;
 		}
@@ -931,8 +931,8 @@ function restore_config_section($section_name, $new_contents) {
 	fclose($fout);
 
 	$xml = parse_xml_config($g['tmp_path'] . "/tmpxml", null);
-	if ($xml['pfsense']) {
-		$xml = $xml['pfsense'];
+	if ($xml['kontrol']) {
+		$xml = $xml['kontrol'];
 	}
 	if ($xml[$section_name]) {
 		$section_xml = $xml[$section_name];
@@ -2796,7 +2796,7 @@ function get_country_name($country_code = "ALL") {
 		return "";
 	}
 
-	$country_names_xml = "/usr/local/share/pfSense/iso_3166-1_list_en.xml";
+	$country_names_xml = "/usr/local/share/Kontrol/iso_3166-1_list_en.xml";
 	$country_names_contents = file_get_contents($country_names_xml);
 	$country_names = xml2array($country_names_contents);
 

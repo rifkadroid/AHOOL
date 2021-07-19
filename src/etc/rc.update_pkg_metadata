@@ -24,7 +24,7 @@ else
 fi
 
 # Read product_name from $g, defaults to pfSense
-product_name=$(/usr/local/sbin/read_global_var product_name pfSense)
+product_name=$(/usr/local/sbin/read_global_var product_name Kontrol)
 
 tmp_version=$(mktemp -q /tmp/${product_name}_version.XXXXXXXX) \
 	|| exit 1

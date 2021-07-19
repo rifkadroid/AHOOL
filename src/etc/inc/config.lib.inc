@@ -54,7 +54,7 @@ function encrypted_configxml() {
 			echo "\nEnter the password to decrypt config.xml: ";
 			$decrypt_password = chop(fgets($fp));
 			$data = decrypt_data($configtxt, $decrypt_password);
-			if (!strstr($data, "<pfsense>")) {
+			if (!strstr($data, "<kontrol>")) {
 				$data = "";
 			}
 			if ($data) {
@@ -131,7 +131,7 @@ function parse_config($parse = false) {
 				die(gettext("Config.xml is corrupted and is 0 bytes.  Could not restore a previous backup."));
 			}
 		}
-		$config = parse_xml_config($g['conf_path'] . '/config.xml', array($g['xml_rootobj'], 'pfsense'));
+		$config = parse_xml_config($g['conf_path'] . '/config.xml', array($g['xml_rootobj'], 'kontrol'));
 		if ($config == -1) {
 			$last_backup = discover_last_backup();
 			if ($last_backup) {
@@ -196,7 +196,7 @@ function discover_last_backup() {
 			if ($testconfig != -1) {
 				return basename($backup);
 			}
-		} 
+		}
 	}
 
 	return false;
@@ -237,7 +237,7 @@ function restore_backup($file) {
 
 /* If the config on disk had rrddata/xmldata tags already, remove that section first.
  * See https://redmine.pfsense.org/issues/8994,
- *     https://redmine.pfsense.org/issues/10508, 
+ *     https://redmine.pfsense.org/issues/10508,
  *     https://redmine.pfsense.org/issues/11050 */
 function clear_tagdata($tag = "rrd", $data) {
 	$data = preg_replace("/[[:blank:]]*<{$tag}data>.*<\\/{$tag}data>[[:blank:]]*\n*/s", "", $data);
@@ -913,7 +913,7 @@ function cleanup_backupcache($lock = false) {
 				echo ".";
 			}
 			try {
-				$newxml = parse_xml_config($backup, array($g['xml_rootobj'], 'pfsense'));
+				$newxml = parse_xml_config($backup, array($g['xml_rootobj'], 'kontrol'));
 			} catch (Exception $exc) {
 				log_error(sprintf(gettext("The backup cache file %s is corrupted. Parser error message: %s"), $backup, $exc->getMessage()));
 				$newxml = "-1";

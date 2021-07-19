@@ -1678,11 +1678,11 @@ function system_ntp_setup_gps($serialport) {
 
 	$gpsbaud = '4800';
 	$speeds = array(
-		0 => '4800', 
-		16 => '9600', 
-		32 => '19200', 
-		48 => '38400', 
-		64 => '57600', 
+		0 => '4800',
+		16 => '9600',
+		32 => '19200',
+		48 => '38400',
+		64 => '57600',
 		80 => '115200'
 	);
 	if (!empty($config['ntpd']['gps']['speed']) && array_key_exists($config['ntpd']['gps']['speed'], $speeds)) {
@@ -1819,7 +1819,7 @@ function system_ntp_configure() {
 	}
 
 	$ntpcfg = "# \n";
-	$ntpcfg .= "# pfSense ntp configuration file \n";
+	$ntpcfg .= "# Kontrol ntp configuration file \n";
 	$ntpcfg .= "# \n\n";
 	$ntpcfg .= "tinker panic 0 \n\n";
 
