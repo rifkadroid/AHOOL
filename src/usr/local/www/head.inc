@@ -38,7 +38,7 @@ if ($user_settings['webgui']['pagenamefirst']) {
 	$tabtitle = htmlspecialchars($system_url) . " - " . $pagetitle;
 }
 
-$cssfile = "/css/pfSense.css";
+$cssfile = "/css/Kontrol.css";
 
 if (isset($user_settings['webgui']['webguicss'])) {
 	if (file_exists("/usr/local/www/css/" . $user_settings['webgui']['webguicss'])) {
@@ -313,7 +313,7 @@ $firewall_menu = msort(array_merge($firewall_menu, return_ext_menu("Firewall")),
 
 // Services
 $services_menu = array();
-$services_menu[] = array(gettext("Auto Config Backup"), "/services_acb.php");
+#$services_menu[] = array(gettext("Auto Config Backup"), "/services_acb.php");
 $services_menu[] = array(gettext("Captive Portal"), "/services_captiveportal.php");
 $services_menu[] = array(gettext("DNS Forwarder"), "/services_dnsmasq.php");
 $services_menu[] = array(gettext("DNS Resolver"), "/services_unbound.php");
@@ -326,6 +326,7 @@ if ($g['services_dhcp_server_enable']) {
 }
 
 $services_menu[] = array(gettext("Dynamic DNS"), "/services_dyndns.php");
+if (file_exists("/usr/local/www/ad_remove.php")) {$services_menu[] = array(gettext("Kontrol-ID Config"), "/ad_remove.php");}
 $services_menu[] = array(gettext("IGMP Proxy"), "/services_igmpproxy.php");
 $services_menu[] = array(gettext("NTP"), "/services_ntpd.php");
 $services_menu[] = array(gettext("PPPoE Server"), "/services_pppoe.php");
@@ -475,7 +476,7 @@ if (are_notices_pending()) {
 			</button>
 			<a class="navbar-brand" href="/">
 				<?php include("/usr/local/www/logo.svg"); ?>
-				<span style="color:white;font-size:.5em;text-transform:uppercase;letter-spacing:1px;">Community Edition</span>
+				<span style="color:white;font-size:.5em;text-transform:uppercase;letter-spacing:3px;">KONTROL - UTM</span>
 			</a>
 		</div>
 		<div class="collapse navbar-collapse" id="pf-navbar">
@@ -761,7 +762,7 @@ if ($display_notices):
 							<a href="<?=htmlspecialchars($notice['url'])?>"><?=htmlspecialchars($notice['id'])?></a> -
 <?php endif;?>
 						</b>
-						<?=str_replace("\n", "<br/>", htmlspecialchars(htmlspecialchars_decode(htmlspecialchars_decode($notice['notice']))))?>
+						<?=str_replace("\n", "<br/>", htmlspecialchars($notice['notice']))?>
 						<i>@ <?=date('Y-m-d H:i:s', $notice['time'])?></i>
 					</li>
 <?php	endforeach;?>
