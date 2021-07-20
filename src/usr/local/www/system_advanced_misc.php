@@ -391,9 +391,9 @@ $section->addInput(new Form_Select(
 
 $form->add($section);
 
-$section = new Form_Section('Installation Feedback');
+/*$section = new Form_Section('Installation Feedback');
 
-/* $section->addInput(new Form_Checkbox(
+$section->addInput(new Form_Checkbox(
 	'do_not_send_uniqueid',
 	'Netgate Device ID',
 	'Do NOT send Netgate Device ID with user agent',
