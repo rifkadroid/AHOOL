@@ -365,10 +365,10 @@ else
 	export SNAPSHOTS_RSYNCUSER=${RSYNCUSER}
 fi
 
-if [ "${PRODUCT_NAME}" = "pfSense" ]; then
-	export VENDOR_NAME=${VENDOR_NAME:-"Rubicon Communications, LLC (Netgate)"}
-	export OVF_INFO=${OVF_INFO:-"pfSense is a free, open source customized distribution of FreeBSD tailored for use as a firewall and router. In addition to being a powerful, flexible firewalling and routing platform, it includes a long list of related features and a package system allowing further expandability without adding bloat and potential security vulnerabilities to the base distribution. pfSense is a popular project with more than 1 million downloads since its inception, and proven in countless installations ranging from small home networks protecting a PC and an Xbox to large corporations, universities and other organizations protecting thousands of network devices."}
+if [ "${PRODUCT_NAME}" = "Kontrol" ]; then
+	export VENDOR_NAME=${VENDOR_NAME:-"Konntrol Tecnologia EPP."}
+	export OVF_INFO=${OVF_INFO:-"Kontrol-UTM is an open source customized distribution of FreeBSD tailored for use as a firewall and router. In addition to being a powerful, flexible firewalling and routing platform, it includes a long list of related features and a package system allowing further expandability without adding bloat and potential security vulnerabilities to the base distribution. pfSense is a popular project with more than 1 million downloads since its inception, and proven in countless installations ranging from small home networks protecting a PC and an Xbox to large corporations, universities and other organizations protecting thousands of network devices."}
 else
-	export VENDOR_NAME=${VENDOR_NAME:-"nonSense"}
+	export VENDOR_NAME=${VENDOR_NAME:-"Kontrol"}
 	export OVF_INFO=${OVF_INFO:-"none"}
 fi
