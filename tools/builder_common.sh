@@ -1361,7 +1361,7 @@ pkg_repo_rsync() {
 		#
 		# https://github.com/freebsd/pkg/issues/1364
 		#
-		if script -aq ${_logfile} pkg repo ${_real_repo_path}/ \
+		if script -aq ${_logfile} pkg -o REPO_ACCEPT_LEGACY_PKG=true repo ${_real_repo_path}/ \
 		    signing_command: ${PKG_REPO_SIGNING_COMMAND} >/dev/null 2>&1; then
 			echo "Done!" | tee -a ${_logfile}
 		else
@@ -1376,6 +1376,9 @@ pkg_repo_rsync() {
 
 			if sha256 -q ${_pkgfile} | ${PKG_REPO_SIGNING_COMMAND} \
 			    > ${_pkgfile}.sig 2>/dev/null; then
+				# XXX Temporary workaround to create link to pkg sig
+				[ -e ${_repo_path}/Latest/pkg.pkg ] && \
+					ln -sf pkg.txz.sig ${_repo_path}/Latest/pkg.pkg.sig
 				echo "Done!" | tee -a ${_logfile}
 			else
 				echo "Failed!" | tee -a ${_logfile}
