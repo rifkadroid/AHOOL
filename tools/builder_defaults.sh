@@ -70,6 +70,7 @@ fi
 export PRODUCT_NAME=${PRODUCT_NAME:-"nonSense"}
 export PRODUCT_NAME_SUFFIX=${PRODUCT_NAME_SUFFIX:-"-CE"}
 export REPO_BRANCH_PREFIX=${REPO_BRANCH_PREFIX:-""}
+export REPO_PATH_PREFIX=$(echo "${REPO_BRANCH_PREFIX}" | sed -e 's,-,_,g')
 export PRODUCT_URL=${PRODUCT_URL:-""}
 export PRODUCT_SRC=${PRODUCT_SRC:-"${BUILDER_ROOT}/src"}
 export PRODUCT_EMAIL=${PRODUCT_EMAIL:-"coreteam@pfsense.org"}
@@ -104,7 +105,7 @@ fi
 # Replace . by _ to make tag names look correct
 POUDRIERE_BRANCH=$(echo "${GIT_REPO_BRANCH_OR_TAG}" | sed 's,RELENG_,v,; s,\.,_,g')
 
-GIT_REPO_BASE=$(git -C ${BUILDER_ROOT} config --get remote.origin.url | sed -e 's,/[^/]*$,,')
+GIT_REPO_BASE=$(git -C ${BUILDER_ROOT} config --get remote.$(git -C ${BUILDER_ROOT} remote).url | sed -e 's,/[^/]*$,,')
 
 # This is used for using svn for retrieving src
 export FREEBSD_REPO_BASE=${FREEBSD_REPO_BASE:-"${GIT_REPO_BASE}/freebsd-src.git"}
@@ -222,7 +223,7 @@ fi
 export POUDRIERE_PORTS_GIT_BRANCH=${POUDRIERE_PORTS_GIT_BRANCH:-"${REPO_BRANCH_PREFIX}RELENG_2_5_2"}
 
 # Use vX_Y instead of RELENG_X_Y for poudriere to make it shorter
-POUDRIERE_PORTS_BRANCH=$(echo "${POUDRIERE_PORTS_GIT_BRANCH}" | sed 's,RELENG_,v,')
+POUDRIERE_PORTS_BRANCH=$(echo "${POUDRIERE_PORTS_GIT_BRANCH}" | sed 's,RELENG_,v,; s,-,_,g')
 
 export POUDRIERE_PORTS_NAME=${POUDRIERE_PORTS_NAME:-"${PRODUCT_NAME}_${POUDRIERE_PORTS_BRANCH}"}
 
