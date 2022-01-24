@@ -1657,9 +1657,9 @@ function save_repo($json) {
 		// Save fingerprint file
 		if (!empty($repo['fingerprint'])) {
 			if (!empty($repo['fpname'])) {
-				$fppath = "/usr/local/share/pfSense/keys/pkg/trusted/" . $repo['fpname'];
+				$fppath = "/usr/local/share/Kontrol/keys/pkg/trusted/" . $repo['fpname'];
 			} else {
-				$fppath = "/usr/local/share/pfSense/keys/pkg/trusted/custom.pfsense.org";
+				$fppath = "/usr/local/share/Kontrol/keys/pkg/trusted/custom.pfsense.org";
 			}
 
 			file_put_contents($fppath, $repo['fingerprint']);
