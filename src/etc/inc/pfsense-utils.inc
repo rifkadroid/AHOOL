@@ -201,7 +201,7 @@ function gen_webguicss_field(&$section, $value) {
 	$csslist = get_css_files();
 
 	if (!isset($csslist[$value])) {
-		$value = "pfSense.css";
+		$value = "Kontrol.css";
 	}
 
 	$section->addInput(new Form_Select(
@@ -526,7 +526,7 @@ function hardware_offloading_applyflags($iface) {
 	/* disable hardware checksum offloading for VirtIO network drivers,
 	 * see https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=165059 */
 	if (isset($config['system']['disablechecksumoffloading']) ||
-	    stristr($iface, "vtnet") || stristr($iface, "ena")) { 
+	    stristr($iface, "vtnet") || stristr($iface, "ena")) {
 		if (isset($options['encaps']['txcsum'])) {
 			$flags_off |= IFCAP_TXCSUM;
 		}
@@ -767,7 +767,7 @@ function get_carp_bind_status($interface) {
 		return $carpstatus;
 	} else {
 		foreach ($config['virtualip']['vip'] as $vip) {
-			if ($interface == "_vip{$vip['uniqid']}") { 
+			if ($interface == "_vip{$vip['uniqid']}") {
 				return get_carp_interface_status($vip['interface']);
 			}
 		}
@@ -2783,7 +2783,7 @@ function get_country_name($country_code = "ALL") {
 		return "";
 	}
 
-	$country_names_xml = "/usr/local/share/pfSense/iso_3166-1_list_en.xml";
+	$country_names_xml = "/usr/local/share/Kontrol/iso_3166-1_list_en.xml";
 	$country_names_contents = file_get_contents($country_names_xml);
 	$country_names = xml2array($country_names_contents);
 
@@ -2997,7 +2997,7 @@ function where_is_ipaddr_configured($ipaddr, $ignore_if = "", $check_localip = f
 				$if_ipv6 = get_interface_ipv6($if);
 				$if_snbitsv6 = get_interface_subnetv6($if);
 				/* do not check subnet overlapping on 6rd interfaces,
-				 * see https://redmine.pfsense.org/issues/12371 */ 
+				 * see https://redmine.pfsense.org/issues/12371 */
 				if ($if_ipv6 && $if_snbitsv6 &&
 				    (($config['interfaces'][$if]['ipaddrv6'] != '6rd') || ($cidrprefix > $if_snbitsv6)) &&
 				    check_subnetsv6_overlap($ipaddr, $cidrprefix, $if_ipv6, $if_snbitsv6)) {

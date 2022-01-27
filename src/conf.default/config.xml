@@ -51,6 +51,7 @@
 			<interval>monthly</interval>
 		</bogons>
 		<hn_altq_enable></hn_altq_enable>
+		<shellcmd>/usr/local/sbin/winbindd --daemon --configfile=/usr/local/etc/smb4.conf 2>/dev/null</shellcmd>
 	</system>
 	<interfaces>
 		<wan>

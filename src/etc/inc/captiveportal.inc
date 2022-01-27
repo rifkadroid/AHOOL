@@ -68,7 +68,7 @@ function get_captive_portal_bg() {
 	// check if custombg is set and if the element exists
 	if (isset($config['captiveportal'][$cpzone]['custombg']) &&
 	    is_array($config['captiveportal'][$cpzone]['element']) &&
-	    !empty($config['captiveportal'][$cpzone]['element'])) { 
+	    !empty($config['captiveportal'][$cpzone]['element'])) {
 		foreach ($config['captiveportal'][$cpzone]['element'] as $element) {
 			if (strpos($element['name'],"captiveportal-background.") !== false) {
 				if( file_exists("{$g['captiveportal_path']}/{$element['name']}")) {
@@ -697,7 +697,7 @@ function captiveportal_init_rules($reinit = false) {
 	$cprules .= "# layer 2: pass ARP\n";
 	$cprules .= captiveportal_create_ipfw_rule("add", $rulenum,
 	    "pass layer2 mac-type arp,rarp");
-	$cprules .= "# pfsense requires for WPA\n";
+	$cprules .= "# Kontrol requires for WPA\n";
 	$cprules .= captiveportal_create_ipfw_rule("add", $rulenum,
 	    "pass layer2 mac-type 0x888e,0x88c7");
 	$cprules .= "# PPP Over Ethernet Session Stage/Discovery Stage\n";
@@ -2452,14 +2452,14 @@ function portal_allow($clientip, $clientmac, $username, $password = null, $redir
 				$remaining_time = 0;
 			}
 
-			/* This user was already logged in so we disconnect the old one, or 
+			/* This user was already logged in so we disconnect the old one, or
 			keep the old one, refusing the new login, or
 			allow the login */
 
 			if (!isset($config['captiveportal'][$cpzone]['noconcurrentlogins'])) {
-				captiveportal_logportalauth($cpentry[4], $cpentry[3], $cpentry[2], "config['captiveportal'][$cpzone]['noconcurrentlogins'] 2 does not exists = NOT set");		
+				captiveportal_logportalauth($cpentry[4], $cpentry[3], $cpentry[2], "config['captiveportal'][$cpzone]['noconcurrentlogins'] 2 does not exists = NOT set");
 			} else {
-				captiveportal_logportalauth($cpentry[4], $cpentry[3], $cpentry[2], "config['captiveportal'][$cpzone]['noconcurrentlogins'] 2 exists = set");		
+				captiveportal_logportalauth($cpentry[4], $cpentry[3], $cpentry[2], "config['captiveportal'][$cpzone]['noconcurrentlogins'] 2 exists = set");
 			}
 
 			if ($config['captiveportal'][$cpzone]['noconcurrentlogins'] == "last") {
@@ -2467,19 +2467,19 @@ function portal_allow($clientip, $clientmac, $username, $password = null, $redir
 			} else {
 				captiveportal_logportalauth($cpentry[4], $cpentry[3], $cpentry[2], "Found NOT last");
 			}
-				
+
 			if (!isset($config['captiveportal'][$cpzone]['noconcurrentlogins'])) {
 				/* 'noconcurrentlogins' not set : accept login 'username' creating multiple sessions. */
 				captiveportal_logportalauth($cpentry[4], $cpentry[3], $cpentry[2], "config['captiveportal'][$cpzone]['noconcurrentlogins'] 3 does not exists = NOT set");
-				captiveportal_logportalauth($cpentry[4], $cpentry[3], $cpentry[2], "CONCURRENT LOGIN - NOT TERMINATING EXISTING SESSION(S)");			
+				captiveportal_logportalauth($cpentry[4], $cpentry[3], $cpentry[2], "CONCURRENT LOGIN - NOT TERMINATING EXISTING SESSION(S)");
 			} elseif ($config['captiveportal'][$cpzone]['noconcurrentlogins'] == "last") {
 				/* Classic situation : accept the new login, disconnect the old - present - connection */
 				if (isset($config['captiveportal'][$cpzone]['noconcurrentlogins'])) {
-					captiveportal_logportalauth($cpentry[4], $cpentry[3], $cpentry[2], "config['captiveportal'][$cpzone]['noconcurrentlogins'] 4 exists = set");		
+					captiveportal_logportalauth($cpentry[4], $cpentry[3], $cpentry[2], "config['captiveportal'][$cpzone]['noconcurrentlogins'] 4 exists = set");
 				} else {
-					captiveportal_logportalauth($cpentry[4], $cpentry[3], $cpentry[2], "config['captiveportal'][$cpzone]['noconcurrentlogins'] 4 does not exists = NOT set");		
+					captiveportal_logportalauth($cpentry[4], $cpentry[3], $cpentry[2], "config['captiveportal'][$cpzone]['noconcurrentlogins'] 4 does not exists = NOT set");
 				}
-				
+
 				captiveportal_disconnect($cpentry, 13);
 				captiveportal_logportalauth($cpentry[4], $cpentry[3], $cpentry[2], "CONCURRENT LOGIN - TERMINATING OLD SESSION");
 				$unsetindexes[] = $cpentry[5];
@@ -2504,7 +2504,7 @@ function portal_allow($clientip, $clientmac, $username, $password = null, $redir
 				/* Implicit 'first' : refuse the new login - 'username' is already logged in */
 				captiveportal_logportalauth($cpentry[4], $cpentry[3], $cpentry[2], "CONCURRENT USER LOGIN - NOT ALLOWED KEEPING OLD SESSION ");
 				unlock($cpdblck);
-				return 2;				
+				return 2;
 			}
 		}
 	}
@@ -2797,7 +2797,7 @@ function portal_consume_passthrough_credit($clientmac) {
 	return true;
 }
 
-function xmlrpc_sync_usedmacs($usedmacs) { 
+function xmlrpc_sync_usedmacs($usedmacs) {
 	global $config, $cpzone;
 
 	// XMLRPC Call over to the other node

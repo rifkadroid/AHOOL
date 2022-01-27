@@ -38,7 +38,7 @@ if ($user_settings['webgui']['pagenamefirst']) {
 	$tabtitle = htmlspecialchars($system_url) . " - " . $pagetitle;
 }
 
-$cssfile = "/css/pfSense.css";
+$cssfile = "/css/Kontrol.css";
 
 if (isset($user_settings['webgui']['webguicss'])) {
 	if (file_exists("/usr/local/www/css/" . $user_settings['webgui']['webguicss'])) {
@@ -483,7 +483,7 @@ if (are_notices_pending()) {
 			</button>
 			<a class="navbar-brand" href="/">
 				<?php include("/usr/local/www/logo.svg"); ?>
-				<span style="color:white;font-size:.5em;text-transform:uppercase;letter-spacing:1px;">Community Edition</span>
+				<span style="color:white;font-size:.5em;text-transform:uppercase;letter-spacing:1px;">KONTROL UTM</span>
 			</a>
 		</div>
 		<div class="collapse navbar-collapse" id="pf-navbar">
