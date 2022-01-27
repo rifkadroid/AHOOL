@@ -490,7 +490,7 @@ function get_pkg_info($pkgs = 'all', $remote_repo_usage_disabled = false,
 
 		/* XXX: Add it to globals.inc? */
 		$pkg_info['changeloglink'] =
-		    "https://github.com/pfsense/FreeBSD-ports/commits/devel/" .
+		    "https://github.com/kontrol-br/FreeBSD-ports/commits/devel/" .
 		    $pkg_info['categories'][0] . '/' . $pkg_info['name'];
 
 		$pkg_is_installed = false;
@@ -1681,7 +1681,7 @@ function save_repo($json) {
 		// Save fingerprint file
 		if (!empty($repo['fingerprint'])) {
 			if (!empty($repo['fpname'])) {
-				$fppath = "/usr/local/share/pfSense/keys/pkg/trusted/" . $repo['fpname'];
+				$fppath = "/usr/local/share/Kontrol/keys/pkg/trusted/" . $repo['fpname'];
 			} else {
 				$fppath = "/usr/local/share/pfSense/keys/pkg/trusted/custom.pfsense.org";
 			}
@@ -1707,9 +1707,9 @@ function save_repo($json) {
 
 		// If config.xml still contains a reference to the custom repo, replace it with the "stable" repository definition
 		if (strpos($config['system']['pkg_repo_conf_path'], "custom") !== false) {
-			$config['system']['pkg_repo_conf_path'] = "/usr/local/share/pfSense/pkg/repos/pfSense-repo.conf";
+			$config['system']['pkg_repo_conf_path'] = "/usr/local/share/Kontrol/pkg/repos/Kontrol-repo.conf";
 			write_config("-NoReMoTeBaCkUp");
-			pkg_switch_repo("/usr/local/share/pfSense/pkg/repos/pfSense-repo.conf");
+			pkg_switch_repo("/usr/local/share/Kontrol/pkg/repos/Kontrol-repo.conf");
 		}
 	}
 }
