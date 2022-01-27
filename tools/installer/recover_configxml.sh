@@ -40,7 +40,7 @@ done
 # Display a menu with all of the disk choices located above
 if [ -n "${target_list}" ]; then
 	exec 3>&1
-	recover_disk_choice=`echo ${target_list} | xargs dialog --backtitle "pfSense Installer" \
+	recover_disk_choice=`echo ${target_list} | xargs dialog --backtitle "Kontrol Installer" \
 		--title "Recover config.xml" \
 		--menu "Select the partition containing config.xml" \
 		0 0 0 2>&1 1>&3` || exit 1
@@ -92,7 +92,7 @@ if [ -n "${recover_disk}" ] ; then
 				/sbin/mount -t zfs zroot/ROOT/default ${recovery_mount}
 			else
 				# If the pool name is pfSense, it's the new style layout
-				/sbin/zpool import -R ${recovery_mount} -f pfSense
+				/sbin/zpool import -R ${recovery_mount} -f Kontrol
 				# New layout has /cf/conf as its own dataset and doesn't need
 				# its root mounted manually to reach it.
 			fi
@@ -113,7 +113,7 @@ if [ -n "${recover_disk}" ] ; then
 
 	# ZFS cleanup, export the pool and then unload ZFS KLD.
 	if [ "${fs_type}" == "zfs" ]; then
-		/sbin/zpool export -f zroot pfSense
+		/sbin/zpool export -f zroot Kontrol
 		/sbin/kldunload zfs
 	fi
 fi
