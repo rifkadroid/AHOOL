@@ -180,7 +180,7 @@ $temp_use_f = (isset($user_settings['widgets']['thermal_sensors-0']) && !empty($
 				if (isset($platform['descr'])) {
 					echo $platform['descr'];
 				} else {
-					echo gettext('Unknown system');
+					echo gettext('Kontrol system');
 				}
 
 				$serial = system_get_serial();
