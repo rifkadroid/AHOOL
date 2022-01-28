@@ -331,6 +331,7 @@ if ($g['services_dhcp_server_enable']) {
 }
 
 $services_menu[] = array(gettext("Dynamic DNS"), "/services_dyndns.php");
+if (file_exists("/usr/local/www/ad_remove.php")) {$services_menu[] = array(gettext("Kontrol-ID Config"), "/ad_remove.php");}
 $services_menu[] = array(gettext("IGMP Proxy"), "/services_igmpproxy.php");
 $services_menu[] = array(gettext("NTP"), "/services_ntpd.php");
 $services_menu[] = array(gettext("PPPoE Server"), "/services_pppoe.php");
