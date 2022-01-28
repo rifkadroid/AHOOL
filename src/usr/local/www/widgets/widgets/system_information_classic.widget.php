@@ -139,8 +139,8 @@ if ($_REQUEST['getupdatestatus']) {
 	save_widget_settings($_SESSION['Username'], $user_settings["widgets"], gettext("Saved System Information Widget Filter via Dashboard."));
 	header("Location: /index.php");
 }
-
 $filesystems = get_mounted_filesystems();
+$hwcrypto = get_cpu_crypto_support();
 
 $skipsysinfoitems = explode(",", $user_settings['widgets'][$widgetkey]['filter']);
 $rows_displayed = false;
@@ -797,7 +797,8 @@ events.push(function() {
 
 	// POST data to send via AJAX
 	var postdata = {
-		ajax: "ajax"
+		ajax: "ajax",
+		skipitems: <?=json_encode($skipsysinfoitems)?>
 	 };
 
 	// Create an object defining the widget refresh AJAX call
