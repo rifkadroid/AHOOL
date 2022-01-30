@@ -261,7 +261,7 @@
 		<enable></enable>
 	</rrd>
 	<widgets>
-		<sequence>system_information_classic:col1:show,interfaces:col2:show</sequence>
+		<sequence>system_information:col1:show,interfaces:col2:show,disks:col2,show</sequence>
 		<period>10</period>
 	</widgets>
 	<openvpn></openvpn>
