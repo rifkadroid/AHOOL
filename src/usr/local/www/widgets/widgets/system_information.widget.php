@@ -52,8 +52,7 @@ $sysinfo_items = array(
 	'load_average' => gettext('Load Average'),
 	'cpu_usage' => gettext('CPU Usage'),
 	'memory_usage' => gettext('Memory Usage'),
-	'swap_usage' => gettext('Swap Usage'),
-	'disk_usage' => gettext('Disk Usage')
+	'swap_usage' => gettext('Swap Usage')
 	);
 
 // Declared here so that JavaScript can access it
@@ -139,7 +138,7 @@ if ($_REQUEST['getupdatestatus']) {
 	save_widget_settings($_SESSION['Username'], $user_settings["widgets"], gettext("Saved System Information Widget Filter via Dashboard."));
 	header("Location: /index.php");
 }
-$filesystems = get_mounted_filesystems();
+
 $hwcrypto = get_cpu_crypto_support();
 
 $skipsysinfoitems = explode(",", $user_settings['widgets'][$widgetkey]['filter']);
@@ -181,7 +180,7 @@ $temp_use_f = (isset($user_settings['widgets']['thermal_sensors-0']) && !empty($
 				if (isset($platform['descr'])) {
 					echo $platform['descr'];
 				} else {
-					echo gettext('Kontrol System');
+					echo gettext('Unknown system');
 				}
 
 				$serial = system_get_serial();
@@ -191,12 +190,12 @@ $temp_use_f = (isset($user_settings['widgets']['thermal_sensors-0']) && !empty($
 				}
 
 				// If the uniqueID is available, display it here
-//				$uniqueid = system_get_uniqueid();
-//				if (!empty($uniqueid)) {
-//					print("<br />" .
-//					    gettext("Netgate Device ID:") .
-//					    " <strong>{$uniqueid}</strong>");
-//				}
+				//$uniqueid = system_get_uniqueid();
+				//if (!empty($uniqueid)) {
+				//	print("<br />" .
+				//	    gettext("Netgate Device ID:") .
+				//	    " <strong>{$uniqueid}</strong>");
+				//}
 ?>
 			</td>
 		</tr>
@@ -507,37 +506,6 @@ $temp_use_f = (isset($user_settings['widgets']['thermal_sensors-0']) && !empty($
 		<?php endif; ?>
 
 <?php
-	endif;
-	if (!in_array('disk_usage', $skipsysinfoitems)):
-		$rows_displayed = true;
-		$diskidx = 0;
-		$first = true;
-		foreach ($filesystems as $fs):
-?>
-		<tr>
-			<th>
-				<?php if ($first): ?>
-					<?=gettext("Disk usage:");?>
-					<br/>
-				<?php endif; ?>
-				&nbsp;&nbsp;&nbsp;&nbsp;
-				<?=$fs['mountpoint']?>
-			</th>
-			<td>
-				<?php if ($first):
-					$first = false; ?>
-					<br/>
-				<?php endif; ?>
-				<div class="progress" >
-					<div id="diskspace<?=$diskidx?>" class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="<?=$fs['percent_used']?>" aria-valuemin="0" aria-valuemax="100" style="width: <?=$fs['percent_used']?>%">
-					</div>
-				</div>
-				<span><?=$fs['percent_used']?>%<?=gettext(" of ")?><?=$fs['total_size']?>iB - <?=$fs['type'] . ("md" == substr(basename($fs['device']), 0, 2) ? " " . gettext("in RAM") : "")?></span>
-			</td>
-		</tr>
-<?php
-			$diskidx++;
-		endforeach;
 	endif;
 	if (!$rows_displayed):
 ?>
