@@ -944,7 +944,7 @@ function system_staticroutes_configure($interface = "", $update_dns = false) {
 
 		foreach ($static_routes as $rtent) {
 			/* Do not delete disabled routes,
-			 * see https://redmine.pfsense.org/issues/3709 
+			 * see https://redmine.pfsense.org/issues/3709
 			 * and https://redmine.pfsense.org/issues/10706 */
 			if (isset($rtent['disabled'])) {
 				continue;
@@ -1768,11 +1768,11 @@ function system_ntp_setup_gps($serialport) {
 
 	$gpsbaud = '4800';
 	$speeds = array(
-		0 => '4800', 
-		16 => '9600', 
-		32 => '19200', 
-		48 => '38400', 
-		64 => '57600', 
+		0 => '4800',
+		16 => '9600',
+		32 => '19200',
+		48 => '38400',
+		64 => '57600',
 		80 => '115200'
 	);
 	if (!empty($config['ntpd']['gps']['speed']) && array_key_exists($config['ntpd']['gps']['speed'], $speeds)) {
@@ -2575,7 +2575,7 @@ function system_get_serial() {
 
 function system_get_uniqueid() {
 	global $g;
-
+if ($g['product_name'] == "pfSense") {
 	$uniqueid_file="{$g['vardb_path']}/uniqueid";
 
 	if (empty($g['uniqueid'])) {
@@ -2589,7 +2589,7 @@ function system_get_uniqueid() {
 	}
 
 	return ($g['uniqueid'] ?: '');
-}
+} }
 
 /*
  * attempt to identify the specific platform (for embedded systems)
@@ -2831,7 +2831,7 @@ function check_dnsavailable($proto='inet') {
 			if (($test == '2') && ($dns_result == "")) {
 				return false;
 			} elseif ($dns_result == "") {
-				$test++; 
+				$test++;
 				continue;
 			} else {
 				return true;
