@@ -807,7 +807,7 @@ function local_user_set_password(&$user, $password) {
 	unset($user['password']);
 	unset($user['md5-hash']);
 	unset($user['bcrypt-hash']);
-	$salt = substr(bin2hex(openssl_random_pseudo_bytes(16)),0,16);
+	$salt = substr(bin2hex(random_bytes(16)),0,16);
 	$user['sha512-hash'] = crypt($password, '$6$'. $salt . '$');
 	if (($user['name'] == $config['hasync']['username']) &&
 	    ($config['hasync']['adminsync'] == 'on')) {
@@ -2094,7 +2094,7 @@ function session_auth() {
 		} else {
 			/* give the user an error message */
 			$_SESSION['Login_Error'] = gettext("Username or Password incorrect");
-			log_auth(sprintf(gettext("webConfigurator authentication error for user '%1\$s' from: %2\$s"), $_POST['usernamefld'], get_user_remote_address() . get_user_remote_authsource()));
+			log_auth(sprintf(gettext("webConfigurator authentication error for user '%1\$s' from: %2\$s"), $_POST['usernamefld'], get_user_remote_address(false)));
 			if (isAjax()) {
 				echo "showajaxmessage('{$_SESSION['Login_Error']}');";
 				return;
@@ -2196,12 +2196,17 @@ function print_credit() {
 			'<a target="_blank" href="https://konntrol.com.br/empresa">' .
 			gettext(' View license.') . '</a>';
 }
-function get_user_remote_address() {
+function get_user_remote_address($print_all=true) {
 	$remote_address = $_SERVER['REMOTE_ADDR'];
-	if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-		$remote_address .= "[{$_SERVER['HTTP_CLIENT_IP']}]";
-	} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-		$remote_address .= "[{$_SERVER['HTTP_X_FORWARDED_FOR']}]";
+	/* Add extra identifying header information upon request */
+	if ($print_all) {
+		if (!empty($_SERVER['HTTP_CLIENT_IP'] &&
+		    is_ipaddr($_SERVER['HTTP_CLIENT_IP']))) {
+			$remote_address .= "[{$_SERVER['HTTP_CLIENT_IP']}]";
+		} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']) &&
+			  is_ipaddr($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+			$remote_address .= "[{$_SERVER['HTTP_X_FORWARDED_FOR']}]";
+		}
 	}
 	return $remote_address;
 }
