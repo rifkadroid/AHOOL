@@ -1583,7 +1583,7 @@ poudriere_rename_ports() {
 
 		# PHP module is special
 		if echo "${_pname}" | grep -q "^php[0-9]*-${PRODUCT_NAME}-module"; then
-			local _product_capital=$(echo ${PRODUCT_NAME} | tr '[a-z]' '[A-Z]')
+			export _product_capital=$(echo ${PRODUCT_NAME} | tr '[a-z]' '[A-Z]')
 			sed -i '' -e "s,PHP_PFSENSE,PHP_${_product_capital},g" \
 				  -e "s,PFSENSE_SHARED_LIBADD,${_product_capital}_SHARED_LIBADD,g" \
 				  -e "s,pfSense,${PRODUCT_NAME},g" \
@@ -1593,10 +1593,15 @@ poudriere_rename_ports() {
 			sed -i '' -e "s,COMPILE_DL_PFSENSE,COMPILE_DL_${_product_capital}," \
 				  -e "s,pfSense_module_entry,${PRODUCT_NAME}_module_entry,g" \
 				  -e "s,php_pfSense.h,php_${PRODUCT_NAME}\.h,g" \
+					-e "s,pfSense_arginfo.h,${PRODUCT_NAME}_arginfo\.h,g" \
+					-e "s,pfSense_private.h,${PRODUCT_NAME}_private\.h,g" \
+					-e "s,pfSense.stub.php,${PRODUCT_NAME}.stub\.php,g" \
 				  -e "/ZEND_GET_MODULE/ s,pfSense,${PRODUCT_NAME}," \
 				  -e "/PHP_PFSENSE_WORLD_EXTNAME/ s,pfSense,${PRODUCT_NAME}," \
 				${_pdir}/${_pname}/files/pfSense.c \
-				${_pdir}/${_pname}/files/dummynet.c \
+				${_pdir}/${_pname}/files/pfSense_arginfo.h \
+				${_pdir}/${_pname}/files/pfSense.stub.php \
+				${_pdir}/${_pname}/files/pfSense_private.h \
 				${_pdir}/${_pname}/files/php_pfSense.h
 		fi
 
