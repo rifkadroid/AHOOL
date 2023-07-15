@@ -60,7 +60,7 @@ net/dhcpcd
 net/frr8
 net/frr8-pythontools
 net/hping3
-net/intel-em-kmod
+#net/intel-em-kmod
 net/kea
 net/keama
 net/librdkafka
@@ -68,7 +68,7 @@ net/mcjoin
 net/mosh
 net/mrouted
 net/py-speedtest-cli
-net/realtek-re-kmod
+#net/realtek-re-kmod
 net/trafshow
 net/trafshow3
 net/udpbroadcastrelay
