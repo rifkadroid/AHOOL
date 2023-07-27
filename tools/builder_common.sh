@@ -1583,7 +1583,7 @@ poudriere_rename_ports() {
 
 		# PHP module is special
 		if echo "${_pname}" | grep -q "^php[0-9]*-${PRODUCT_NAME}-module"; then
-			export _product_capital=$(echo ${PRODUCT_NAME} | tr '[a-z]' '[A-Z]')
+			local _product_capital=$(echo ${PRODUCT_NAME} | tr '[a-z]' '[A-Z]')
 			sed -i '' -e "s,PHP_PFSENSE,PHP_${_product_capital},g" \
 				  -e "s,PFSENSE_SHARED_LIBADD,${_product_capital}_SHARED_LIBADD,g" \
 				  -e "s,pfSense,${PRODUCT_NAME},g" \
