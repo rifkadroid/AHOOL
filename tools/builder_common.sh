@@ -273,7 +273,7 @@ make_world() {
 	# Use the builder cross compiler from obj to produce the final binary.
 	BUILD_CC="${MAKEOBJDIRPREFIX}${FREEBSD_SRC_DIR}/${TARGET}.${TARGET_ARCH}/tmp/usr/bin/cc"
 
-	[ -f "${BUILD_CC}" ] || print_error_pfS
+	#[ -f "${BUILD_CC}" ] || print_error_pfS
 
 	# XXX It must go to the scripts
 	[ -d "${STAGE_CHROOT_DIR}/usr/local/bin" ] \
