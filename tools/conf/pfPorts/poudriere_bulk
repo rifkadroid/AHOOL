@@ -68,7 +68,7 @@ net/mcjoin
 net/mosh
 net/mrouted
 net/py-speedtest-cli
-#net/realtek-re-kmod
+net/realtek-re-kmod
 net/trafshow
 net/trafshow3
 net/udpbroadcastrelay
