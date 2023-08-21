@@ -41,13 +41,7 @@ require_once("firewall_nat.inc");
 
 $referer = (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '/firewall_nat.php');
 
-$specialsrcdst = explode(" ", "any (self) pptp pppoe l2tp openvpn");
 $ifdisp = get_configured_interface_with_descr();
-
-foreach ($ifdisp as $kif => $kdescr) {
-	$specialsrcdst[] = "{$kif}";
-	$specialsrcdst[] = "{$kif}ip";
-}
 
 init_config_arr(array('filter', 'rule'));
 init_config_arr(array('nat', 'separator'));
@@ -150,7 +144,7 @@ function localtype_selected() {
 		return $pconfig['localtype'];
 	}
 
-	$sel = is_specialnet($pconfig['localip']);
+	$sel = get_specialnet($pconfig['localip']);
 
 	if (!$sel) {
 		return('single');
@@ -192,8 +186,6 @@ $section->addInput(new Form_Select(
 	filter_get_interface_list()
 ))->setHelp('Choose which interface this rule applies to. In most cases "WAN" is specified.');
 
-$protocols = "TCP UDP TCP/UDP ICMP ESP AH GRE IPV6 IGMP PIM OSPF Any";
-
 $section->addInput(new Form_Select(
 	'ipprotocol',
 	'*Address Family',
@@ -208,7 +200,7 @@ $section->addInput(new Form_Select(
 	'proto',
 	'*Protocol',
 	$pconfig['proto'],
-	array_combine(explode(" ", strtolower($protocols)), explode(" ", $protocols))
+	get_ipprotocols('portforward')
 ))->setHelp('Choose which protocol this rule should match. In most cases "TCP" is specified.');
 
 $btnsrcadv = new Form_Button(
@@ -245,7 +237,7 @@ $group->add(new Form_Select(
 $group->add(new Form_IpAddress(
 	'src',
 	null,
-	is_specialnet($pconfig['src']) ? '': $pconfig['src'],
+	get_specialnet($pconfig['src']) ? '': $pconfig['src'],
 	'ALIASV4V6'
 ))->addMask('srcmask', $pconfig['srcmask'])->setHelp('Address/mask');
 
@@ -313,7 +305,7 @@ $group->add(new Form_Select(
 $group->add(new Form_IpAddress(
 	'dst',
 	null,
-	is_specialnet($pconfig['dst']) ? '': $pconfig['dst'],
+	get_specialnet($pconfig['dst']) ? '': $pconfig['dst'],
 	'ALIASV4V6'
 ))->addMask('dstmask', $pconfig['dstmask'], 31)->setHelp('Address/mask');
 
@@ -599,11 +591,7 @@ events.push(function() {
 	}
 
 	function proto_change() {
-		if ($('#proto').find(":selected").index() >= 0 && $('#proto').find(":selected").index() <= 2) {
-			portsenabled = true;
-		} else {
-			portsenabled = false;
-		}
+		portsenabled = (jQuery.inArray($('#proto :selected').val(), Object.keys(<?=json_encode(get_ipprotocols('portsonly'))?>)) != -1) ? true : false;
 
 		if (portsenabled) {
 			hideClass('srcportrange', !srcenabled);

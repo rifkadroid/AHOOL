@@ -30,6 +30,9 @@ if (!function_exists("read_altq_config")) {
 if (!function_exists("console_configure")) {
 	require_once("/etc/inc/pfsense-utils.inc");
 }
+if (!function_exists("get_specialnet")) {
+	require_once("/etc/inc/util.inc");
+}
 
 /* Upgrade functions must be named:
  *    upgrade_XXX_to_YYY
@@ -6780,6 +6783,222 @@ function upgrade_228_to_229() {
 	mwexec("$rrdtool tune {$rrddbpath}{$database} DS:userwire:GAUGE:{$valid}:0:10000000 2>&1");
 	mwexec("$rrdtool tune {$rrddbpath}{$database} DS:laundry:GAUGE:{$valid}:0:10000000 2>&1");
 	mwexec("$rrdtool tune {$rrddbpath}{$database} DS:buffers:GAUGE:{$valid}:0:10000000 2>&1");
+}
+
+function upgrade_229_to_230() {
+	/* The "target" GUI for outbound NAT rules now behaves similarly to other pages. */
+	$obn_rules = config_get_path('nat/outbound/rule', []);
+	foreach ($obn_rules as & $obent) {
+		if (empty($obent['target'])) {
+			// migrate interface address selection
+			$obent['target'] = $obent['interface'] . 'ip';
+			$obent['target_subnet'] = '';
+		} elseif ($obent['target'] == 'other-subnet') {
+			// migrate custom subnets
+			$obent['target'] = $obent['targetip'];
+			$obent['target_subnet'] = (get_specialnet($obent['target'], [SPECIALNET_IFADDR])) ? '' : $obent['targetip_subnet'];
+		} else {
+			// migrate VIPs and aliases
+			$obent['target_subnet'] = '';
+		}
+		foreach (['targetip', 'targetip_subnet'] as $old) {
+			if (array_key_exists($old, $obent)) {
+				unset($obent[$old]);
+			}
+		}
+		// migrate destination address
+		if (array_key_exists('address', $obent['destination'])) {
+			$obent['destination']['network'] = $obent['destination']['address'];
+			unset($obent['destination']['address']);
+		}
+	}
+	if (isset($obent)) {
+		unset($obent);
+	}
+	config_set_path('nat/outbound/rule', $obn_rules);
+
+	/* A reserved keyword suffix has been added; migrate conflicting aliases */
+	$aliases = config_get_path('aliases/alias', []);
+	$aliases_rename = [];
+	$rename_suffix = '__RENAMED';
+	$reserved_suffix = '__NETWORK';
+	$interfaces = array_merge(array_column(config_get_path('interfaces', []), 'descr'),
+	                          array_column(config_get_path('ifgroups/ifgroupentry', []), 'ifname'));
+	foreach ($aliases as & $alias) {
+		// varify that a name exists; alias names cannot start with a number
+		if (empty($alias['name'])) {
+			continue;
+		}
+
+		// check if the alias could conflict
+		if ($alias['name'] == $reserved_suffix || !str_ends_with($alias['name'], $reserved_suffix)) {
+			continue;
+		}
+
+		// check if the alias would conflict with an interface name
+		if (!in_array(strstr($alias['name'], $reserved_suffix, true), $interfaces)) {
+			continue;
+		}
+
+		// alias conflicts, attempt to rename it and flag it for references update
+		if (in_array($alias['name'] . $rename_suffix, array_column($aliases, 'name'))) {
+			file_notice('Alias', gettext('The following alias conflicts with a reserved keyword and must' .
+			            ' be manually renamed: ' . $alias['name']));
+		} else {
+			$aliases_rename[] = $alias['name'];
+			$alias['name'] .= $rename_suffix;
+		}
+	}
+	if (isset($alias)) {
+		unset($alias);
+	}
+	if (!empty($aliases_rename)) {
+		// commit alias changes
+		config_set_path('aliases/alias', $aliases);
+		// update alias references
+		foreach ($aliases_rename as $conflicting_name) {
+			update_alias_name($conflicting_name . $rename_suffix, $conflicting_name);
+		}
+		file_notice('Alias', gettext('The following aliases conflict with a reserved keyword and have been renamed: ') .
+		            implode(', ', $aliases_rename));
+	}
+}
+
+/*
+ * Check OpenVPN instances for deprecated algorithms and weak certificate
+ * digests.
+ * https://redmine.pfsense.org/issues/14677
+ * https://redmine.pfsense.org/issues/14686
+ */
+function upgrade_230_to_231() {
+	/* Load lists of current usable algorithms */
+	$cipher_validation_list = array_keys(openvpn_get_cipherlist());
+	$digest_validation_list = array_keys(openvpn_get_digestlist());
+	$changed = false;
+	$disabled = false;
+	foreach(array('server', 'client') as $mode) {
+		foreach (config_get_path("openvpn/openvpn-{$mode}", []) as $idx => $settings) {
+			$thischanged = false;
+			$thisdisabled = false;
+			/* Check data_ciphers and filter out any deprecated items */
+			if (!empty($settings['data_ciphers'])) {
+				$dc = explode(',', $settings['data_ciphers']);
+				/* Retain valid entries only, in the original order */
+				$dc = array_intersect($dc, $cipher_validation_list);
+				$dc = implode(',', $dc);
+				if ($settings['data_ciphers'] != $dc) {
+					$settings['data_ciphers'] = $dc;
+					$thischanged = true;
+				}
+			}
+			/* If no supported ciphers remain, replace with default set. */
+			if (empty($settings['data_ciphers'])) {
+				$settings['data_ciphers'] = 'AES-256-GCM,AES-128-GCM,CHACHA20-POLY1305';
+				$thischanged = true;
+			}
+
+			/* Check data_ciphers_fallback and if it's deprecated, replace with 'AES-256-CBC' */
+			if (!in_array($settings['data_ciphers_fallback'], $cipher_validation_list)) {
+				$settings['data_ciphers_fallback'] = 'AES-256-CBC';
+				$thischanged = true;
+			}
+
+			/* Check digest and if it's deprecated, replace with 'SHA256' */
+			if (!empty($settings['digest']) &&
+			    !in_array($settings['digest'], $digest_validation_list)) {
+				$settings['digest'] = 'SHA256';
+				$thischanged = true;
+			}
+
+			/* If using SSL/TLS, check if (server|client) certificate is weak, if so, disable tunnel */
+			if (!empty($settings['certref'])) {
+				$cert = lookup_cert($settings['certref']);
+				/* Disable only if weak and not already disabled */
+				if (cert_has_weak_digest($cert['crt']) &&
+					!isset($settings['disable'])) {
+					/* Weak digest, disable tunnel. */
+					$settings['disable'] = true;
+					$thisdisabled = true;
+				}
+			}
+
+			/* If any changes were made, alert user (clarify changed vs disabled). */
+			if ($thisdisabled) {
+				$disabled = true;
+			}
+			if ($thischanged) {
+				$changed = true;
+			}
+
+			/* Save changes (if any were made) */
+			if ($thisdisabled || $thischanged) {
+				config_set_path("openvpn/openvpn-{$mode}/{$idx}", $settings);
+			}
+		}
+	}
+	if ($changed) {
+		file_notice("OpenVPN", gettext("One or more OpenVPN entries used deprecated algorithms and has been updated to secure defaults."));
+	}
+	if ($disabled) {
+		file_notice("OpenVPN", gettext("One or more OpenVPN entries has been disabled because it used a certificate with a deprecated weak digest algorithm."));
+	}
+}
+
+/*
+ * Check GUI and Captive Portal zones for certs with weak digests
+ * https://redmine.pfsense.org/issues/14672
+ */
+function upgrade_231_to_232() {
+	/* Check GUI if it is set for HTTPS */
+	if (config_get_path('system/webgui/protocol') == "https" &&
+	    !empty(config_get_path('system/webgui/ssl-certref'))) {
+		$cert = lookup_cert(config_get_path('system/webgui/ssl-certref'));
+		/* If the GUI certificate is invalid or weak, replace it */
+		if (!is_array($cert) || !$cert['crt'] || !$cert['prv'] ||
+		    cert_chain_has_weak_digest($cert)) {
+			$cert = cert_create_selfsigned('', '', false);
+			if (is_array($cert) && !empty($cert)) {
+				config_set_path('system/webgui/ssl-certref', $cert['refid']);
+				file_notice("GUI", gettext("The GUI HTTPS certificate used a deprecated algorithm and has been replaced with a secure default."));
+			}
+		}
+	}
+
+	/* Check each portal zone */
+	foreach (config_get_path('captiveportal', []) as $zone => $portal) {
+		/* Only act if the portal is enabled and using HTTPS login */
+		if (!isset($portal['enable']) ||
+		    !isset($portal['httpslogin'])||
+		    empty($portal['certref'])) {
+			continue;
+		}
+
+		$cert = lookup_cert($portal['certref']);
+
+		/* If the cert is invalid or weak, generate a new self-signed
+		 * cert using configured HTTPS server name, if present */
+		if (!is_array($cert) ||
+		    !$cert['crt'] ||
+		    !$cert['prv'] ||
+		    cert_chain_has_weak_digest($cert)) {
+
+			if (!empty($portal['httpsname']) &&
+			    (is_hostname($portal['httpsname']) ||
+			    is_fqdn($portal['httpsname']))) {
+				$hostname = $portal['httpsname'];
+			} else {
+				$hostname = '';
+			}
+			$cert = cert_create_selfsigned("Captive Portal Zone {$zone}", $hostname, false);
+			if (is_array($cert) && !empty($cert)) {
+				config_set_path("captiveportal/{$zone}/certref", $cert['refid']);
+
+				file_notice("Captive Portal",
+					sprintf(gettext("The HTTPS certificate for Captive Portal Zone %s used ".
+							"a deprecated algorithm and has been replaced with a secure default."), $zone));
+			}
+		}
+	}
 }
 
 /*

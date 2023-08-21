@@ -640,6 +640,14 @@ function is_alias_inuse($alias) {
 			}
 		}
 	}
+	/* loop through outbound nat rules looking for alias in use */
+	foreach (config_get_path('nat/outbound/rule', []) as $rule) {
+		foreach (['target', 'sourceport', 'dstport', 'source/network', 'destination/network'] as $property) {
+			if (array_get_path($rule, $property) == $alias) {
+				return true;
+			}
+		}
+	}
 	return false;
 }
 
@@ -1901,8 +1909,16 @@ function pfsense_default_state_size() {
 	/* get system memory amount */
 	$memory = get_memory();
 	$physmem = $memory[0];
-	/* Be cautious and only allocate 10% of system memory to the state table */
-	$max_states = (int) ($physmem/10)*1000;
+
+	if ((int) $physmem > 0) {
+		/* Be cautious and only allocate 10% of system memory to the state table */
+		$max_states = (int) ($physmem/10)*1000;
+	} else {
+		/* If the memory check result is invalid, use a low but still
+		 * somewhat sane default (Equivalent to ~256MB RAM) */
+		$max_states = 25600;
+	}
+
 	return $max_states;
 }
 
@@ -2263,7 +2279,7 @@ function update_alias_name($new_alias_name, $orig_alias_name) {
 	// NAT Outbound Rules
 	update_alias_names_upon_change(array('nat', 'outbound', 'rule'), array('source', 'network'), $new_alias_name, $orig_alias_name);
 	update_alias_names_upon_change(array('nat', 'outbound', 'rule'), array('sourceport'), $new_alias_name, $orig_alias_name);
-	update_alias_names_upon_change(array('nat', 'outbound', 'rule'), array('destination', 'address'), $new_alias_name, $orig_alias_name);
+	update_alias_names_upon_change(array('nat', 'outbound', 'rule'), array('destination', 'network'), $new_alias_name, $orig_alias_name);
 	update_alias_names_upon_change(array('nat', 'outbound', 'rule'), array('dstport'), $new_alias_name, $orig_alias_name);
 	update_alias_names_upon_change(array('nat', 'outbound', 'rule'), array('target'), $new_alias_name, $orig_alias_name);
 	// Alias in an alias
@@ -3601,6 +3617,32 @@ function is_url_hostname_resolvable($url) {
 	$resolvable = ($urlhostname !== gethostbyname($urlhostname));
 	putenv("RES_OPTIONS");
 	return $resolvable;
+}
+
+function get_pf_reserved(?string $name = '', bool $check_ifdescr = true):bool|array {
+	global $pf_reserved_keywords, $reserved_table_names, $FilterIflist;
+
+	// generate a list of assigned interfaces and interface groups
+	$iflist = $FilterIflist;
+	if (empty($iflist)) {
+		$iflist = config_get_path('interfaces', []);
+		foreach (config_get_path('ifgroups/ifgroupentry', []) as $ifgen) {
+			$iflist[$ifgen['ifname']] = $ifgen['ifname'];
+		}
+	}
+	$reserved = [];
+	foreach ($iflist as $ifconf) {
+		if (empty($ifconf['descr'])) {
+			continue;
+		}
+		if ($check_ifdescr) {
+			$reserved[] = strtoupper($ifconf['descr']);
+		}
+		$reserved[] = strtoupper($ifconf['descr'] . '__NETWORK');
+	}
+	$reserved = array_merge($pf_reserved_keywords, $reserved_table_names, $reserved);
+
+	return (empty($name) ? $reserved : in_array(strtoupper($name), $reserved));
 }
 
 function get_pf_timeouts () {

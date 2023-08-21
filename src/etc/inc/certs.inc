@@ -1708,7 +1708,7 @@ function cert_renew(& $cert, $reusekey = true, $strictsecurity = false, $reusese
 	/* If we are enforcing strict security, then check the digest against a
 	 * blacklist of insecure digest methods. */
 	if ($strictsecurity &&
-	    (in_array($digest_alg, $cert_strict_values['digest_blacklist']))) {
+	    is_weak_digest($cert_details['signatureTypeSN'])) {
 		$digest_alg = 'sha256';
 	}
 
@@ -2162,7 +2162,14 @@ function cert_print_infoblock($cert) {
 	$certsig = cert_get_sigtype($cert['crt']);
 	if (is_array($certsig) && !empty($certsig) && !empty($certsig['shortname'])) {
 		$certextinfo .= '<b>' . gettext("Signature Digest: ") . '</b> ';
+		$is_weak = is_weak_digest($certsig['shortname']);
+		$csgclass = ($is_weak) ? 'warning' : 'normal';
+		$certextinfo .= '<span class="text-' . $csgclass . '" data-placement="bottom">';
 		$certextinfo .= htmlspecialchars(cert_escape_x509_chars($certsig['shortname'], true));
+		if ($is_weak) {
+			$certextinfo .= ' (' . gettext("Weak Digest") . ')';
+		}
+		$certextinfo .= '</span>';
 		$certextinfo .= '<br/>';
 	}
 
@@ -2600,7 +2607,8 @@ function cert_build_list($type = 'cert', $consumer = '', $selectsource = false, 
 	foreach (config_get_path($type, []) as $cert) {
 		if (empty($cert['prv']) && ($type == 'cert')) {
 			continue;
-		} else if (cert_check_pkey_compatibility($cert['prv'], $consumer)) {
+		} elseif (cert_check_pkey_compatibility($cert['prv'], $consumer) &&
+			  cert_check_digest_compatibility($type, $cert['crt'], $consumer)) {
 			if ($selectsource) {
 				$list[] = array('refid' => $cert['refid'],
 						'descr' => $cert['descr']);
@@ -2655,7 +2663,7 @@ function cert_pkcs12_export($cert, $encryption = 'high', $passphrase = '', $add_
 	/* Encryption and Digest */
 	switch ($encryption) {
 		case 'legacy':
-			$algo = '-certpbe PBE-SHA1-RC2-40 -keypbe PBE-SHA1-RC2-40';
+			$algo = '-legacy -certpbe PBE-SHA1-RC2-40 -keypbe PBE-SHA1-RC2-40';
 			$hash = '';
 			break;
 		case 'low':
@@ -2761,4 +2769,98 @@ function cert_pkcs12_export($cert, $encryption = 'high', $passphrase = '', $add_
 
 	return null;
 }
+
+/* Check if a given digest is known to be weak */
+function is_weak_digest($digest_alg) {
+	global $cert_strict_values;
+	/* Check for and remove unnecessary ECDSA digest prefix
+	 * See https://redmine.pfsense.org/issues/13437 */
+	$ecdsa_prefix = 'ecdsa-with-';
+	if (substr(strtolower($digest_alg), 0, strlen($ecdsa_prefix)) == $ecdsa_prefix) {
+		$digest_alg = substr($digest_alg, strlen($ecdsa_prefix));
+	}
+	return in_array($digest_alg, $cert_strict_values['digest_blacklist']);
+}
+
+/* Determine if a certificate is too weak to function in certain contexts
+ * such as for the GUI, Captive Portal, or OpenVPN with OpenSSL 3.x */
+function cert_has_weak_digest($str_crt, $decode = true) {
+	$digestinfo = cert_get_sigtype($str_crt, $decode);
+	return is_weak_digest($digestinfo['shortname']);
+}
+
+/* Check both certificate and CA when passed a full certificate array entry */
+function cert_chain_has_weak_digest($cert) {
+	if (!is_array($cert) || !$cert['crt']) {
+		/* Empty input so flag as weak anyhow */
+		return true;
+	}
+	$weak = false;
+	/* Check CA if present */
+	if (!empty($cert['caref'])) {
+		$ca = lookup_ca($cert['caref']);
+		$weak = cert_has_weak_digest($ca['crt']);
+	}
+	/* Only check cert if the CA is not weak (or no self-signed) */
+	if (!$weak) {
+		$weak = cert_has_weak_digest($cert['crt']);
+	}
+	return $weak;
+}
+
+function cert_check_digest_compatibility($type, $cert, $consumer) {
+	$nonweak_consumers = [
+		'ca'   => ['HTTPS'],
+		'cert' => ['HTTPS', 'OpenVPN'],
+	];
+	return (!cert_has_weak_digest($cert) ||
+		!in_array($consumer, $nonweak_consumers[$type]));
+}
+
+function cert_create_selfsigned($descr = '', $hostname = '', $log = true) {
+	global $cert_strict_values;
+
+	$a_cert = config_get_path('cert', []);
+	if ($log) {
+		log_error(sprintf(gettext("Creating self-signed SSL/TLS certificate (%s)"), $descr));
+	}
+
+	if (empty($descr)) {
+		$descr = gettext("GUI default");
+	}
+
+	/* Basic cert details */
+	$cert = [];
+	$cert['refid'] = uniqid();
+	$cert['descr'] = "{$descr} ({$cert['refid']})";
+
+	if (empty($hostname)) {
+		/* Find the system hostname, append unique refid */
+		$hostname = config_get_path('system/hostname') . "-{$cert['refid']}";
+	}
+
+	$dn = [
+		'organizationName' => g_get('product_label') . " {$descr} Self-Signed Certificate",
+		'commonName' => $hostname,
+		'subjectAltName' => "DNS:{$hostname}"
+	];
+
+	/* Create the self-signed certificate */
+	$old_err_level = error_reporting(0); /* otherwise openssl_ functions throw warnings directly to a page screwing menu tab */
+	if (!cert_create($cert, null, 2048, $cert_strict_values['max_server_cert_lifetime'], $dn, "self-signed", "sha256")) {
+		while ($log && ($ssl_err = openssl_error_string())) {
+			log_error(sprintf(gettext("Error creating self-signed certificate: openssl library returns: %s"), $ssl_err));
+		}
+		error_reporting($old_err_level);
+		return null;
+	}
+	error_reporting($old_err_level);
+
+	/* Add the new certificate */
+	$a_cert[] = $cert;
+	config_set_path('cert', $a_cert);
+
+	return $cert;
+}
+
 ?>

@@ -152,13 +152,7 @@ if (count($ostypes) > 2) {
 	);
 }
 
-$specialsrcdst = explode(" ", "any (self) pptp pppoe l2tp openvpn");
 $ifdisp = get_configured_interface_with_descr();
-
-foreach ($ifdisp as $kif => $kdescr) {
-	$specialsrcdst[] = "{$kif}";
-	$specialsrcdst[] = "{$kif}ip";
-}
 
 init_config_arr(array('filter', 'rule'));
 filter_rules_sort();
@@ -410,7 +404,7 @@ if ($_POST['save']) {
 		$input_errors[] = gettext("The '\' character is not allowed in the Description field.");
 	}
 
-	if (($_POST['proto'] != "tcp") && ($_POST['proto'] != "udp") && ($_POST['proto'] != "tcp/udp")) {
+	if (!array_key_exists(strtolower($_POST['proto']), get_ipprotocols('portsonly'))) {
 		$_POST['srcbeginport'] = 0;
 		$_POST['srcendport'] = 0;
 		$_POST['dstbeginport'] = 0;
@@ -454,7 +448,7 @@ if ($_POST['save']) {
 		}
 	}
 
-	if (is_specialnet($_POST['srctype'])) {
+	if (get_specialnet($_POST['srctype'])) {
 		$_POST['src'] = $_POST['srctype'];
 		$_POST['srcmask'] = 0;
 	} else if ($_POST['srctype'] == "single") {
@@ -464,7 +458,7 @@ if ($_POST['save']) {
 			$_POST['srcmask'] = 32;
 		}
 	}
-	if (is_specialnet($_POST['dsttype'])) {
+	if (get_specialnet($_POST['dsttype'])) {
 		$_POST['dst'] = $_POST['dsttype'];
 		$_POST['dstmask'] = 0;
 	} else if ($_POST['dsttype'] == "single") {
@@ -512,12 +506,12 @@ if ($_POST['save']) {
 	}
 
 	if (isset($a_filter[$id]['associated-rule-id']) === false &&
-	    (!(is_specialnet($_POST['srctype']) || ($_POST['srctype'] == "single")))) {
+	    (!(get_specialnet($_POST['srctype']) || ($_POST['srctype'] == "single")))) {
 		$reqdfields[] = "srcmask";
 		$reqdfieldsn[] = gettext("Source bit count");
 	}
 	if (isset($a_filter[$id]['associated-rule-id']) === false &&
-	    (!(is_specialnet($_POST['dsttype']) || ($_POST['dsttype'] == "single")))) {
+	    (!(get_specialnet($_POST['dsttype']) || ($_POST['dsttype'] == "single")))) {
 		$reqdfields[] = "dstmask";
 		$reqdfieldsn[] = gettext("Destination bit count");
 	}
@@ -602,7 +596,7 @@ if ($_POST['save']) {
 		}
 	}
 
-	if (!is_specialnet($_POST['srctype'])) {
+	if (!get_specialnet($_POST['srctype'])) {
 		if (($_POST['src'] && !is_ipaddroralias($_POST['src']))) {
 			$input_errors[] = sprintf(gettext("%s is not a valid source IP address or alias."), $_POST['src']);
 		}
@@ -610,7 +604,7 @@ if ($_POST['save']) {
 			$input_errors[] = gettext("A valid source bit count must be specified.");
 		}
 	}
-	if (!is_specialnet($_POST['dsttype'])) {
+	if (!get_specialnet($_POST['dsttype'])) {
 		if (($_POST['dst'] && !is_ipaddroralias($_POST['dst']))) {
 			$input_errors[] = sprintf(gettext("%s is not a valid destination IP address or alias."), $_POST['dst']);
 		}
@@ -1058,7 +1052,7 @@ if ($_POST['save']) {
 				// Update the separators of previous interface.
 				init_config_arr(array('filter', 'separator', strtolower($if)));
 				$a_separators = config_get_path('filter/separator/' . strtolower($if));
-				$ridx = ifridx($if, $id);		// get rule index within interface
+				$ridx = abs(ifridx($if, $id));		// get rule index within interface
 				$mvnrows = -1;
 				move_separators($a_separators, $ridx, $mvnrows);
 				config_set_path('filter/separator/' . strtolower($if), $a_separators);
@@ -1067,7 +1061,7 @@ if ($_POST['save']) {
 				// Update the separators of new interface.
 				init_config_arr(array('filter', 'separator', strtolower($tmpif)));
 				$a_separators = config_get_path('filter/separator/' . strtolower($tmpif));
-				$ridx = ifridx($tmpif, $id);	// get rule index within interface
+				$ridx = abs(ifridx($tmpif, $id));	// get rule index within interface
 				if ($ridx == 0) {				// rule was placed at the top
 					$ridx = -1;					// move all separators
 				}
@@ -1088,7 +1082,7 @@ if ($_POST['save']) {
 				} else if (isset($filterent['interface'])) {
 					$tmpif = $filterent['interface'];
 					if ($tmpif != $if) {					// rule copied to different interface
-						$ridx = ifridx($tmpif, $after+1);	// get rule index within interface
+						$ridx = abs(ifridx($tmpif, $after+1));	// get rule index within interface
 						if ($ridx == 0) {					// rule was placed at the top
 							$after = -1;					// move all separators
 						}
@@ -1100,7 +1094,7 @@ if ($_POST['save']) {
 				// Update the separators
 				init_config_arr(array('filter', 'separator', strtolower($tmpif)));
 				$a_separators = config_get_path('filter/separator/' . strtolower($tmpif));
-				$ridx = ifridx($tmpif, $after);	// get rule index within interface
+				$ridx = abs(ifridx($tmpif, $after));	// get rule index within interface
 				$mvnrows = +1;
 				move_separators($a_separators, $ridx, $mvnrows);
 				config_set_path('filter/separator/' . strtolower($tmpif), $a_separators);
@@ -1354,24 +1348,7 @@ $section->addInput(new Form_Select(
 	'proto',
 	'*Protocol',
 	$pconfig['proto'],
-	array(
-		'any' => gettext('Any'),
-		'tcp' => 'TCP',
-		'udp' => 'UDP',
-		'tcp/udp' => 'TCP/UDP',
-		'icmp' => 'ICMP',
-		'esp' => 'ESP',
-		'ah' => 'AH',
-		'gre' => 'GRE',
-		'etherip' => 'EoIP',
-		'ipv6' => 'IPV6',
-		'igmp' => 'IGMP',
-		'pim' => 'PIM',
-		'ospf' => 'OSPF',
-		'sctp' => 'SCTP',
-		'carp' => 'CARP',
-		'pfsync' => 'PFSYNC',
-	)
+	get_ipprotocols()
 ))->setHelp('Choose which IP protocol this rule should match.');
 
 $group = new Form_Group("ICMP Subtypes");
@@ -1406,7 +1383,7 @@ foreach (['src' => gettext('Source'), 'dst' => gettext('Destination')] as $type 
 	if ($pconfig[$type.'type']) {
 		// The rule type came from the $_POST array, after input errors, so keep it.
 		$ruleType = $pconfig[$type.'type'];
-	} elseif (is_specialnet($pconfig[$type])) {
+	} elseif (get_specialnet($pconfig[$type])) {
 		// It is one of the special names, let it through as-is.
 		$ruleType = $pconfig[$type];
 	} elseif ((is_ipaddrv6($pconfig[$type]) && $pconfig[$type.'mask'] == 128) ||
@@ -1419,40 +1396,19 @@ foreach (['src' => gettext('Source'), 'dst' => gettext('Destination')] as $type 
 		$ruleType = 'network';
 	}
 
-	$ruleValues = array(
-		'any' => gettext('any'),
-		'single' => gettext('Single host or alias'),
-		'network' => gettext('Network'),
-	);
-
-	if ($type == 'dst') {
-		$ruleValues['(self)'] = gettext("This firewall (self)");
-	}
-
-	if (isset($a_filter[$id]['floating']) || $if == "FloatingRules") {
-		$ruleValues['(self)'] = gettext('This Firewall (self)');
-	}
-	if (have_ruleint_access("pppoe")) {
-		$ruleValues['pppoe'] = gettext('PPPoE clients');
-	}
-	if (have_ruleint_access("l2tp")) {
-		$ruleValues['l2tp'] = gettext('L2TP clients');
-	}
-
-	foreach ($ifdisp as $ifent => $ifdesc) {
-		if (!have_ruleint_access($ifent)) {
-			continue;
-		}
-
-		$ruleValues[$ifent] = $ifdesc.' net';
-		$ruleValues[$ifent.'ip'] = $ifdesc.' address';
+	$ruleValues_flags = [SPECIALNET_CHECKPERM, SPECIALNET_ANY,
+		SPECIALNET_COMPAT_ADDRAL, SPECIALNET_NET, SPECIALNET_SELF,
+		SPECIALNET_CLIENTS, SPECIALNET_IFADDR, SPECIALNET_IFNET, SPECIALNET_GROUP
+	];
+	if ($type != 'dst' && !isset($a_filter[$id]['floating']) && $if != "FloatingRules") {
+		$ruleValues_flags = array_diff($ruleValues_flags, [SPECIALNET_SELF]);
 	}
 
 	$group->add(new Form_Select(
 		$type . 'type',
 		$name .' Type',
 		$ruleType,
-		$ruleValues
+		get_specialnet('', $ruleValues_flags)
 	));
 
 	$group->add(new Form_IpAddress(
@@ -1990,9 +1946,8 @@ events.push(function() {
 	}
 
 	function proto_change() {
-		var is_tcpudp = (jQuery.inArray($('#proto :selected').val(), ['tcp','udp', 'tcp/udp']) != -1);
-		portsenabled = (is_tcpudp ? 1 : 0);
-		hideClass('tcpflags', !is_tcpudp);
+		portsenabled = (jQuery.inArray($('#proto :selected').val(), Object.keys(<?=json_encode(get_ipprotocols('portsonly'))?>)) != -1) ? true : false;
+		hideClass('tcpflags', !portsenabled);
 
 		// Disable OS if the proto is not TCP.
 		disableInput('os', ($('#proto :selected').val() != 'tcp'));
@@ -2019,7 +1974,7 @@ events.push(function() {
 
 		ext_change();
 
-		if (is_tcpudp) {
+		if (portsenabled) {
 			hideClass('dstprtr', false);
 			hideInput('btnsrctoggle', false);
 			if ((($('#srcbeginport').val() == "any") || ($('#srcbeginport').val() == "")) &&

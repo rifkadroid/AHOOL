@@ -29,6 +29,24 @@ require_once('Net/IPv6.php');
 define('VIP_ALL', 1);
 define('VIP_CARP', 2);
 define('VIP_IPALIAS', 3);
+// Special networks flags
+define('SPECIALNET_NONE', 0);
+define('SPECIALNET_ANY', 1);
+define('SPECIALNET_COMPAT_ADDR', 22);
+define('SPECIALNET_ADDR', 2);
+define('SPECIALNET_COMPAT_ADDRAL', 33);
+define('SPECIALNET_ADDRAL', 3);
+define('SPECIALNET_NET', 4);
+define('SPECIALNET_NETAL', 5);
+define('SPECIALNET_SELF', 6);
+define('SPECIALNET_CLIENTS', 7);
+define('SPECIALNET_IFADDR', 8);
+define('SPECIALNET_IFSUB', 9);
+define('SPECIALNET_IFNET', 10);
+define('SPECIALNET_GROUP', 11);
+define('SPECIALNET_VIPS', 12);
+define('SPECIALNET_CHECKPERM', 98);
+define('SPECIALNET_EXCLUDE', 99);
 
 /* kill a process by pid file */
 function killbypid($pidfile, $waitfor = 0) {
@@ -310,7 +328,7 @@ function is_module_loaded(string $module_name): bool
 
 /* validate non-negative numeric string, or equivalent numeric variable */
 function is_numericint($arg) {
-	return (((is_int($arg) && $arg >= 0) || (is_string($arg) && strlen($arg) > 0 && ctype_digit($arg))) ? true : false);
+	return (((is_int($arg) && $arg >= 0) || (is_string($arg) && strlen($arg) > 0 && ctype_digit(strval($arg)))) ? true : false);
 }
 
 /* Generate the (human readable) ipv4 or ipv6 subnet address (i.e., netmask, or subnet start IP)
@@ -1226,7 +1244,7 @@ function is_intrange($range, $min, $max) {
 		return false;
 	}
 
-	if (!ctype_digit($values[0]) || !ctype_digit($values[1])) {
+	if (!ctype_digit(strval($values[0])) || !ctype_digit(strval($values[1]))) {
 		return false;
 	}
 
@@ -1244,12 +1262,12 @@ function is_intrange($range, $min, $max) {
 	return true;
 }
 
-/* returns true if $port is a valid TCP/UDP port */
+/* returns true if $port is a valid TCP/UDP/SCTP port */
 function is_port($port) {
-	if (ctype_digit($port) && ((intval($port) >= 1) && (intval($port) <= 65535))) {
+	if (ctype_digit(strval($port)) && ((intval($port) >= 1) && (intval($port) <= 65535))) {
 		return true;
 	}
-	if (getservbyname($port, "tcp") || getservbyname($port, "udp")) {
+	if (getservbyname($port, "tcp") || getservbyname($port, "udp") || getservbyname($port, "sctp")) {
 		return true;
 	}
 	return false;
@@ -1271,14 +1289,14 @@ function is_port_in_use($port, $proto = "tcp", $ip_version = 4) {
 	return in_array($port, $port_info);
 }
 
-/* returns true if $portrange is a valid TCP/UDP portrange ("<port>:<port>") */
+/* returns true if $portrange is a valid portrange ("<port>:<port>") */
 function is_portrange($portrange) {
 	$ports = explode(":", $portrange);
 
 	return (count($ports) == 2 && is_port($ports[0]) && is_port($ports[1]));
 }
 
-/* returns true if $port is a valid TCP/UDP port number or range ("<port>:<port>") */
+/* returns true if $port is a valid port number or range ("<port>:<port>") */
 function is_port_or_range($port) {
 	return (is_port($port) || is_portrange($port));
 }
@@ -1300,7 +1318,7 @@ function is_port_or_alias($port) {
 	return (is_port($port) || is_portalias($port));
 }
 
-/* returns true if $port is a valid TCP/UDP port number or range ("<port>:<port>") or an alias thereof */
+/* returns true if $port is a valid port number or range ("<port>:<port>") or an alias thereof */
 function is_port_or_range_or_alias($port) {
 	return (is_port($port) || is_portrange($port) || is_portalias($port));
 }
@@ -2421,8 +2439,32 @@ function set_single_sysctl($name, $value) {
 function get_memory() {
 	$physmem = get_single_sysctl("hw.physmem");
 	$realmem = get_single_sysctl("hw.realmem");
+	/* Ensure $physmem has a sane value */
+	if (!is_numericint($physmem) &&
+	    is_numericint($realmem)) {
+		$physmem = $realmem;
+	}
+	/* Ensure $realmem has a sane value */
+	if (!is_numericint($realmem) &&
+	    is_numericint($physmem)) {
+		$realmem = $physmem;
+	}
+	/* If both are invalid, something deeper is wrong */
+	if (!is_numericint($physmem) &&
+	    is_numericint($realmem)) {
+		/* Try checking by pages instead */
+		$membypages = (int) get_single_sysctl("vm.stats.vm.v_page_count") * (int) get_single_sysctl("vm.stats.vm.v_page_size");
+		if (is_numericint($membypages)) {
+			$physmem = $membypages;
+			$realmem = $membypages;
+		} else {
+			/* Everything failed, return zeroes */
+			$physmem = 0;
+			$realmem = 0;
+		}
+	}
 	/* convert from bytes to megabytes */
-	return array(($physmem/1048576), ($realmem/1048576));
+	return array(((int) $physmem/1048576), ((int) $realmem/1048576));
 }
 
 function mute_kernel_msgs() {
@@ -3973,7 +4015,7 @@ function pconfig_to_address(&$adr, $padr, $pmask, $pnot = false, $pbeginport = 0
 
 	if ($padr == "any") {
 		$adr['any'] = true;
-	} else if (is_specialnet($padr)) {
+	} else if (get_specialnet($padr)) {
 		if ($addmask) {
 			$padr .= "/" . $pmask;
 		}
@@ -4015,13 +4057,173 @@ function pconfig_to_address(&$adr, $padr, $pmask, $pnot = false, $pbeginport = 0
 	}
 }
 
-function is_specialnet($net) {
-	global $specialsrcdst;
-
-	if (!$net) {
+function get_specialnet(?string $net = '', array $flags = [], ?string $if = ''):bool|array {
+	if ($net === null || $if === null) {
 		return false;
 	}
-	if (in_array($net, $specialsrcdst)) {
+	$checkpermission = false;
+	$allnetflags = [SPECIALNET_ANY, SPECIALNET_SELF, SPECIALNET_CLIENTS,
+	                SPECIALNET_IFADDR, SPECIALNET_IFSUB, SPECIALNET_IFNET,
+	                SPECIALNET_GROUP, SPECIALNET_VIPS];
+
+	if (empty($flags)) {
+		$flags = $allnetflags;
+	} else {
+		if (in_array(SPECIALNET_CHECKPERM, $flags)) {
+			$checkpermission = true;
+		}
+		if (in_array(SPECIALNET_EXCLUDE, $flags)) {
+			$flags = array_diff($allnetflags, $flags);
+		}
+	}
+	$specialnet = [];
+	if (in_array(SPECIALNET_IFADDR, $flags) || in_array(SPECIALNET_IFSUB, $flags) || in_array(SPECIALNET_IFNET, $flags)) {
+		$ifmacros = get_configured_interface_with_descr();
+	}
+	foreach ($flags as $include) {
+		switch ($include) {
+			case SPECIALNET_NONE:
+				$specialnet = array_merge($specialnet, ['none' => gettext('None')]);
+				break;
+			case SPECIALNET_ANY:
+				$specialnet = array_merge($specialnet, ['any' => gettext('Any')]);
+				break;
+			case SPECIALNET_COMPAT_ADDR:
+			case SPECIALNET_ADDR:
+				if ($include == SPECIALNET_COMPAT_ADDR) {
+					$ifname = 'single';
+				} else {
+					$ifname = 'address';
+				}
+				$specialnet = array_merge($specialnet, [$ifname => gettext('Address')]);
+				break;
+			case SPECIALNET_COMPAT_ADDRAL:
+			case SPECIALNET_ADDRAL:
+				if ($include == SPECIALNET_COMPAT_ADDRAL) {
+					$ifname = 'single';
+				} else {
+					$ifname = 'address';
+				}
+				$specialnet = array_merge($specialnet, [$ifname => gettext('Address or Alias')]);
+				break;
+			case SPECIALNET_NET:
+			case SPECIALNET_NETAL:
+				if ($include == SPECIALNET_NET) {
+					$ifdescr = 'Network';
+				} else {
+					$ifdescr = 'Network or Alias';
+				}
+				$specialnet = array_merge($specialnet, ['network' => gettext($ifdescr)]);
+				break;
+			case SPECIALNET_SELF:
+				$specialnet = array_merge($specialnet, ['(self)' => gettext('This Firewall (self)')]);
+				break;
+			case SPECIALNET_CLIENTS:
+				if ($checkpermission) {
+					$ifallowed = [];
+					if (have_ruleint_access("pptp")) {
+						$ifallowed['pptp'] = gettext('PPTP clients');
+					}
+					if (have_ruleint_access("pppoe")) {
+						$ifallowed['pppoe'] = gettext('PPPoE clients');
+					}
+					if (have_ruleint_access("l2tp")) {
+						$ifallowed['l2tp'] = gettext('L2TP clients');
+					}
+					$specialnet = array_merge($specialnet, $ifallowed);
+				} else {
+					$specialnet = array_merge($specialnet, [
+					                          'pptp' => gettext('PPTP clients'),
+					                          'pppoe' => gettext('PPPoE clients'),
+					                          'l2tp' => gettext('L2TP clients')]);
+				}
+				break;
+			case SPECIALNET_IFADDR:
+			case SPECIALNET_IFSUB:
+			case SPECIALNET_IFNET:
+				if ($include == SPECIALNET_IFADDR) {
+					$ifname_suffix = 'ip';
+					$ifdescr_suffix = ' address';
+				} elseif ($include == SPECIALNET_IFSUB) {
+					$ifname_suffix = '';
+					$ifdescr_suffix = ' subnet';
+				} else {
+					$ifname_suffix = '';
+					$ifdescr_suffix = ' subnets';
+				}
+				foreach ($ifmacros as $ifname => $ifdescr) {
+					// Only add macros for allowed interfaces when checking permissions
+					if ($checkpermission && !have_ruleint_access($ifname)) {
+						continue;
+					}
+					// If an interface is specified, only add interface macros for that interface
+					if (!empty($if)) {
+						if ($if != $ifname) {
+							continue;
+						} else {
+							$specialnet[$ifname . $ifname_suffix] = $ifdescr . $ifdescr_suffix;
+							break;
+						}
+					} else {
+						$specialnet[$ifname . $ifname_suffix] = $ifdescr . $ifdescr_suffix;
+					}
+				}
+				break;
+			case SPECIALNET_GROUP:
+				foreach (config_get_path('ifgroups/ifgroupentry', []) as $ifgen) {
+					$ifgenmembers = explode(' ', $ifgen['members']);
+					foreach ($ifgenmembers as $ifgmember) {
+						// Skip interface groups with members which are not allowed
+						if ($checkpermission && !have_ruleint_access($ifgmember)) {
+							continue 2;
+						}
+						// Skip interface groups which do not include the specified interface
+						if (!empty($if) && $if != $ifgmember &&
+						    $ifgmember == $ifgenmembers[array_key_last($ifgenmembers)]) {
+							continue 2;
+						}
+					}
+					$specialnet[$ifgen['ifname']] = $ifgen['ifname'] . ' networks';
+				}
+				break;
+			case SPECIALNET_VIPS:
+				$tmp_vips = [];
+				foreach (config_get_path('virtualip/vip', []) as $vip) {
+					// Only add VIPs for allowed interfaces when checking permissions
+					if ($checkpermission && !empty($vip['interface']) && !have_ruleint_access($vip['interface'])) {
+						continue;
+					}
+					$tmp_vips[$vip['subnet'] . '/' . $vip['subnet_bits']] = $vip;
+				}
+				asort($tmp_vips, SORT_NATURAL);
+				foreach ($tmp_vips as $vipsn => $sn) {
+					if (($sn['mode'] == "proxyarp" || $sn['mode'] == "other") && $sn['type'] == "network") {
+						$specialnet[$vipsn] = 'Subnet: ' . $sn['subnet'] . '/' . $sn['subnet_bits'] . ' (' . $sn['descr'] . ')';
+						// Skip expanding IPv4 VIPs with the option, as well as any IPv6 network
+						if (isset($sn['noexpand']) || strstr($sn['subnet'], ':' !== false)) {
+							continue;
+						}
+						$start = ip2long32(gen_subnet($sn['subnet'], $sn['subnet_bits']));
+						$end = ip2long32(gen_subnet_max($sn['subnet'], $sn['subnet_bits']));
+						$len = $end - $start;
+						for ($i = 0; $i <= $len; $i++) {
+							$snip = ip2long32($start+$i);
+			
+							$specialnet[$snip] = $snip . ' (' . $sn['descr'] . ')';
+						}
+					} else {
+						$specialnet[$sn['subnet']] = $sn['subnet'] . ' (' . $sn['descr'] . ')';
+					}
+				}
+				break;
+			default:
+				break;
+		}
+	}
+
+	if (empty($net)) {
+		return $specialnet;
+	} elseif (array_key_exists($net, $specialnet)) {
 		return true;
 	} else {
 		return false;

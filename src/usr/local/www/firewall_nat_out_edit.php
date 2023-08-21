@@ -112,13 +112,11 @@ $section->addInput(new Form_Select(
 	)
 ))->setHelp('Select the Internet Protocol version this rule applies to.');
 
-$protocols = "any TCP UDP TCP/UDP ICMP ESP AH GRE IPV6 IGMP carp pfsync";
-
 $section->addInput(new Form_Select(
 	'protocol',
 	'*Protocol',
 	$pconfig['protocol'],
-	array_combine(explode(" ", strtolower($protocols)), explode(" ", $protocols))
+	get_ipprotocols('outboundnat')
 ))->setHelp('Choose which protocol this rule should match. In most cases "any" is specified.');
 
 $group = new Form_Group('*Source');
@@ -126,8 +124,8 @@ $group = new Form_Group('*Source');
 $group->add(new Form_Select(
 	'source_type',
 	null,
-	(($pconfig['source'] == "any") || ($pconfig['source'] == "(self)")) ? $pconfig['source'] : "network",
-	array('any' => gettext('Any'), '(self)' => gettext('This Firewall (self)'), 'network' => gettext('Network'))
+	$pconfig['source_type'],
+	get_specialnet('', [SPECIALNET_ANY, SPECIALNET_SELF, SPECIALNET_NETAL, SPECIALNET_IFNET, SPECIALNET_GROUP])
 ))->setHelp('Type')->setWidth('3');
 
 $group->add(new Form_IpAddress(
@@ -151,14 +149,14 @@ $group = new Form_Group('*Destination');
 $group->add(new Form_Select(
 	'destination_type',
 	null,
-	$pconfig['destination'] == "any" ? "any":"network",
-	array('any' => gettext('Any'), 'network' => gettext('Network'))
+	$pconfig['destination_type'],
+	get_specialnet('', [SPECIALNET_ANY, SPECIALNET_NETAL, SPECIALNET_IFNET, SPECIALNET_GROUP])
 ))->setHelp('Type')->setWidth('3');
 
 $group->add(new Form_IpAddress(
 	'destination',
 	null,
-	$pconfig['destination'] == "any" ? "":$pconfig['destination'],
+	$pconfig['destination'],
 	'ALIASV4V6'
 ))->addMask('destination_subnet', $pconfig['destination_subnet'])->setHelp('Destination network for the outbound NAT mapping.');
 
@@ -183,22 +181,22 @@ $form->add($section);
 $section = new Form_Section('Translation');
 $section->addClass('translation');
 
-$section->addInput(new Form_Select(
+$group = new Form_Group('*Address');
+$group->add(new Form_Select(
+	'target_type',
+	null,
+	$pconfig['target_type'],
+	get_specialnet('', [SPECIALNET_NETAL, SPECIALNET_IFADDR, SPECIALNET_VIPS])
+))->setHelp('Type')->setWidth('3');
+$group->add(new Form_IpAddress(
 	'target',
-	'*Address',
+	null,
 	$pconfig['target'],
-	build_target_list()
-))->setHelp('Connections matching this rule will be mapped to the specified %1$sAddress%2$s.%3$s' .
-		'The %1$sAddress%2$s can be an Interface, a Host-type Alias, or a %4$sVirtual IP%5$s address.',
-		'<b>', '</b>', '<br />', '<a href="firewall_virtual_ip.php">', '</a>');
-
-$section->addInput(new Form_IpAddress(
-	'targetip',
-	'Other subnet',
-	$pconfig['targetip']
-))->addMask('targetip_subnet', $pconfig['targetip_subnet'])->setHelp(
-		'This subnet must be routed to the firewall or each address in the subnet must be defined in one or more %1$sVirtual IP%2$s addresses.',
-		'<a href="firewall_virtual_ip.php">', '</a>');
+	'ALIASV4V6'
+))->addMask('target_subnet', $pconfig['target_subnet'])->setHelp('Address')->setWidth('4');
+$group->setHelp('Connections matching this rule will be mapped to the specified address.' .
+                ' If specifying a custom network or alias, it must be routed to the firewall.');
+$section->add($group);
 
 $section->addInput(new Form_Select(
 	'poolopts',
@@ -341,7 +339,8 @@ events.push(function() {
 	}
 
 	function proto_change() {
-		if (($('#protocol').find(":selected").index() >= 0) && ($('#protocol').find(":selected").index() <= 3)) {
+		portsenabled = ($('#protocol :selected').val() == 'any' || (jQuery.inArray($('#protocol :selected').val(), Object.keys(<?=json_encode(get_ipprotocols('portsonly'))?>)) != -1)) ? true : false;
+		if (portsenabled) {
 			hideGroupInput('sourceport', false);
 			hideGroupInput('dstport', false);
 			hideClass('natportgrp', false);
@@ -353,30 +352,14 @@ events.push(function() {
 	}
 
 	function poolopts_change() {
-		if ($('#target option:selected').val().substring(0,1) == "H") {
-			hideInput('poolopts', false);
-			hideInput('source_hash_key', true);
-			hideIpAddress('targetip', true);
-		} else if ($('#target option:selected').val().substring(0,1) == "S") {
-			hideInput('poolopts', false);
-			hideInput('source_hash_key', true);
-			hideIpAddress('targetip', true);
-		} else if ($('#target option:selected').val().substring(0,1) == "O") {
-			hideInput('poolopts', false);
-			hideIpAddress('targetip', false);
-			if ($('#poolopts option:selected').val() == "source-hash") {
-				hideInput('source_hash_key', false);
-			} else {
-				hideInput('source_hash_key', true);
-			}
+		if ($('#target_type option:selected').val() == "network") {
+			var hide = false;
 		} else {
-			$('#poolopts').prop('selectedIndex',0);
-			hideInput('poolopts', true);
-			hideInput('source_hash_key', true);
-			hideIpAddress('targetip', true);
-			$('#targetip').val('');
-			$('#targetip_subnet').val('0');
+			var hide = true;
 		}
+		hideInput('poolopts', hide);
+		hideInput('target', hide);
+		hideInput('source_hash_key', (hide || !($('#poolopts option:selected').val() == "source-hash")));
 	}
 
 	// When controls are clicked . .
@@ -400,7 +383,7 @@ events.push(function() {
 		proto_change();
 	});
 
-	$('#target').on('change', function() {
+	$('#target_type').on('change', function() {
 		poolopts_change();
 	});
 
@@ -420,7 +403,7 @@ events.push(function() {
     var addressarray = <?= json_encode(get_alias_list(array("host", "network", "urltable"))) ?>;
     var customarray = <?= json_encode(get_alias_list(array("port", "url_ports", "urltable_ports"))) ?>;
 
-    $('#destination, #source').autocomplete({
+    $('#destination, #source, #target').autocomplete({
         source: addressarray
     });
 

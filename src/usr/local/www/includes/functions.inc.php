@@ -199,7 +199,7 @@ function swap_usage() {
 function mem_usage() {
 	$memUsage = "NA";
 	$totalMem = (int) get_single_sysctl("vm.stats.vm.v_page_count");
-	if (is_numeric($totalMem)) {
+	if (is_numeric($totalMem) and ($totalMem > 0)) {
 		/* Include inactive and laundry with free memory since they
 		 * could be freed under pressure. */
 		$inactiveMem = (int) get_single_sysctl("vm.stats.vm.v_inactive_count");
@@ -308,25 +308,30 @@ function crypto_accel_set_algs($crypto, $name, $algs) {
 }
 
 function crypto_accel_get_algs($crypto) {
-	$algs = array();
-	$algs_str = "";
+	$algs = [];
 
-	foreach ($crypto["accel"] as $accel) {
+	foreach ($crypto['accel'] as $accel) {
+		/* skip these... */
 		if (!$accel["present"] || !$accel["enabled"]) {
 			continue;
 		}
-		$algs = array_merge($accel["algs"], $algs);
-	}
-	foreach (array_unique($algs, SORT_STRING) as $alg) {
-		if (strlen($algs_str) > 0) {
-			$algs_str .= ",";
-		}
-		$algs_str .= $alg;
+		/* $algs is indexed by number, array_merge will automatically
+		 * append values for entries with duplicate numerical keys so no
+		 * need to manually avoid duplicate index values here. */
+		$algs = array_unique(array_merge($algs, $accel['algs']), SORT_STRING);
 	}
 
-	return (!empty($algs_str) ? $algs_str : gettext("Inactive"));
+	/* return early */
+	if (empty($algs)) {
+		return (gettext('Inactive'));
+	}
+
+	/* Sort values, ignoring keys */
+	sort($algs, SORT_STRING);
+
+	/* format and return the algs string */
+	return (implode(', ', $algs));
 }
-
 
 function get_cpu_crypto_support() {
 	global $g;

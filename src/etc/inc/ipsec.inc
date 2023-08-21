@@ -303,7 +303,7 @@ function ipsec_ikeid_next() {
 	$ikeids = array();
 
 	foreach (config_get_path('ipsec/phase1', []) as $ph1) {
-		$keyids[$ph1['ikeid']] = $ph1['ikeid'];
+		$ikeids[$ph1['ikeid']] = $ph1['ikeid'];
 	}
 
 	for ($i = 1; $i < 16000; $i++) {
@@ -886,7 +886,7 @@ function ipsec_terminate_by_conid($type = 'ike', $conid = null, $uniqueid = null
 	$selector = '--';
 	$selector .= ($type == 'ike') ? 'ike' : 'child';
 
-	if (ctype_digit($uniqueid) && ($uniqueid > 0)) {
+	if (ctype_digit(strval($uniqueid)) && ($uniqueid > 0)) {
 		$selector .= '-id';
 		$term = $uniqueid;
 	} else {
