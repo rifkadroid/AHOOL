@@ -6088,69 +6088,25 @@ function link_interface_to_track6($int, $action = "") {
 }
 
 function interface_find_child_cfgmtu($realiface) {
-	$interface = convert_real_interface_to_friendly_interface_name($realiface);
 	$vlans = link_interface_to_vlans($realiface);
 	$qinqs = link_interface_to_qinqs($realiface);
 	$bridge = link_interface_to_bridge($realiface);
-	$gifs = link_interface_to_tunnelif($interface, 'gif');
-	$gres = link_interface_to_tunnelif($interface, 'gre');
-
 	$mtu = 0;
-	if (is_array($vlans)) {
-		foreach ($vlans as $vlan) {
-			$ifass = convert_real_interface_to_friendly_interface_name($vlan['vlanif']);
-			if (empty($ifass)) {
-				continue;
-			}
-			$vlanmtu = config_get_path("interfaces/{$ifass}/mtu");
-			if ($vlanmtu && (intval($vlanmtu) > $mtu)) {
-				$mtu = $vlanmtu;
-			}
-		}
-	}
-	if (is_array($qinqs)) {
-		foreach ($qinqs as $qinq) {
-			$ifass = convert_real_interface_to_friendly_interface_name($qinq['vlanif']);
-			if (empty($ifass)) {
-				continue;
-			}
 
-			$qinqmtu = config_get_path("interfaces/{$ifass}/mtu");
-			if ($qinqmtu && (intval($qinqmtu) > $mtu)) {
-				$mtu = $qinqmtu;
+	foreach ([$vlans, $qinqs, ['bridge' => $bridge]] as $ints) {
+		if (is_array($ints)) {
+			foreach ($ints as $int) {
+				$ifass = convert_real_interface_to_friendly_interface_name($int['vlanif']);
+				if (!empty($ifass) &&
+				    config_path_enabled("interfaces/{$ifass}") &&
+				    (intval(config_get_path("interfaces/{$ifass}/mtu")) > $mtu)) {
+					$mtu = config_get_path("interfaces/{$ifass}/mtu");
+				}
 			}
 		}
 	}
-	foreach ($gifs as $gif) {
-		$ifass = convert_real_interface_to_friendly_interface_name($gif['gifif']);
-		if (empty($ifass)) {
-			continue;
-		}
 
-		$gifmtu = config_get_path("interfaces/{$ifass}/mtu");
-		if ($gifmtu && (intval($gifmtu) > $mtu)) {
-			$mtu = $gifmtu;
-		}
-	}
-	foreach ($gres as $gre) {
-		$ifass = convert_real_interface_to_friendly_interface_name($gre['greif']);
-		if (empty($ifass)) {
-			continue;
-		}
-		$gremtu = config_get_path("interfaces/{$ifass}/mtu");
-		if ($gremtu && (intval($gremtu) > $mtu)) {
-			$mtu = $gremtu;
-		}
-	}
-	$ifass = convert_real_interface_to_friendly_interface_name($bridge);
-	$ifassmtu = config_get_path("interfaces/{$ifass}/mtu");
-	if (!empty($ifass) && !empty($ifassmtu)) {
-		if ($ifassmtu > $mtu) {
-			$mtu = $ifassmtu;
-		}
-	}
-	unset($vlans, $bridge, $gifs, $gres, $ifass, $vlan);
-
+	unset($vlans, $qinqs, $bridge);
 	return $mtu;
 }
 
@@ -6363,9 +6319,9 @@ function find_interface_ipv6($interface, $flush = false) {
 }
 
 /*
- * find_interface_ipv6_ll($interface): return the interface ipv6 link local (first found)
+ * Return the interface ipv6 link local address
  */
-function find_interface_ipv6_ll($interface, $flush = false) {
+function find_interface_ipv6_ll($interface, $flush = false, $usefirst = true) {
 	global $interface_llv6_arr_cache;
 
 	$interface = str_replace("\n", "", $interface);
@@ -6382,6 +6338,9 @@ function find_interface_ipv6_ll($interface, $flush = false) {
 				$parts = explode("/", $line);
 				if (is_linklocal($parts[0])) {
 					$ifinfo['linklocal'] = $parts[0];
+					if ($usefirst) {
+						break;
+					}
 				}
 			}
 		}
@@ -7535,7 +7494,7 @@ function get_interface_addresses($interface) {
 	}
 	/* Transform output to conform to pfSense_get_interface_addresses() */
 	if ($v4addrs) {
-		$v4addr = array_pop($v4addrs);
+		$v4addr = array_shift($v4addrs);
 		$ifaddrs['ipaddr'] = $v4addr['addr'];
 		foreach(array("subnetbits", "subnet", "broadcast", "tunnel") as $key) {
 			if (array_key_exists($key, $v4addr)) {
@@ -7545,7 +7504,14 @@ function get_interface_addresses($interface) {
 	}
 
 	if ($v6addrs) {
-		$v6addr = array_pop($v6addrs);
+		// use the first IPv6 GUA address if one exists, otherwise the first address
+		$v6addr = $v6addrs[array_key_first($v6addrs)];
+		foreach ($v6addrs as $addr) {
+			if (is_v6gua($addr['addr'])) {
+				$v6addr = $addr;
+				break;
+			}
+		}
 		$ifaddrs['ipaddr6'] = $v6addr['addr'];
 		foreach(array("subnetbits", "tunnel") as $key) {
 			if (array_key_exists($key, $v6addr)) {
