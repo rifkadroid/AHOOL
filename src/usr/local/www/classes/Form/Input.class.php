@@ -57,6 +57,10 @@ class Form_Input extends Form_Element
 			case 'file':
 				unset($this->_attributes['class']['form-control']);
 			break;
+			case 'range':
+				unset($this->_attributes['class']['form-control']);
+				$this->_attributes['class']['form-range'] = true;
+			break;
 		}
 
 		if (isset($value))
@@ -244,6 +248,22 @@ class Form_Input extends Form_Element
 
 	public function __toString()
 	{
+		$label = '';
+		if (!empty($this->_attributes['label-start'])) {
+			$label .= '<label for="' . $this->_attributes['id'] . '" class="form-label">' . $this->_attributes['label-start'] . '</label>';
+			unset($this->_attributes['label-start']);
+		}
+		if (!empty($this->_attributes['label-end'])) {
+			$label .= '<label for="' . $this->_attributes['id'] . '" class="form-label pull-right">' . $this->_attributes['label-end'] . '</label>';
+			unset($this->_attributes['label-end']);
+		}
+		$output = '';
+		if (isset($this->_attributes['show-output'])) {
+			$this->_attributes['oninput'] = 'this.nextElementSibling.value = this.value';
+			$output = '<output>' . $this->_attributes['value'] . '</output>';
+			unset($this->_attributes['show-output']);
+		}
+
 		$input = $this->_getInput();
 		$column = (string)$this->column;
 
@@ -258,7 +278,9 @@ class Form_Input extends Form_Element
 
 		return <<<EOT
 	{$column}
+		{$label}
 		{$input}
+		{$output}
 
 		{$help}
 	</div>

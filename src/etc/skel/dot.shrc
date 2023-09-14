@@ -59,6 +59,9 @@ fi
 
 if [ -n "${_interactive}" ]; then
 	/usr/bin/resizewin -z
+	if [ -f ~/.shrc.local ]; then
+		. ~/.shrc.local
+	fi
 	/etc/rc.initial
 	exit
 fi

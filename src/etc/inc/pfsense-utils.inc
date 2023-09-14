@@ -1170,7 +1170,10 @@ function load_loader_conf($loader_conf = NULL, $local = false) {
 		    "debug.ddb.capture.bufsize",
 		    "hint.uart.0.flags",
 		    "hint.uart.1.flags",
-		    "net.link.ifqmaxlen"
+		    "net.link.ifqmaxlen",
+		    "hint.hwpstate_intel.0.disabled",
+		    "machdep.hwpstate_pkg_ctrl",
+		    "net.pf.states_hashsize"
 		));
 	}
 	foreach ($input_split as $line) {
@@ -1302,6 +1305,17 @@ function setup_loader_settings($path = "", $upgrade = false) {
 
 	/* Set maximum send queue length. */
 	$data[] = 'net.link.ifqmaxlen="128"';
+
+	/* Speed Shift / hwpstate */
+	if (config_get_path('system/hwpstate', 'enabled') == 'disabled') {
+		$data[] = 'hint.hwpstate_intel.0.disabled="1"';
+	}
+	$data[] = 'machdep.hwpstate_pkg_ctrl="' . config_get_path('system/hwpstate_control_level', get_single_sysctl('machdep.hwpstate_pkg_ctrl')) . '"';
+
+	// calculate the size of hash tables that store states - should be power of 2
+	$pf_maximumstates = intval(config_get_path('system/maximumstates', pfsense_default_state_size()));
+	$pf_hashtablesize = pow(2, ceil(log(floor($pf_maximumstates / 2), 2)));
+	$data[] = "net.pf.states_hashsize=\"{$pf_hashtablesize}\"";
 
 	safe_write_file($loader_conf_file, $data);
 
@@ -3175,18 +3189,18 @@ function get_locale_list() {
 		"zh_Hans_CN" => gettext("Chinese (Simplified, China)"),
 		"zh_Hans_HK" => gettext("Chinese (Simplified, Hong Kong SAR China)"),
 		"zh_Hant_TW" => gettext("Chinese (Traditional, Taiwan)"),
-		"nl" => gettext("Dutch"),
+		"nl_NL" => gettext("Dutch"),
 		"en_US" => gettext("English"),
-		"fr" => gettext("French"),
+		"fr_FR" => gettext("French"),
 		"de_DE" => gettext("German (Germany)"),
-		"it" => gettext("Italian"),
-		"ko" => gettext("Korean"),
-		"nb" => gettext("Norwegian Bokmål"),
-		"pl" => gettext("Polish"),
+		"it_IT" => gettext("Italian"),
+		"ko_FR" => gettext("Korean"),
+		"nb_NO" => gettext("Norwegian Bokmål"),
+		"pl_PL" => gettext("Polish"),
 		"pt_PT" => gettext("Portuguese"),
 		"pt_BR" => gettext("Portuguese (Brazil)"),
-		"ru" => gettext("Russian"),
-		"es" => gettext("Spanish"),
+		"ru_RU" => gettext("Russian"),
+		"es_ES" => gettext("Spanish"),
 		"es_AR" => gettext("Spanish (Argentina)"),
 	);
 
