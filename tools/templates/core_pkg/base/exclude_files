@@ -1,4 +1,3 @@
-./boot
 ./boot.config
 ./cf/conf/config.xml
 ./cf/conf/enableserial_force
