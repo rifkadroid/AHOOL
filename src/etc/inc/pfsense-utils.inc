@@ -24,6 +24,27 @@
 require_once("config.inc");
 require_once("config.lib.inc");
 
+function dhcp_is_backend($dhcpbackend)
+{
+	return (dhcp_get_backend() === $dhcpbackend);
+}
+
+function dhcp_get_backend()
+{
+	$dhcpbackend = config_get_path('dhcpbackend');
+	return (in_array($dhcpbackend, ['isc', 'kea']) ? $dhcpbackend : 'isc');
+}
+
+function display_isc_warning()
+{
+	if (!dhcp_is_backend('isc') ||
+	    config_path_enabled('system', 'ignoreiscwarning')) {
+		return;
+	}
+
+	print_info_box(sprintf(gettext('ISC DHCP has reached end-of-life and will be removed in a future version of %s. Visit %s to switch DHCP backend.'), g_get('product_label'), sprintf('<a href="%s">%s</a>', 'system_advanced_network.php', 'System > Advanced > Networking')), 'warning', false);
+}
+
 /****f* pfsense-utils/have_natpfruleint_access
  * NAME
  *   have_natpfruleint_access
@@ -3719,4 +3740,3 @@ function set_curlproxy(&$ch) {
 		}
 	}
 }
-?>
