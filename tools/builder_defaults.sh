@@ -55,13 +55,13 @@ fi
 
 # Define pfSense versions
 PKG_REPO_BRANCH_DEVEL="devel"
-PKG_REPO_BRANCH_NEXT="v2_8_0"
-PKG_REPO_BRANCH_RELEASE="v2_7_0"
-PKG_REPO_BRANCH_PREVIOUS="v2_6_0"
+PKG_REPO_BRANCH_NEXT="v2_9_0"
+PKG_REPO_BRANCH_RELEASE="v2_8_0"
+PKG_REPO_BRANCH_PREVIOUS="v2_7_0"
 export PKG_REPO_BRANCH_DEVEL="devel"
-export PKG_REPO_BRANCH_NEXT="v2_8_0"
-export PKG_REPO_BRANCH_RELEASE="v2_7_0"
-export PKG_REPO_BRANCH_PREVIOUS="v2_6_0"
+export PKG_REPO_BRANCH_NEXT="v2_9_0"
+export PKG_REPO_BRANCH_RELEASE="v2_8_0"
+export PKG_REPO_BRANCH_PREVIOUS="v2_7_0"
 
 # Make sure pkg will not be interactive
 export ASSUME_ALWAYS_YES=true
@@ -119,7 +119,7 @@ GIT_REPO_BASE=$(git -C ${BUILDER_ROOT} config --get remote.$(git -C ${BUILDER_RO
 
 # This is used for using svn for retrieving src
 export FREEBSD_REPO_BASE=${FREEBSD_REPO_BASE:-"${GIT_REPO_BASE}/Freebsd-src"}
-export FREEBSD_BRANCH=${FREEBSD_BRANCH:-"${REPO_BRANCH_PREFIX}RELENG_2_7_0"}
+export FREEBSD_BRANCH=${FREEBSD_BRANCH:-"${REPO_BRANCH_PREFIX}RELENG_2_8_0"}
 export FREEBSD_SRC_DIR=${FREEBSD_SRC_DIR:-"${SCRATCHDIR}/FreeBSD-src"}
 
 export BUILD_KERNELS=${BUILD_KERNELS:-"${PRODUCT_NAME}"}
@@ -150,7 +150,7 @@ export MAKEOBJDIRPREFIX=${MAKEOBJDIRPREFIX:-"${SCRATCHDIR}/obj"}
 
 if [ -z "${MODULES_OVERRIDE}" ]; then
 	export MODULES_OVERRIDE_base="cc/cc_cdg cc/cc_chd cc/cc_cubic cc/cc_dctcp cc/cc_hd cc/cc_htcp cc/cc_vegas cryptodev dummynet fdescfs hwpmc i2c if_stf ipdivert ipfw ipfw_nat64 opensolaris usb/cdce usb/ipheth usb/ure usb/urndis zfs"
-	export MODULES_OVERRIDE_amd64="${MODULES_OVERRIDE_base}  amdsmn amdtemp  coretemp cpuctl cxgbe/tom   ipmi ix ixv   nmdm qlnx sfxge vmm"
+	export MODULES_OVERRIDE_amd64="${MODULES_OVERRIDE_base}  amdsmn amdtemp  coretemp cpuctl cxgbe/tom   ipmi ix ixv if_wg  nmdm qlnx sfxge vmm"
 	export MODULES_OVERRIDE="${MODULES_OVERRIDE_amd64}"
 fi
 
