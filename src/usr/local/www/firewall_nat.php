@@ -42,6 +42,8 @@ require_once("firewall_nat.inc");
 
 init_config_arr(array('nat', 'rule'));
 $a_nat = &$config['nat']['rule'];
+$rdr_srctype_flags = [SPECIALNET_ANY, SPECIALNET_CLIENTS, SPECIALNET_IFADDR, SPECIALNET_IFNET];
+$rdr_dsttype_flags = [SPECIALNET_ANY, SPECIALNET_SELF, SPECIALNET_CLIENTS, SPECIALNET_IFADDR, SPECIALNET_IFNET, SPECIALNET_VIPS];
 
 // Process $_POST/$_REQUEST =======================================================================
 if ($_REQUEST['savemsg']) {
@@ -220,7 +222,7 @@ foreach ($a_nat as $natent):
 <?php
 	endif;
 ?>
-							<?=str_replace('_', '_<wbr>', htmlspecialchars(pprint_address($natent['source'])))?>
+							<?=str_replace('_', '_<wbr>', htmlspecialchars(pprint_address($natent['source'], $rdr_srctype_flags)))?>
 <?php
 	if (isset($alias['src'])):
 ?>
@@ -255,7 +257,7 @@ foreach ($a_nat as $natent):
 <?php
 	endif;
 ?>
-							<?=str_replace('_', '_<wbr>', htmlspecialchars(pprint_address($natent['destination'])))?>
+							<?=str_replace('_', '_<wbr>', htmlspecialchars(pprint_address($natent['destination'], $rdr_dsttype_flags)))?>
 <?php
 	if (isset($alias['dst'])):
 ?>

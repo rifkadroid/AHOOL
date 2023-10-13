@@ -1054,6 +1054,7 @@ function services_kea4_configure()
 		'valid-lifetime' => 7200,
 		'max-valid-lifetime' => 86400,
 		'ip-reservations-unique' => false,
+		'echo-client-id' => false, /* RFC6842 compatibility mode */
 		'option-data' => [[
 			'name' => 'domain-name',
 			'data' => $syscfg['domain'],
@@ -1504,7 +1505,7 @@ function services_kea4_configure()
 						'only-if-required' => true,
 						'option-data' => [[
 							'name' => 'boot-file-name',
-							'data' => $dhcpifconf['filename']
+							'data' => $poolconf['filename']
 						]]
 					];
 					if (!is_array($keapool['require-client-classes'])) {
