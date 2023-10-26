@@ -1485,12 +1485,6 @@ function is_dhcp_server_enabled() {
 
 /* DHCP enabled on any interfaces? */
 function is_dhcpv6_server_enabled() {
-	foreach (config_get_path('interfaces', []) as $ifcfg) {
-		if (isset($ifcfg['enable']) && !empty($ifcfg['track6-interface'])) {
-			return true;
-		}
-	}
-
 	foreach (config_get_path('dhcpdv6', []) as $dhcpv6if => $dhcpv6ifconf) {
 		if (empty($dhcpv6ifconf)) {
 			continue;
@@ -3679,10 +3673,23 @@ function is_url_hostname_resolvable($url) {
 function get_pf_reserved(?string $name = '', bool $check_ifname = true):bool|array {
 	global $pf_reserved_keywords, $reserved_table_names, $FilterIflist;
 
-	// generate a list of assigned interfaces and interface groups
+	// get relevant interface names
 	$iflist = $FilterIflist;
 	if (empty($iflist)) {
+		// if list
 		$iflist = config_get_path('interfaces', []);
+		// l2tp
+		if (config_get_path('l2tp/mode') == "server") {
+			$iflist['l2tp'] = 'L2TP';
+		}
+		// pppoe
+		foreach (config_get_path('pppoes/pppoe', []) as $ifgen) {
+			if (array_key_exists('mode', $ifgen) && $ifgen['mode'] == 'server') {
+				$iflist['pppoe'] = 'pppoe';
+				break;
+			}
+		}
+		// add interface groups
 		foreach (config_get_path('ifgroups/ifgroupentry', []) as $ifgen) {
 			$iflist[$ifgen['ifname']] = $ifgen['ifname'];
 		}
@@ -3693,10 +3700,7 @@ function get_pf_reserved(?string $name = '', bool $check_ifname = true):bool|arr
 	 * Hence, a combination of the interface name (optX) + the suffix should be safe.
 	 */ 
 	$reserved = [];
-	foreach ($iflist as $if => $ifconf) {
-		if (empty($ifconf['descr'])) {
-			continue;
-		}
+	foreach (array_keys($iflist) as $if) {
 		if ($check_ifname) {
 			$reserved[] = strtoupper($if);
 		}
