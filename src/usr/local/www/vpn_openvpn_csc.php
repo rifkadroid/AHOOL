@@ -41,7 +41,7 @@ $a_csc = &$config['openvpn']['openvpn-csc'];
 init_config_arr(array('openvpn', 'openvpn-server'));
 
 $serveroptionlist = array();
-foreach ($config['openvpn']['openvpn-server'] as $serversettings) {
+foreach (config_get_path('openvpn/openvpn-server', []) as $serversettings) {
 	if (in_array($serversettings['mode'], $openvpn_tls_server_modes)) {
 		$serveroptionlist[$serversettings['vpnid']] = sprintf(gettext("OpenVPN Server %d: %s"), $serversettings['vpnid'], $serversettings['description']);
 	}
@@ -294,10 +294,11 @@ if ($_POST['save']) {
 		}
 
 		$csc['netbios_enable'] = $pconfig['netbios_enable'];
-		$csc['netbios_ntype'] = $pconfig['netbios_ntype'];
-		$csc['netbios_scope'] = $pconfig['netbios_scope'];
 
 		if ($pconfig['netbios_enable']) {
+			$csc['netbios_ntype'] = $pconfig['netbios_ntype'];
+			$csc['netbios_scope'] = $pconfig['netbios_scope'];
+
 			if ($pconfig['wins_server_enable']) {
 				$csc['wins_server1'] = $pconfig['wins_server1'];
 				$csc['wins_server2'] = $pconfig['wins_server2'];

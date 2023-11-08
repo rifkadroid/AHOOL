@@ -1718,7 +1718,7 @@ function get_configured_ip_addresses() {
 
 	/* pppoe server */
 	if (is_array($config['pppoes']) && is_array($config['pppoes']['pppoe'])) {
-		foreach ($config['pppoes']['pppoe'] as $pppoe) {
+		foreach (config_get_path('pppoes/pppoe', []) as $pppoe) {
 			if ($pppoe['mode'] == "server") {
 				if (is_ipaddr($pppoe['localip'])) {
 					$int = "poes". $pppoe['pppoeid'];
@@ -1860,7 +1860,7 @@ function get_interface_list($mode = "active", $keyby = "physical", $vfaces = fal
 				}
 			}
 			if (is_array($config['interfaces'])) {
-				foreach ($config['interfaces'] as $name => $int) {
+				foreach (config_get_path('interfaces', []) as $name => $int) {
 					if ($int['if'] == $ifname) {
 						$friendly = $name;
 					}
@@ -1896,7 +1896,7 @@ function get_lagg_interface_list() {
 
 	$plist = array();
 	if (isset($config['laggs']['lagg']) && is_array($config['laggs']['lagg'])) {
-		foreach ($config['laggs']['lagg'] as $lagg) {
+		foreach (config_get_path('laggs/lagg', []) as $lagg) {
 			$lagg['mac'] = get_interface_mac($lagg['laggif']);
 			$lagg['islagg'] = true;
 			$plist[$lagg['laggif']] = $lagg;
@@ -2074,7 +2074,7 @@ function alias_expand($name) {
 			return null;
 		}
 		/*
-		 * make sure if it's a url alias, it actually exists.
+		 * make sure if it's a url alias, it actually exists and valid URLs.
 		 * redmine #5845, #13068
 		 */
 		foreach (config_get_path('aliases/alias', []) as $alias) {
@@ -2083,6 +2083,13 @@ function alias_expand($name) {
 					if (is_URL($alias['url']) &&
 					    file_exists($urltable_filename) &&
 					    !empty(trim(file_get_contents($urltable_filename)))) {
+						return "\${$name}";
+					} elseif (is_array($alias['aliasurl'])) {
+						foreach ($alias['aliasurl'] as $aliasurl) {
+							if (!is_URL($aliasurl)) {
+								return null;
+							}
+						}
 						return "\${$name}";
 					} else {
 						return null;
@@ -2590,7 +2597,7 @@ function is_interface_mismatch() {
 	$i = 0;
 	$missing_interfaces = array();
 	if (is_array($config['interfaces'])) {
-		foreach ($config['interfaces'] as $ifcfg) {
+		foreach (config_get_path('interfaces', []) as $ifcfg) {
 			if (interface_is_vlan($ifcfg['if']) != NULL ||
 			    interface_is_qinq($ifcfg['if']) != NULL ||
 			    preg_match("/^bridge|^cua|^enc|^gif|^gre|^ipsec|^l2tp|^lagg|^ngeth|^ovpn|^ppp|^pptp|^tap|^tun|^ue|vlan|^wg|_wlan|_\d{0,4}_\d{0,4}$/i", $ifcfg['if'])) {
@@ -2609,7 +2616,7 @@ function is_interface_mismatch() {
 	/* VLAN/QinQ-only interface mismatch detection
 	 * see https://redmine.pfsense.org/issues/12170 */
 	init_config_arr(array('vlans', 'vlan'));
-	foreach ($config['vlans']['vlan'] as $vlan) {
+	foreach (config_get_path('vlans/vlan', []) as $vlan) {
 		if (!does_interface_exist($vlan['if']) &&
 		    !preg_match("/^enc|^cua|^tun|^tap|^l2tp|^pptp|^ppp|^ovpn|^ipsec|^gif|^gre|^lagg|^bridge|vlan|_wlan|_\d{0,4}_\d{0,4}$/i", $vlan['if'])) {
 			$missing_interfaces[] = $vlan['if'];
@@ -2617,7 +2624,7 @@ function is_interface_mismatch() {
 		}
 	}
 	init_config_arr(array('qinqs', 'qinqentry'));
-	foreach ($config['qinqs']['qinqentry'] as $qinq) {
+	foreach (config_get_path('qinqs/qinqentry', []) as $qinq) {
 		if (!does_interface_exist($qinq['if']) &&
 		    !preg_match("/^enc|^cua|^tun|^tap|^l2tp|^pptp|^ppp|^ovpn|^ipsec|^gif|^gre|^lagg|^bridge|vlan|_wlan|_\d{0,4}_\d{0,4}$/i", $qinq['if'])) {
 			$missing_interfaces[] = $qinq['if'];
@@ -3199,7 +3206,7 @@ function get_staticroutes($returnsubnetsonly = false, $returnhostnames = false, 
 	$allstaticroutes = array();
 	$allsubnets = array();
 	/* Loop through routes and expand aliases as we find them. */
-	foreach ($config['staticroutes']['route'] as $route) {
+	foreach (config_get_path('staticroutes/route', []) as $route) {
 		if ($returnenabledroutesonly && isset($route['disabled'])) {
 			continue;
 		}
@@ -4082,12 +4089,13 @@ function address_to_pconfig($adr, &$padr, &$pmask, &$pnot, &$pbeginport, &$pendp
 	}
 }
 
-function pconfig_to_address(&$adr, $padr, $pmask, $pnot = false, $pbeginport = 0, $pendport = 0, $addmask = false) {
+// does not support specialnet VIPs
+function pconfig_to_address(&$adr, $padr, $pmask, $pnot = false, $pbeginport = 0, $pendport = 0, $addmask = false, $specialnet_flags = []) {
 	$adr = array();
 
 	if ($padr == "any") {
 		$adr['any'] = true;
-	} else if (get_specialnet($padr)) {
+	} else if (get_specialnet($padr, $specialnet_flags)) {
 		if ($addmask) {
 			$padr .= "/" . $pmask;
 		}
@@ -4443,7 +4451,7 @@ function get_interface_vip_ips($interface) {
 	$vipips = '';
 
 	init_config_arr(array('virtualip', 'vip'));
-	foreach ($config['virtualip']['vip'] as $vip) {
+	foreach (config_get_path('virtualip/vip', []) as $vip) {
 		if (($vip['interface'] == $interface) &&
 		    (($vip['mode'] == "carp") || ($vip['mode'] == "ipalias"))) {
 			$vipips .= $vip['subnet'] . ' ';

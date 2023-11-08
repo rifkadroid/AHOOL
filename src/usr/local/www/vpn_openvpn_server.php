@@ -812,13 +812,9 @@ if ($_POST['save']) {
 		}
 
 		$server['netbios_enable'] = $pconfig['netbios_enable'];
-		$server['netbios_ntype'] = $pconfig['netbios_ntype'];
-		$server['netbios_scope'] = $pconfig['netbios_scope'];
-
-		$server['create_gw'] = $pconfig['create_gw'];
-		$server['verbosity_level'] = $pconfig['verbosity_level'];
-
 		if ($pconfig['netbios_enable']) {
+			$server['netbios_ntype'] = $pconfig['netbios_ntype'];
+			$server['netbios_scope'] = $pconfig['netbios_scope'];
 
 			if ($pconfig['wins_server_enable']) {
 				$server['wins_server1'] = $pconfig['wins_server1'];
@@ -829,6 +825,9 @@ if ($_POST['save']) {
 				$server['nbdd_server1'] = $pconfig['nbdd_server1'];
 			}
 		}
+
+		$server['create_gw'] = $pconfig['create_gw'];
+		$server['verbosity_level'] = $pconfig['verbosity_level'];
 
 		if ($_POST['duplicate_cn'] == "yes") {
 			$server['duplicate_cn'] = true;
@@ -2139,7 +2138,7 @@ events.push(function() {
 	}
 
 	function wins_server_change() {
-		var hide  = ! $('#wins_server_enable').prop('checked')
+		var hide  = (! $('#wins_server_enable').prop('checked') || ! $('#netbios_enable').prop('checked'))
 
 		hideInput('wins_server1', hide);
 		hideInput('wins_server2', hide);
