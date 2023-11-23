@@ -39,7 +39,8 @@ if (isset($_POST['referer'])) {
 
 global $gateway_state_kill_modes;
 
-$a_gateways = return_gateways_array(true, false, true, true);
+refresh_gateways_cache(); // make sure we're working on a current gateway list
+$a_gateways = get_gateways(GW_CACHE_INDEXED);
 
 init_config_arr(array('gateways', 'gateway_item'));
 $a_gateway_item = &$config['gateways']['gateway_item'];
@@ -265,7 +266,7 @@ $btnadv = new Form_Button(
 	'btnadvopts',
 	'Display Advanced',
 	null,
-	'fa-cog'
+	'fa-solid fa-cog'
 );
 
 $btnadv->setAttribute('type','button')->addClass('btn-info btn-sm');
@@ -469,7 +470,7 @@ events.push(function() {
 		} else {
 			text = "<?=gettext('Display Advanced');?>";
 		}
-		$('#btnadvopts').html('<i class="fa fa-cog"></i> ' + text);
+		$('#btnadvopts').html('<i class="fa-solid fa-cog"></i> ' + text);
 	}
 
 	$('#btnadvopts').click(function(event) {

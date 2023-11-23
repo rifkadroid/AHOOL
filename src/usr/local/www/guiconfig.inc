@@ -309,7 +309,7 @@ function sprint_info_box($msg, $class="alert-warning", $btnname = "close", $btnt
 			$btntext = $btnname;
 		}
 		if (!empty($btnicon)) {
-			$btnicon = '<i class="fa ' . $btnicon . ' icon-embed-btn"></i>';
+			$btnicon = '<i class="' . $btnicon . ' icon-embed-btn"></i>';
 		}
 
 		$msg .= '<form method="post" class="pull-right"><button type="submit" class="btn btn-' . $btnclass . '" name="'. $btnname . '" value="' . $btntext . '">' . $btnicon . $btntext . '</button>';
@@ -330,7 +330,7 @@ function print_info_box($msg, $class="alert-warning", $btnname = "close", $btnte
 }
 
 function print_apply_box($msg) {
-	print_info_box($msg, "warning", "apply", gettext("Apply Changes"), 'fa-check', 'success');
+	print_info_box($msg, "warning", "apply", gettext("Apply Changes"), 'fa-solid fa-check', 'success');
 }
 
 // Format and print a box reporting that changes have been applied
@@ -983,7 +983,7 @@ function gateway_info_popup($showgw, $gateways_status = false) {
 	init_config_arr(array('gateways', 'gateway_group'));
 	/* Get groups indexed by name so we can avoid re-scanning the array
 	 * multiple times later unnecessarily. */
-	$a_gateways = return_gateways_array(true, false, true, false);
+	$a_gateways = get_gateways(GW_CACHE_DISABLED | GW_CACHE_INACTIVE);
 
 	/* Use cached gateway status if available.
 	 * See https://redmine.pfsense.org/issues/12174 */

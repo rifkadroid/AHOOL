@@ -42,7 +42,7 @@ $pconfig['hostname'] = $config['system']['hostname'];
 $pconfig['domain'] = $config['system']['domain'];
 $pconfig['dnsserver'] = $config['system']['dnsserver'];
 
-$arr_gateways = return_gateways_array();
+$arr_gateways = get_gateways();
 
 // set default columns to two if unset
 if (!isset($config['system']['webgui']['dashboardcolumns'])) {
@@ -609,7 +609,7 @@ foreach ($pconfig['dnsserver'] as $dnsserver) {
 		'deleterow' . $dnsserver_num,
 		'Delete',
 		null,
-		'fa-trash'
+		'fa-solid fa-trash-can'
 	))->setWidth(2)->addClass('btn-warning');
 
 	$section->add($group);
@@ -620,7 +620,7 @@ $section->addInput(new Form_Button(
 	'addrow',
 	'Add DNS Server',
 	null,
-	'fa-plus'
+	'fa-solid fa-plus'
 ))->addClass('btn-success addbtn');
 
 $section->addInput(new Form_Checkbox(

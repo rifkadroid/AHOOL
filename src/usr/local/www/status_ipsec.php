@@ -145,7 +145,7 @@ function print_ipsec_body() {
 	<td>
 		<?= htmlspecialchars($cmap[$ikeid]['p1']['descr']) ?>
 		<br/>
-		<a class="fa fa-pencil" href="vpn_ipsec_phase1.php?ikeid=<?= htmlspecialchars($ikeid) ?>"
+		<a class="fa-solid fa-pencil" href="vpn_ipsec_phase1.php?ikeid=<?= htmlspecialchars($ikeid) ?>"
 			title="<?= htmlspecialchars(gettext("Edit Phase 1 Entry")) ?>">
 		</a>
 	</td>
@@ -297,7 +297,7 @@ function print_ipsec_body() {
 	<div>
 <?php		if ((count($ikesa['child-sas']) + count($p2disconnected)) > 0): ?>
 		<a type="button" id="btnchildsa-<?= htmlspecialchars($child_key) ?>" class="btn btn-sm btn-info">
-		<i class="fa fa-plus-circle icon-embed-btn"></i>
+		<i class="fa-solid fa-plus-circle icon-embed-btn"></i>
 		<?= htmlspecialchars(gettext('Show child SA entries')) ?>
 <?php
 			$p2counts = count($ikesa['child-sas']) . " " . gettext("Connected");
@@ -354,7 +354,7 @@ function print_ipsec_body() {
 			<?= htmlspecialchars($p2descr) ?>
 <?php				if (!empty($p2uid) && ($p2descr != gettext("Multiple"))): ?>
 			<br/>
-			<a class="fa fa-pencil" href="vpn_ipsec_phase2.php?uniqid=<?= htmlspecialchars($p2uid) ?>"
+			<a class="fa-solid fa-pencil" href="vpn_ipsec_phase2.php?uniqid=<?= htmlspecialchars($p2uid) ?>"
 				title="<?= gettext("Edit Phase 2 Entry") ?>">
 			</a>
 <?php				endif ?>
@@ -478,7 +478,7 @@ function print_ipsec_body() {
 		<td>
 			<?= htmlspecialchars($p2['descr']) ?>
 			<br/>
-			<a class="fa fa-pencil" href="vpn_ipsec_phase2.php?uniqid=<?= htmlspecialchars($p2['uniqid']) ?>"
+			<a class="fa-solid fa-pencil" href="vpn_ipsec_phase2.php?uniqid=<?= htmlspecialchars($p2['uniqid']) ?>"
 				title="<?= htmlspecialchars(gettext("Edit Phase 2 Entry")) ?>">
 			</a>
 		</td>
@@ -508,7 +508,6 @@ function print_ipsec_body() {
 	}
 
 	$rgmap = array();
-	$gateways_status = return_gateways_status(true);
 
 	foreach ($cmap as $p1) {
 		if (!array_key_exists('p1', $p1) ||
@@ -531,7 +530,7 @@ function print_ipsec_body() {
 	<td>
 		<b><?= htmlspecialchars(gettext("ID:")) ?></b>
 <?php
-		list ($myid_type, $myid_data) = ipsec_find_id($ph1ent, "local", array(), $gateways_status);
+		list ($myid_type, $myid_data) = ipsec_find_id($ph1ent, "local", array());
 		if (empty($myid_data)) {
 			$myid_data = gettext("Unknown");
 		}
@@ -540,7 +539,7 @@ function print_ipsec_body() {
 		<br/>
 		<b><?= htmlspecialchars(gettext("Host:")) ?></b>
 <?php
-		$ph1src = ipsec_get_phase1_src($ph1ent, $gateways_status);
+		$ph1src = ipsec_get_phase1_src($ph1ent);
 		if (empty($ph1src)) {
 			$ph1src = gettext("Unknown");
 		} else {
@@ -553,7 +552,7 @@ function print_ipsec_body() {
 <?php		if (!isset($ph1ent['mobile'])): ?>
 		<b><?= htmlspecialchars(gettext("ID:")) ?></b>
 <?php
-		list ($peerid_type, $peerid_data) = ipsec_find_id($ph1ent, "peer", $rgmap, $gateways_status);
+		list ($peerid_type, $peerid_data) = ipsec_find_id($ph1ent, "peer", $rgmap);
 		if (empty($peerid_data)) {
 			$peerid_data = gettext("Unknown");
 		}
@@ -626,7 +625,7 @@ display_top_tabs($tab_array);
 			<tbody id="ipsec-body">
 				<tr>
 					<td colspan="10">
-						<?= print_info_box('<i class="fa fa-gear fa-spin"></i>&nbsp;&nbsp;' .
+						<?= print_info_box('<i class="fa-solid fa-gear fa-spin"></i>&nbsp;&nbsp;' .
 						   gettext("Collecting IPsec status information."), "warning", "") ?>
 					</td>
 				</tr>

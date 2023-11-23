@@ -445,7 +445,7 @@ $btnadv = new Form_Button(
 	'btnadvopts',
 	'Display Advanced',
 	null,
-	'fa-cog'
+	'fa-solid fa-cog'
 );
 
 $btnadv->setAttribute('type','button')->addClass('btn-info btn-sm');
@@ -697,7 +697,7 @@ events.push(function() {
 		} else {
 			text = "<?=gettext('Display Advanced');?>";
 		}
-		$('#btnadvopts').html('<i class="fa fa-cog"></i> ' + text);
+		$('#btnadvopts').html('<i class="fa-solid fa-cog"></i> ' + text);
 	}
 
 	$('#btnadvopts').click(function(event) {

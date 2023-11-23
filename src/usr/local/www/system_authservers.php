@@ -83,7 +83,7 @@ if ($_REQUEST['ajax']) {
 			'svcontbtn',
 			'Save',
 			null,
-			'fa-save'
+			'fa-solid fa-save'
 		);
 
 		$btnsv->removeClass("btn-default)")->addClass("btn-primary");
@@ -521,9 +521,9 @@ if (!($act == "new" || $act == "edit" || $input_errors)) {
 						<td><?=htmlspecialchars($server['host'])?></td>
 						<td>
 						<?php if ($i < (count($a_server) - 1)): ?>
-							<a class="fa fa-pencil" title="<?=gettext("Edit server"); ?>" href="system_authservers.php?act=edit&amp;id=<?=$i?>"></a>
-							<a class="fa fa-clone" title="<?=gettext("Copy server"); ?>" href="system_authservers.php?act=dup&amp;id=<?=$i?>"></a>
-							<a class="fa fa-trash"  title="<?=gettext("Delete server")?>" href="system_authservers.php?act=del&amp;id=<?=$i?>" usepost></a>
+							<a class="fa-solid fa-pencil" title="<?=gettext("Edit server"); ?>" href="system_authservers.php?act=edit&amp;id=<?=$i?>"></a>
+							<a class="fa-regular fa-clone" title="<?=gettext("Copy server"); ?>" href="system_authservers.php?act=dup&amp;id=<?=$i?>"></a>
+							<a class="fa-solid fa-trash-can"  title="<?=gettext("Delete server")?>" href="system_authservers.php?act=del&amp;id=<?=$i?>" usepost></a>
 						<?php endif?>
 						</td>
 					</tr>
@@ -536,7 +536,7 @@ if (!($act == "new" || $act == "edit" || $input_errors)) {
 
 <nav class="action-buttons">
 	<a href="?act=new" class="btn btn-success btn-sm">
-		<i class="fa fa-plus icon-embed-btn"></i>
+		<i class="fa-solid fa-plus icon-embed-btn"></i>
 		<?=gettext("Add")?>
 	</a>
 </nav>
@@ -667,7 +667,7 @@ $group->add(new Form_Button(
 	'Select',
 	'Select a container',
 	null,
-	'fa-search'
+	'fa-solid fa-search'
 ))->setAttribute('type','button')->addClass('btn-info');
 
 $section->add($group);

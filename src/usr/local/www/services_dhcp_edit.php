@@ -225,6 +225,11 @@ if ($_POST['save']) {
 			$input_errors[] = gettext("This MAC address or Client identifier already exists.");
 			break;
 		}
+		if (($mapent['ipaddr'] == $_POST['ipaddr']) && $mapent['ipaddr']) {
+			set_flash_message('alert-info', sprintf(gettext('The IP address %1$s is in use by another static DHCP mapping. ' .
+			'This has the potential to cause an IP conflict.'), $mapent['ipaddr']));
+			break;
+		}
 	}
 
 	/* make sure it's not within the dynamic subnet */
@@ -453,9 +458,9 @@ if ($_POST['save']) {
 
 		/* Configure static ARP entry, or remove ARP entry if this host is dynamic. See https://redmine.pfsense.org/issues/6821 */
 		if ($mapent['arp_table_static_entry']) {
-			mwexec("/usr/sbin/arp -S " . escapeshellarg($mapent['ipaddr']) . " " . escapeshellarg($mapent['mac']));
+			mwexec("/usr/sbin/arp -S " . escapeshellarg($mapent['ipaddr']) . " " . escapeshellarg($mapent['mac']) . " >/dev/null", true);
 		} else {
-			mwexec("/usr/sbin/arp -d " . escapeshellarg($mapent['ipaddr']));
+			mwexec("/usr/sbin/arp -d " . escapeshellarg($mapent['ipaddr']) . " >/dev/null", true);
 		}
 
 		header("Location: services_dhcp.php?if={$if}");
@@ -515,7 +520,7 @@ $btnmymac = new Form_Button(
 	'btnmymac',
 	gettext('Copy My MAC'),
 	null,
-	'fa-clone'
+	'fa-regular fa-clone'
 	);
 
 $btnmymac->setAttribute('type','button')->removeClass('btn-primary')->addClass('btn-success btn-sm');
@@ -699,7 +704,7 @@ $btnadv = new Form_Button(
 	'btnadvdns',
 	gettext('Display Advanced'),
 	null,
-	'fa-cog'
+	'fa-solid fa-cog'
 );
 
 $btnadv->setAttribute('type','button')->addClass('btn-info btn-sm');
@@ -773,7 +778,7 @@ $btnadv = new Form_Button(
 	'btnadvntp',
 	gettext('Display Advanced'),
 	null,
-	'fa-cog'
+	'fa-solid fa-cog'
 );
 
 $btnadv->setAttribute('type','button')->addClass('btn-info btn-sm');
@@ -798,7 +803,7 @@ $btnadv = new Form_Button(
 	'btnadvtftp',
 	gettext('Display Advanced'),
 	null,
-	'fa-cog'
+	'fa-solid fa-cog'
 );
 
 $btnadv->setAttribute('type','button')->addClass('btn-info btn-sm');
@@ -822,7 +827,7 @@ $btnadv = new Form_Button(
 	'btnadvldap',
 	gettext('Display Advanced'),
 	null,
-	'fa-cog'
+	'fa-solid fa-cog'
 );
 
 $btnadv->setAttribute('type','button')->addClass('btn-info btn-sm');
@@ -846,7 +851,7 @@ $btnadv = new Form_Button(
 	'btnadvnwkboot',
 	'Display Advanced',
 	null,
-	'fa-cog'
+	'fa-solid fa-cog'
 );
 
 $btnadv->setAttribute('type','button')->addClass('btn-info btn-sm');
@@ -929,7 +934,7 @@ $btnadv = new Form_Button(
 	'btnadvopts',
 	gettext('Display Advanced'),
 	null,
-	'fa-cog'
+	'fa-solid fa-cog'
 );
 
 $btnadv->setAttribute('type','button')->addClass('btn-info btn-sm');
@@ -995,7 +1000,7 @@ foreach ($pconfig['numberoptions']['item'] as $item) {
 		'deleterow' . $counter,
 		gettext('Delete'),
 		null,
-		'fa-trash'
+		'fa-solid fa-trash-can'
 	))->addClass('btn-sm btn-warning');
 
 	$section->add($group);
@@ -1008,7 +1013,7 @@ $group->add(new Form_Button(
 	'addrow',
 	gettext('Add Custom Option'),
 	null,
-	'fa-plus'
+	'fa-solid fa-plus'
 ))->addClass('btn-success')
   ->setHelp(gettext('Enter the DHCP option number, type and the value for each item to include in the DHCP lease information.'));
 $section->add($group);
@@ -1065,7 +1070,7 @@ events.push(function() {
 		} else {
 			text = "<?=gettext('Display Advanced');?>";
 		}
-		$('#btnadvdns').html('<i class="fa fa-cog"></i> ' + text);
+		$('#btnadvdns').html('<i class="fa-solid fa-cog"></i> ' + text);
 	}
 
 	$('#btnadvdns').click(function(event) {
@@ -1102,7 +1107,7 @@ events.push(function() {
 		} else {
 			text = "<?=gettext('Display Advanced');?>";
 		}
-		$('#btnadvntp').html('<i class="fa fa-cog"></i> ' + text);
+		$('#btnadvntp').html('<i class="fa-solid fa-cog"></i> ' + text);
 	}
 
 	$('#btnadvntp').click(function(event) {
@@ -1136,7 +1141,7 @@ events.push(function() {
 		} else {
 			text = "<?=gettext('Display Advanced');?>";
 		}
-		$('#btnadvtftp').html('<i class="fa fa-cog"></i> ' + text);
+		$('#btnadvtftp').html('<i class="fa-solid fa-cog"></i> ' + text);
 	}
 
 	$('#btnadvtftp').click(function(event) {
@@ -1170,7 +1175,7 @@ events.push(function() {
 		} else {
 			text = "<?=gettext('Display Advanced');?>";
 		}
-		$('#btnadvldap').html('<i class="fa fa-cog"></i> ' + text);
+		$('#btnadvldap').html('<i class="fa-solid fa-cog"></i> ' + text);
 	}
 
 	$('#btnadvldap').click(function(event) {
@@ -1205,7 +1210,7 @@ events.push(function() {
 		} else {
 			text = "<?=gettext('Display Advanced');?>";
 		}
-		$('#btnadvopts').html('<i class="fa fa-cog"></i> ' + text);
+		$('#btnadvopts').html('<i class="fa-solid fa-cog"></i> ' + text);
 	}
 
 	$('#btnadvopts').click(function(event) {
@@ -1247,7 +1252,7 @@ events.push(function() {
 		} else {
 			text = "<?=gettext('Display Advanced');?>";
 		}
-		$('#btnadvnwkboot').html('<i class="fa fa-cog"></i> ' + text);
+		$('#btnadvnwkboot').html('<i class="fa-solid fa-cog"></i> ' + text);
 	}
 
 	$('#btnadvnwkboot').click(function(event) {

@@ -1418,7 +1418,7 @@ foreach (['src' => gettext('Source'), 'dst' => gettext('Destination')] as $type 
 			'btnsrctoggle',
 			'',
 			null,
-			'fa-cog'
+			'fa-solid fa-cog'
 		))->setAttribute('type','button')->addClass('btn-info btn-sm')->setHelp(
 			'The %1$sSource Port Range%2$s for a connection is typically random '.
 			'and almost never equal to the destination port. '.
@@ -1492,7 +1492,7 @@ $btnadv = new Form_Button(
 	'btnadvopts',
 	'Display Advanced',
 	null,
-	'fa-cog'
+	'fa-solid fa-cog'
 );
 
 $btnadv->setAttribute('type','button')->addClass('btn-info btn-sm');
@@ -1673,7 +1673,7 @@ $section->addInput(new Form_Select(
 // Build the gateway lists in JSON so the selector can be populated in JS
 $gwjson = '[{"name":"", "gateway":"Default", "family":"inet46"}';
 
-foreach (return_gateways_array() as $gwname => $gw) {
+foreach (get_gateways() as $gwname => $gw) {
 	$gwjson = $gwjson . "," .'{"name":' . json_encode($gwname) . ', "gateway":' .
 	json_encode($gw['name'] . (empty($gw['gateway'])? '' : ' - '. $gw['gateway']) . (empty($gw['descr'])? '' : ' - '. $gw['descr'])) . ',"family":' .
 	json_encode($gw['ipprotocol']) . '}';
@@ -1786,7 +1786,7 @@ events.push(function() {
 		} else {
 			text = "<?=gettext('Display Advanced');?>";
 		}
-		$('#btnadvopts').html('<i class="fa fa-cog"></i> ' + text);
+		$('#btnadvopts').html('<i class="fa-solid fa-cog"></i> ' + text);
 	}
 
 	$('#btnadvopts').click(function(event) {
@@ -1859,7 +1859,7 @@ events.push(function() {
 			text = "<?=gettext('Display Advanced');?>";
 		}
 
-		$('#btnsrctoggle').html('<i class="fa fa-cog"></i> ' + text);
+		$('#btnsrctoggle').html('<i class="fa-solid fa-cog"></i> ' + text);
 	}
 
 	function typesel_change() {

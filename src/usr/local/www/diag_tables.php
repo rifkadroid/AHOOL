@@ -152,14 +152,14 @@ if ($bogons || $urltable || !empty($entries)) {
 			'Download',
 			'Update',
 			null,
-			'fa-refresh'
+			'fa-solid fa-arrows-rotate'
 		))->addClass('btn-success btn-sm');
 	} elseif (!empty($entries)) {
 		$group->add(new Form_Button(
 			'clearall',
 			'Empty Table',
 			null,
-			'fa-trash'
+			'fa-solid fa-trash-can'
 		))->addClass('btn-danger btn-sm');
 	}
 }
@@ -291,7 +291,7 @@ if (empty($entries)) {
 						<td>
 							<?php if (!$bogons && !$urltable): ?>
 								<a style="cursor: pointer;" data-entry="<?=htmlspecialchars($entry)?>">
-									<i class="fa fa-trash" title="<?= gettext("Remove this entry") ?>"></i>
+									<i class="fa-solid fa-trash-can" title="<?= gettext("Remove this entry") ?>"></i>
 								</a>
 							<?php endif ?>
 						</td>

@@ -219,8 +219,7 @@ function is_service_enabled($service_name) {
 		case 'dpinger':
 			/* TODO: Should loop through gateways and check to make
 			 *       sure they don't all have monitoring disabled. */
-			$gateways_arr = return_gateways_array();
-			return is_array($gateways_arr) && !empty($gateways_arr);
+			return !empty(get_gateways());
 			break;
 		case 'igmpproxy':
 			return (config_path_enabled('igmpproxy') && !empty(config_get_path('igmpproxy/igmpentry', [])));
@@ -427,8 +426,7 @@ function get_services() {
 		$services[] = $pconfig;
 	}
 
-	$gateways_arr = return_gateways_array();
-	if (is_array($gateways_arr) && !empty($gateways_arr)) {
+	if (!empty(get_gateways())) {
 		$pconfig = array();
 		$pconfig['name'] = "dpinger";
 		$pconfig['description'] = gettext("Gateway Monitoring Daemon");
@@ -616,20 +614,20 @@ function get_service_status_icon($service, $withtext = true, $smallicon = false,
 	if (get_service_status($service)) {
 		$statustext = gettext("Running");
 		$text_class = "text-success";
-		$fa_class = "fa fa-check-circle";
-		$fa_class_thumbs = "fa fa-thumbs-o-up";
+		$fa_class = "fa-solid fa-check-circle";
+		$fa_class_thumbs = "fa-regular fa-thumbs-up";
 		$Thumbs_UpDown = "Thumbs up";
 	} else {
 		if (is_service_enabled($service['name'])) {
 			$statustext = gettext("Stopped");
 			$text_class = "text-danger";
-			$fa_class = "fa fa-times-circle";
+			$fa_class = "fa-solid fa-times-circle";
 		} else {
 			$statustext = gettext("Disabled");
 			$text_class = "text-warning";
-			$fa_class = "fa fa-ban";
+			$fa_class = "fa-solid fa-ban";
 		}
-		$fa_class_thumbs = "fa fa-thumbs-o-down";
+		$fa_class_thumbs = "fa-regular fa-thumbs-down";
 		$Thumbs_UpDown = "Thumbs down";
 	}
 	$fa_size = ($smallicon) ? "fa-1x" : "fa-lg";
@@ -688,7 +686,7 @@ function get_service_control_links($service, $addname = false) {
 				$output .= '<a href="#" id="restartservice-' . $service['name'] . '" >';
 		}
 
-		$output .= "<i class=\"fa fa-repeat\" title=\"" . sprintf(gettext("Restart %sService"), $stitle) . "\"></i></a>\n";
+		$output .= "<i class=\"fa-solid fa-arrow-rotate-right\" title=\"" . sprintf(gettext("Restart %sService"), $stitle) . "\"></i></a>\n";
 
 		switch ($service['name']) {
 			case "openvpn":
@@ -701,14 +699,14 @@ function get_service_control_links($service, $addname = false) {
 				$output .= '<a href="#" id="stopservice-' . $service['name'] . '">';
 		}
 
-		$output .= "<i class=\"fa fa-stop-circle-o\" title=\"" . sprintf(gettext("Stop %sService"), $stitle) . "\"></i></a>";
+		$output .= "<i class=\"fa-regular fa-circle-stop\" title=\"" . sprintf(gettext("Stop %sService"), $stitle) . "\"></i></a>";
 
 	} else {
 		$service_enabled = is_service_enabled($service['name']);
 
 		if ($service['name'] == 'openvpn' || $service['name'] == 'captiveportal' || $service_enabled) {
 			$output .= sprintf($link, sprintf(gettext("Start %sService"), $stitle), 'startservice');
-			$output .= '<i class="fa fa-play-circle"></i></a> ';
+			$output .= '<i class="fa-solid fa-play-circle"></i></a> ';
 		}
 	}
 

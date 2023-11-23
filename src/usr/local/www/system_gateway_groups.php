@@ -86,7 +86,7 @@ if ($_POST['act'] == "del") {
 }
 
 function gateway_exists($gwname) {
-	$gateways = return_gateways_array();
+	$gateways = get_gateways();
 
 	if (is_array($gateways)) {
 		foreach ($gateways as $gw) {
@@ -166,9 +166,9 @@ foreach ($a_gateway_groups as $gateway_group):
 							<?=htmlspecialchars($gateway_group['descr'])?>
 						</td>
 						<td>
-							<a href="system_gateway_groups_edit.php?id=<?=$i?>" class="fa fa-pencil" title="<?=gettext('Edit gateway group')?>"></a>
-							<a href="system_gateway_groups_edit.php?dup=<?=$i?>" class="fa fa-clone" title="<?=gettext('Copy gateway group')?>"></a>
-							<a href="system_gateway_groups.php?act=del&amp;id=<?=$i?>" class="fa fa-trash" title="<?=gettext('Delete gateway group')?>" usepost></a>
+							<a href="system_gateway_groups_edit.php?id=<?=$i?>" class="fa-solid fa-pencil" title="<?=gettext('Edit gateway group')?>"></a>
+							<a href="system_gateway_groups_edit.php?dup=<?=$i?>" class="fa-regular fa-clone" title="<?=gettext('Copy gateway group')?>"></a>
+							<a href="system_gateway_groups.php?act=del&amp;id=<?=$i?>" class="fa-solid fa-trash-can" title="<?=gettext('Delete gateway group')?>" usepost></a>
 						</td>
 					</tr>
 <?php
@@ -183,7 +183,7 @@ endforeach;
 
 <nav class="action-buttons">
 	<a href="system_gateway_groups_edit.php" class="btn btn-success btn-sm">
-		<i class="fa fa-plus icon-embed-btn"></i>
+		<i class="fa-solid fa-plus icon-embed-btn"></i>
 		<?=gettext('Add')?>
 	</a>
 </nav>

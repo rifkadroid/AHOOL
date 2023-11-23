@@ -310,6 +310,7 @@ if ($_POST['save']) {
 			config_del_path('ipsec/client/user_source');
 		}
 
+		config_set_path('ipsec/client/group_source', (($pconfig['group_source'] == 'yes') ? "enabled" : "disabled"));
 		if (($pconfig['group_source'] == 'yes') && !empty($pconfig['auth_groups'])) {
 			config_set_path('ipsec/client/auth_groups', implode(",", $pconfig['auth_groups']));
 		} else {
@@ -573,7 +574,7 @@ foreach (config_get_path('ipsec/phase1', []) as $ph1ent) {
 	}
 }
 if ($pconfig['enable'] && !$ph1found) {
-	print_info_box(gettext("Support for IPsec Mobile Clients is enabled but a Phase 1 definition was not found") . ".<br />" . gettext("Please click Create to define one."), "warning", "create", gettext("Create Phase 1"), 'fa-plus', 'success');
+	print_info_box(gettext("Support for IPsec Mobile Clients is enabled but a Phase 1 definition was not found") . ".<br />" . gettext("Please click Create to define one."), "warning", "create", gettext("Create Phase 1"), 'fa-solid fa-plus', 'success');
 }
 
 if ($input_errors) {

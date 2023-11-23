@@ -1025,7 +1025,8 @@ function filter_generate_gateways() {
 	update_filter_reload_status(gettext("Creating gateway group item..."));
 
 	/* Lookup Gateways to be used in filter rules once */
-	$GatewaysList = return_gateways_array();
+	refresh_gateways_cache(); // make sure rules are generated from a current gateway list
+	$GatewaysList = get_gateways();
 	$GatewayGroupsList = return_gateway_groups_array(true);
 	$GatewaysStatus = return_gateways_status(true);
 
@@ -1164,12 +1165,20 @@ function filter_get_vpns_list() {
 		   See https://redmine.pfsense.org/issues/7005 */
 		$pool_address = config_get_path('ipsec/client/pool_address');
 		$pool_netbits = config_get_path('ipsec/client/pool_netbits');
-		if (config_path_enabled('ipsec/client')
-			&& isset($pool_address)
-			&& isset($pool_netbits)) {
-			$client_subnet = "{$pool_address}/{$pool_netbits}";
-			if (is_subnet($client_subnet)) {
-				 $vpns_arr[] = $client_subnet;
+		$pool_address_v6 = config_get_path('ipsec/client/pool_address_v6');
+		$pool_netbits_v6 = config_get_path('ipsec/client/pool_netbits_v6');
+		if (config_path_enabled('ipsec/client')) {
+			if (isset($pool_address) && isset($pool_netbits)) {
+				$client_subnet = "{$pool_address}/{$pool_netbits}";
+				if (is_subnet($client_subnet)) {
+					 $vpns_arr[] = $client_subnet;
+				}
+			}
+			if (isset($pool_address_v6) && isset($pool_netbits_v6)) {
+				$client_subnet = "{$pool_address_v6}/{$pool_netbits_v6}";
+				if (is_subnet($client_subnet)) {
+					 $vpns_arr[] = $client_subnet;
+				}
 			}
 		}
 		foreach (config_get_path('ipsec/phase2', []) as $ph2ent) {
@@ -1996,7 +2005,7 @@ function filter_nat_rules_outbound_automatic($src) {
 		$natent['interface'] = $if;
 		$natent['source']['network'] = $src;
 		$natent['dstport'] = "500";
-		$natent['target'] = "";
+		$natent['target'] = "{$if}ip";
 		$natent['destination']['any'] = true;
 		$natent['staticnatport'] = true;
 		$natent['descr'] = gettext('Auto created rule for ISAKMP');
@@ -2006,7 +2015,7 @@ function filter_nat_rules_outbound_automatic($src) {
 		$natent['interface'] = $if;
 		$natent['source']['network'] = $src;
 		$natent['sourceport'] = "";
-		$natent['target'] = "";
+		$natent['target'] = "{$if}ip";
 		$natent['destination']['any'] = true;
 		$natent['natport'] = "";
 		$natent['descr'] = gettext('Auto created rule');
@@ -2442,7 +2451,7 @@ function filter_nat_rules_generate() {
 
 			if (!$obent['interface'] || !isset($FilterIflist[$obent['interface']])) {
 				$error_text = sprintf(gettext("Missing interface '%1\$s' for rule '%2\$s'"), $obent['interface'], $descr);
-				$natrules .= "# {$error_text}";
+				$natrules .= "# {$error_text}\n";
 				continue;
 			}
 
@@ -2453,7 +2462,7 @@ function filter_nat_rules_generate() {
 				if (empty($src)) {
 					$error_text = sprintf(gettext("Unresolvable source alias '%1\$s' for rule '%2\$s'"), $src, $descr);
 					file_notice("Filter_Reload", $error_text);
-					$natrules .= "# {$error_text}";
+					$natrules .= "# {$error_text}\n";
 					continue;
 				}
 			}
@@ -2467,7 +2476,7 @@ function filter_nat_rules_generate() {
 				}
 				if ($error_text) {
 					file_notice("Filter_Reload", $error_text);
-					$natrules .= "# {$error_text}";
+					$natrules .= "# {$error_text}\n";
 					continue;
 				}
 			}
@@ -2479,7 +2488,7 @@ function filter_nat_rules_generate() {
 				if (empty($dst)) {
 					$error_text = sprintf(gettext("Unresolvable destination alias '%1\$s' for rule '%2\$s'"), $dst, $descr);
 					file_notice("Filter_Reload", $error_text);
-					$natrules .= "# {$error_text}";
+					$natrules .= "# {$error_text}\n";
 					continue;
 				}
 			}
@@ -2493,7 +2502,7 @@ function filter_nat_rules_generate() {
 				}
 				if ($error_text) {
 					file_notice("Filter_Reload", $error_text);
-					$natrules .= "# {$error_text}";
+					$natrules .= "# {$error_text}\n";
 					continue;
 				}
 			}
@@ -2522,7 +2531,7 @@ function filter_nat_rules_generate() {
 					$inet6 = true;
 				}
 				if ($inet4 && $inet6) {
-					$natrules .= "# conflicting ipv4/ipv6 settings in nat rule: {$descr}";
+					$natrules .= "# conflicting ipv4/ipv6 settings in nat rule: {$descr}\n";
 					continue;
 				} elseif ($inet4 || $inet6) {
 					$obent['ipprotocol'] = ($inet4) ? 'inet' : 'inet6';
@@ -4676,6 +4685,7 @@ function filter_generate_ipsec_rules($log = array()) {
 	}
 	if (ipsec_enabled()) {
 		/* step through all phase1 entries */
+		$a_groups = return_gateway_groups_array(true);
 		foreach (config_get_path('ipsec/phase1', []) as $ph1ent) {
 			$tracker += 10;
 
@@ -4722,7 +4732,6 @@ function filter_generate_ipsec_rules($log = array()) {
 				}
 			}
 
-			$a_groups = return_gateway_groups_array(true);
 			if (is_array($a_groups[$ph1ent['interface']])) {
 				// bound to gateway group
 				$parentinterface = get_failover_interface($ph1ent['interface']);
@@ -4982,7 +4991,7 @@ function display_separator($separators, $nrules, $columns_in_table) {
 				$cellcolor = $separator['color'];
 				print('<tr class="ui-sortable-handle separator">' .
 					'<td class="' . $cellcolor . '" colspan="' . ($columns_in_table -1) . '">' . '<span class="' . $cellcolor . '">' . htmlspecialchars($separator['text']) . '</span></td>' .
-					'<td  class="' . $cellcolor . '"><a href="#"><i class="fa fa-trash no-confirm sepdel" title="' . gettext("delete this separator") . '"></i></a></td>' .
+					'<td  class="' . $cellcolor . '"><a href="#"><i class="fa-solid fa-trash-can no-confirm sepdel" title="' . gettext("delete this separator") . '"></i></a></td>' .
 					'</tr>' . "\n");
 			}
 		}

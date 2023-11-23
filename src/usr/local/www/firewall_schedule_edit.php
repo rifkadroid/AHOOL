@@ -431,14 +431,14 @@ $group->add(new Form_Button(
 	'btnaddtime',
 	'Add Time',
 	null,
-	'fa-plus'
+	'fa-solid fa-plus'
 ))->setAttribute('type','button')->addClass('btn-success btn-sm');
 
 $group->add(new Form_Button(
 	'btnclrsel',
 	'Clear selection',
 	null,
-	'fa-undo'
+	'fa-solid fa-undo'
 ))->setAttribute('type','button')->addClass('btn-info btn-sm');
 
 $section->add($group);
@@ -617,7 +617,7 @@ if ($getSchedule && !empty($pconfig['timerange'])) {
 				'Delete' . $counter,
 				'Delete',
 				null,
-				'fa-trash'
+				'fa-solid fa-trash-can'
 			))->setAttribute('type','button')->addClass('btn-xs btn-warning');
 
 			$group->add(new Form_Input(
@@ -1112,7 +1112,7 @@ function insertElements(tempFriendlyTime, starttimehour, starttimemin, stoptimeh
 			'<input class="form-control" name="schedule@" id="schedule@" type="hidden" value="' + tempID + '"/>' +
 		'</div>' +
 		'<div class="col-sm-2">' +
-			'<a class="btn btn-xs btn-warning" name="delete@" id="delete@" type="button" value="@"><i class="fa fa-trash icon-embed-btn"></i><?= gettext("Delete") ?></a>' +
+			'<a class="btn btn-xs btn-warning" name="delete@" id="delete@" type="button" value="@"><i class="fa-solid fa-trash-can icon-embed-btn"></i><?= gettext("Delete") ?></a>' +
 		'</div>' +
 	'</div>';
 

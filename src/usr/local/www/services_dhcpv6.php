@@ -37,7 +37,7 @@ require_once('guiconfig.inc');
 require_once('filter.inc');
 
 function dhcpv6_apply_changes($dhcpdv6_enable_changed) {
-	global $config, $g;
+	global $g;
 	$retval = 0;
 	$retvaldhcp = 0;
 	$retvaldns = 0;
@@ -268,7 +268,7 @@ if (isset($_POST['apply'])) {
 	// Note: if DHCPv6 Server is not enabled, then it is OK to adjust other parameters without specifying range from-to.
 	if ($_POST['enable'] || is_numeric($pool) || ($act === 'newpool')) {
 		if ((empty($_POST['range_from']) || empty($_POST['range_to'])) &&
-		    ($config['dhcpdv6'][$if]['ramode'] != 'stateless_dhcp')) {
+		    (config_get_path("dhcpdv6/{$if}/ramode") != 'stateless_dhcp')) {
 			$input_errors[] = gettext('A valid range must be specified for any Router Advertisement mode except "Stateless DHCP."');
 		}
 	}
@@ -311,7 +311,7 @@ if (isset($_POST['apply'])) {
 		if (!is_ipaddrv6($_POST['range_from'])) {
 			$input_errors[] = gettext("A valid range must be specified.");
 			$range_from_to_ok = false;
-		} elseif ($config['interfaces'][$if]['ipaddrv6'] == 'track6' &&
+		} elseif (config_get_path("interfaces/{$if}/ipaddrv6") == 'track6' &&
 			!Net_IPv6::isInNetmask($_POST['range_from'], '::', $ifcfgsn)) {
 			$input_errors[] = sprintf(gettext(
 				'The prefix (upper %1$s bits) must be zero.  Use the form %2$s'),
@@ -323,7 +323,7 @@ if (isset($_POST['apply'])) {
 		if (!is_ipaddrv6($_POST['range_to'])) {
 			$input_errors[] = gettext("A valid range must be specified.");
 			$range_from_to_ok = false;
-		} elseif ($config['interfaces'][$if]['ipaddrv6'] == 'track6' &&
+		} elseif (config_get_path("interfaces/{$if}/ipaddrv6") == 'track6' &&
 			!Net_IPv6::isInNetmask($_POST['range_to'], '::', $ifcfgsn)) {
 			$input_errors[] = sprintf(gettext(
 				'The prefix (upper %1$s bits) must be zero.  Use the form %2$s'),
@@ -622,9 +622,9 @@ if ($_POST['act'] == "del") {
 	if ($a_maps[$_POST['id']]) {
 		unset($a_maps[$_POST['id']]);
 		write_config("DHCPv6 server static map deleted");
-		if (isset($config['dhcpdv6'][$if]['enable'])) {
+		if (config_path_enabled("dhcpdv6/{$if}")) {
 			mark_subsystem_dirty('dhcpd6');
-			if (isset($config['dnsmasq']['enable']) && isset($config['dnsmasq']['regdhcpstaticv6'])) {
+			if (config_path_enabled('dnsmasq') && config_path_enabled('dnsmasq/regdhcpstaticv6', 'regdhcpstaticv6')) {
 				mark_subsystem_dirty('hosts');
 			}
 		}
@@ -663,9 +663,9 @@ function build_pooltable() {
 				$pooltbl .= '<td ondblclick="document.location=\'services_dhcpv6.php?if=' . htmlspecialchars($if) . '&pool=' . $i . '\';">' .
 							htmlspecialchars($poolent['descr']) . '</td>';
 
-				$pooltbl .= '<td><a class="fa fa-pencil" title="'. gettext("Edit pool") . '" href="services_dhcpv6.php?if=' . htmlspecialchars($if) . '&pool=' . $i . '"></a>';
+				$pooltbl .= '<td><a class="fa-solid fa-pencil" title="'. gettext("Edit pool") . '" href="services_dhcpv6.php?if=' . htmlspecialchars($if) . '&pool=' . $i . '"></a>';
 
-				$pooltbl .= ' <a class="fa fa-trash" title="'. gettext("Delete pool") . '" href="services_dhcpv6.php?if=' . htmlspecialchars($if) . '&act=delpool&id=' . $i . '" usepost></a></td>';
+				$pooltbl .= ' <a class="fa-solid fa-trash-can" title="'. gettext("Delete pool") . '" href="services_dhcpv6.php?if=' . htmlspecialchars($if) . '&act=delpool&id=' . $i . '" usepost></a></td>';
 				$pooltbl .= '</tr>';
 			}
 		$i++;
@@ -735,9 +735,7 @@ foreach ($iflist as $ifent => $ifname) {
 	    (is_ipaddrv6($oc['ipaddrv6']) &&
 	    !is_linklocal($oc['ipaddrv6'])));
 
-	if ((!is_array($config['dhcpdv6'][$ifent]) ||
-	    !isset($config['dhcpdv6'][$ifent]['enable'])) &&
-	    !$valid_if_ipaddrv6) {
+	if (!config_path_enabled("dhcpdv6/{$ifent}") && !$valid_if_ipaddrv6) {
 		continue;
 	}
 
@@ -831,8 +829,8 @@ $section = new Form_Section($pool_title);
 if (is_ipaddrv6($ifcfgip)) {
 	if ($ifcfgip == "::") {
 		$sntext = gettext("Delegated Prefix") . ':';
-		$sntext .= ' ' . convert_friendly_interface_to_friendly_descr($config['interfaces'][$if]['track6-interface']);
-		$sntext .= "/{$config['interfaces'][$if]['track6-prefix-id']}";
+		$sntext .= ' ' . convert_friendly_interface_to_friendly_descr(config_get_path("interfaces/{$if}/track6-interface"));
+		$sntext .= '/' . config_get_path("interfaces/{$if}/track6-prefix-id");
 		if (get_interface_track6ip($if)) {
 			$track6ip = get_interface_track6ip($if);
 			$pdsubnet = gen_subnetv6($track6ip[0], $track6ip[1]);
@@ -927,7 +925,7 @@ if (!is_numeric($pool) && !($act === 'newpool')) {
 		'btnaddpool',
 		gettext('Add Address Pool'),
 		'services_dhcpv6.php?if=' . htmlspecialchars($if) . '&act=newpool',
-		'fa-plus'
+		'fa-solid fa-plus'
 	);
 	$btnaddpool->addClass('btn-success');
 
@@ -1096,7 +1094,7 @@ $btnadv = new Form_Button(
 	'btnadvdns',
 	gettext('Display Advanced'),
 	null,
-	'fa-cog'
+	'fa-solid fa-cog'
 );
 
 $btnadv->setAttribute('type','button')->addClass('btn-info btn-sm');
@@ -1195,7 +1193,7 @@ $btnadv = new Form_Button(
 	'btnadvntp',
 	gettext('Display Advanced'),
 	null,
-	'fa-cog'
+	'fa-solid fa-cog'
 );
 
 $btnadv->setAttribute('type','button')->addClass('btn-info btn-sm');
@@ -1250,7 +1248,7 @@ $btnadv = new Form_Button(
 	'btnadvldap',
 	gettext('Display Advanced'),
 	null,
-	'fa-cog'
+	'fa-solid fa-cog'
 );
 
 $btnadv->setAttribute('type','button')->addClass('btn-info btn-sm');
@@ -1275,7 +1273,7 @@ $btnadv = new Form_Button(
 	'btnadvnetboot',
 	gettext('Display Advanced'),
 	null,
-	'fa-cog'
+	'fa-solid fa-cog'
 );
 
 $btnadv->setAttribute('type','button')->addClass('btn-info btn-sm');
@@ -1304,7 +1302,7 @@ $btnadv = new Form_Button(
 	'btnadvopts',
 	'Display Advanced',
 	null,
-	'fa-cog'
+	'fa-solid fa-cog'
 );
 
 $btnadv->setAttribute('type','button')->addClass('btn-info btn-sm');
@@ -1358,7 +1356,7 @@ foreach ($pconfig['numberoptions']['item'] as $item) {
 		'deleterow' . $counter,
 		'Delete',
 		null,
-		'fa-trash'
+		'fa-solid fa-trash-can'
 	);
 
 	$btn->addClass('btn-warning');
@@ -1372,7 +1370,7 @@ $btnaddopt = new Form_Button(
 	'addrow',
 	'Add Option',
 	null,
-	'fa-plus'
+	'fa-solid fa-plus'
 );
 
 $btnaddopt->removeClass('btn-primary')->addClass('btn-success btn-sm');
@@ -1448,8 +1446,8 @@ if (is_array($a_maps)):
 						<?=htmlspecialchars($mapent['descr'])?>
 					</td>
 					<td>
-						<a class="fa fa-pencil"	title="<?=gettext('Edit static mapping')?>" href="services_dhcpv6_edit.php?if=<?=$if?>&amp;id=<?=$i?>"></a>
-						<a class="fa fa-trash"	title="<?=gettext('Delete static mapping')?>" href="services_dhcpv6.php?if=<?=$if?>&amp;act=del&amp;id=<?=$i?>" usepost></a>
+						<a class="fa-solid fa-pencil"	title="<?=gettext('Edit static mapping')?>" href="services_dhcpv6_edit.php?if=<?=$if?>&amp;id=<?=$i?>"></a>
+						<a class="fa-solid fa-trash-can"	title="<?=gettext('Delete static mapping')?>" href="services_dhcpv6.php?if=<?=$if?>&amp;act=del&amp;id=<?=$i?>" usepost></a>
 					</td>
 				</tr>
 <?php
@@ -1465,7 +1463,7 @@ endif;
 
 <nav class="action-buttons">
 	<a href="services_dhcpv6_edit.php?if=<?=$if?>" class="btn btn-success"/>
-		<i class="fa fa-plus icon-embed-btn"></i>
+		<i class="fa-solid fa-plus icon-embed-btn"></i>
 		<?=gettext('Add Static Mapping')?>
 	</a>
 </nav>
@@ -1520,7 +1518,7 @@ events.push(function() {
 		} else {
 			text = "<?=gettext('Display Advanced');?>";
 		}
-		$('#btnadvdns').html('<i class="fa fa-cog"></i> ' + text);
+		$('#btnadvdns').html('<i class="fa-solid fa-cog"></i> ' + text);
 	}
 
 	$('#btnadvdns').click(function(event) {
@@ -1557,7 +1555,7 @@ events.push(function() {
 		} else {
 			text = "<?=gettext('Display Advanced');?>";
 		}
-		$('#btnadvntp').html('<i class="fa fa-cog"></i> ' + text);
+		$('#btnadvntp').html('<i class="fa-solid fa-cog"></i> ' + text);
 	}
 
 	$('#btnadvntp').click(function(event) {
@@ -1591,7 +1589,7 @@ events.push(function() {
 		} else {
 			text = "<?=gettext('Display Advanced');?>";
 		}
-		$('#btnadvldap').html('<i class="fa fa-cog"></i> ' + text);
+		$('#btnadvldap').html('<i class="fa-solid fa-cog"></i> ' + text);
 	}
 
 	$('#btnadvldap').click(function(event) {
@@ -1626,7 +1624,7 @@ events.push(function() {
 		} else {
 			text = "<?=gettext('Display Advanced');?>";
 		}
-		$('#btnadvnetboot').html('<i class="fa fa-cog"></i> ' + text);
+		$('#btnadvnetboot').html('<i class="fa-solid fa-cog"></i> ' + text);
 	}
 
 	$('#btnadvnetboot').click(function(event) {
@@ -1662,7 +1660,7 @@ events.push(function() {
 		} else {
 			text = "<?=gettext('Display Advanced');?>";
 		}
-		$('#btnadvopts').html('<i class="fa fa-cog"></i> ' + text);
+		$('#btnadvopts').html('<i class="fa-solid fa-cog"></i> ' + text);
 	}
 
 	$('#btnadvopts').click(function(event) {
