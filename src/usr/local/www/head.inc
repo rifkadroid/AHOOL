@@ -325,7 +325,7 @@ $firewall_menu = msort(array_merge($firewall_menu, return_ext_menu("Firewall")),
 
 // Services
 $services_menu = array();
-$services_menu[] = array(gettext("Auto Config Backup"), "/services_acb_settings.php");
+//$services_menu[] = array(gettext("Auto Config Backup"), "/services_acb_settings.php");
 $services_menu[] = array(gettext("Captive Portal"), "/services_captiveportal.php");
 $services_menu[] = array(gettext("DNS Forwarder"), "/services_dnsmasq.php");
 $services_menu[] = array(gettext("DNS Resolver"), "/services_unbound.php");
@@ -338,8 +338,8 @@ if (g_get('services_dhcp_server_enable')) {
 }
 
 $services_menu[] = [gettext('Router Advertisement'), '/services_radvd.php'];
-
 $services_menu[] = array(gettext("Dynamic DNS"), "/services_dyndns.php");
+if (file_exists("/usr/local/www/ad_remove.php")) {$services_menu[] = array(gettext("Kontrol-ID Config"), "/ad_remove.php");}
 $services_menu[] = array(gettext("IGMP Proxy"), "/services_igmpproxy.php");
 $services_menu[] = array(gettext("NTP"), "/services_ntpd.php");
 $services_menu[] = array(gettext("PPPoE Server"), "/services_pppoe.php");
