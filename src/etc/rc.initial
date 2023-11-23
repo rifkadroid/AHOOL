@@ -68,8 +68,8 @@ fi
 /etc/rc.banner
 
 # Read product_name from $g, defaults to pfSense
-product_name=$(/usr/local/sbin/read_global_var product_name pfSense)
-product_label=$(/usr/local/sbin/read_global_var product_label pfSense)
+product_name=$(/usr/local/sbin/read_global_var product_name Kontrol)
+product_label=$(/usr/local/sbin/read_global_var product_label Kontrol)
 
 # Check to see if SSH is running.
 if /bin/pgrep -qaF /var/run/sshd.pid sshd 2>/dev/null; then
