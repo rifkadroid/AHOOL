@@ -225,7 +225,7 @@ function gen_webguicss_field(&$section, $value) {
 	$csslist = get_css_files();
 
 	if (!isset($csslist[$value])) {
-		$value = "pfSense.css";
+		$value = "Kontrol.css";
 	}
 
 	$section->addInput(new Form_Select(
@@ -2894,7 +2894,7 @@ function get_country_name($country_code = "ALL") {
 		return "";
 	}
 
-	$country_names_xml = "/usr/local/share/pfSense/iso_3166-1_list_en.xml";
+	$country_names_xml = "/usr/local/share/Kontrol/iso_3166-1_list_en.xml";
 	$country_names_contents = file_get_contents($country_names_xml);
 	$country_names = xml2array($country_names_contents);
 
@@ -3698,7 +3698,7 @@ function get_pf_reserved(?string $name = '', bool $check_ifname = true):bool|arr
 	 * pf table names are limited to a max of 31 characters.
 	 * Interface group names are limited to a max of 15 characters.
 	 * Hence, a combination of the interface name (optX) + the suffix should be safe.
-	 */ 
+	 */
 	$reserved = [];
 	foreach (array_keys($iflist) as $if) {
 		if ($check_ifname) {
