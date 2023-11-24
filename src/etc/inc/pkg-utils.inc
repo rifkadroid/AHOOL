@@ -1504,55 +1504,55 @@ function pkg_switch_repo($repo_path, $repo_name) {
 /*
  * Update the repository settings.
  */
-function update_repos() {
+/*
+	function update_repos() {
 	$product_name = g_get('product_name');
 	$pipes = [];
 	$descriptorspec = [
-		1 => ["pipe", "w"], /* stdout */
-		2 => ["pipe", "w"]  /* stderr */
+		1 => ["pipe", "w"],
+		2 => ["pipe", "w"]
 	];
 	$rc = -1;
-	/* Default error message for failure cases. */
+
 	$fail_error = [
 		"error" => 1,
 		"messages" => ["Could not update connect to Netgate servers. Please try again later."]
 	];
 
-	/* Execute repoc with a full pkg style environment, including proxy
-	 * configuration. */
+
 	$process = proc_open("/usr/local/sbin/{$product_name}-repoc",
 	    $descriptorspec, $pipes, '/', pkg_env());
 
-	/* Process failed to start */
+
 	if (!is_resource($process)) {
 		return $fail_error;
 	}
 
-	/* Read output */
+
 	$stdout = stream_get_contents($pipes[1]);
 	fclose($pipes[1]);
-	/* If stdout is boolean false, reading stdout failed. */
+
 	if ($stdout === false) {
 		return $fail_error;
 	}
 
-	/* Read errors */
+
 	$stderr = stream_get_contents($pipes[2]);
 	fclose($pipes[2]);
 
-	/* Get return code */
+
 	$rc = proc_close($process);
 	$result = [
 		"error" => $rc,
 		"messages" => []
 	];
 
-	/* Change stdout to be an array of lines */
+
 	$stdout = explode("\n", trim($stdout));
 
 	if ((count($stdout) > 1) &&
 	    ($stdout[0] === "Messages:")) {
-		/* Copy over message content from the output. */
+
 		$result['messages'] = array_merge($result['messages'], array_slice($stdout, 1));
 	} elseif (!empty($stderr)) {
 		$result['messages'][] = $stderr;
@@ -1560,4 +1560,101 @@ function update_repos() {
 
 	return ($result);
 }
+*/
+
+//Function from RELENG_2_6_0 as the pfsense-repoc is not available (closed code)
+function update_repos() {
+	global $g, $cafile, $cafilesrc, $config, $idfile, $FQDN, $repopath;
+
+	if (!file_exists($idfile) || !function_exists('curl_version')) {
+		return;
+	}
+	/* Copy the CA file to the proper place before start. */
+	if (!file_exists($cafile) && file_exists($cafilesrc)) {
+		copy($cafilesrc, $cafile);
+	}
+	/*
+	 * If the custom repository definition does not exist, or is more
+	 * than 24 hours old fetch a copy from the server
+	 */
+	if (!file_exists($configflename) ||
+	    (time()-filemtime($configflename) > $refreshinterval)) {
+		/*
+		 * Gather some information about the system so the proper
+		 * repo can be returned
+		 */
+		$nid = file_get_contents($idfile);
+		$serial = system_get_serial();
+
+		// Compose a version string in JSON format
+		$os = php_uname('s');
+		$osver = php_uname('r');
+		$ed =  (strpos($g['product_label'], 'Plus') !== false)
+		    ? "Plus" : "Community";
+		$pkglist = get_pkg_info("all", false, true);
+		$platform = system_identify_specific_platform();
+		$platformname = gettext('Unknown system');
+
+		if (isset($platform['descr'])) {
+			$platformname = $platform['descr'];
+		}
+
+		$arch =  php_uname('m');
+		$locale = $config['system']['language'];
+
+		// Find root file system type
+		$filesystems = get_mounted_filesystems();
+		$fstype = "";
+
+		foreach ($filesystems as $fs)  {
+		   if ($fs['mountpoint'] == "/") {
+		      $fstype = strtoupper($fs['type']);
+		      break;
+		   }
+		}
+
+		$va = array();
+		$va['platform'] = $platformname;
+		$va['os'] = $os;
+		$va['osver'] = $platformname;
+		$va['fstype'] = $fstype;
+		$va['prod'] = $g['product_label'];
+		$va['ver'] = $g['product_version_string'];
+		$va['ed'] = $ed;
+		$va['pkgs'] = array();
+
+		foreach($pkglist as $pkg) {
+			$va['pkgs'][] = array('name' => $pkg['shortname'], 'ver' => $pkg['version']);
+		}
+
+		$post = [
+		    'uid' => $nid,
+		    'language' => $locale,
+		    'serial' => $serial,
+		    'version' => json_encode($va),
+		    'arch' => $arch
+		];
+
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_VERBOSE, 0);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_USERAGENT, $g['product_label'] . '/' . $g['product_version']);
+		curl_setopt($ch, CURLOPT_URL, $FQDN);
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post));
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT ,4);
+		set_curlproxy($ch);
+
+		$response = curl_exec($ch);
+		$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+		curl_close($ch);
+
+		if ($status == 200) {
+			save_repo($response);
+		}
+	}
+}
+
 ?>
