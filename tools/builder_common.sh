@@ -630,7 +630,7 @@ clone_to_staging_area() {
 	core_pkg_create base "" ${CORE_PKG_VERSION} ${STAGE_CHROOT_DIR}
 	#core_pkg_create default-config "" ${CORE_PKG_VERSION} ${STAGE_CHROOT_DIR}
 
-	local DEFAULTCONF=${STAGE_CHROOT_DIR}/conf.default/config.xml
+	#local DEFAULTCONF=${STAGE_CHROOT_DIR}/conf.default/config.xml
 
 	# Save current WAN and LAN if value
 	local _old_wan_if=$(xml sel -t -v "${XML_ROOTOBJ}/interfaces/wan/if" ${DEFAULTCONF})
