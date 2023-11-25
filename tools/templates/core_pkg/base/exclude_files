@@ -13,10 +13,7 @@
 ./etc/bogonsv6
 ./etc/dh-parameters.1024
 ./etc/dh-parameters.2048
-./etc/dh-parameters.3072
 ./etc/dh-parameters.4096
-./etc/dh-parameters.6144
-./etc/dh-parameters.8192
 ./etc/fstab
 ./etc/group
 ./etc/hosts
@@ -26,6 +23,7 @@
 ./etc/pfSense-rc.shutdown
 ./etc/platform
 ./etc/pwd.db
+./etc/rc
 ./etc/rc.conf
 ./etc/rc.ramdisk_functions.sh
 ./etc/spwd.db
