@@ -365,6 +365,7 @@ if [ -z "${_SKIP_REBUILD_PRESTAGE}" ]; then
 	install_pkg_install_ports
 
 	# Create core repo
+	echo "Innitiating core-pkg-repo process"
 	core_pkg_create_repo
 fi
 

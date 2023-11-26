@@ -45,6 +45,7 @@ git_last_commit() {
 
 # Create core pkg repository
 core_pkg_create_repo() {
+	echo "starting core pkg create repo function"
 	if [ ! -d "${CORE_PKG_REAL_PATH}/All" ]; then
 		echo "core pkg folder (All) does not exist"
 		return
