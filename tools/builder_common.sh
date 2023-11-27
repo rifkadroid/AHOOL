@@ -1174,7 +1174,7 @@ pkg_chroot() {
 		_params="${_params} --config /tmp/pkg/pkg.conf "
 	fi
 	script -aq ${BUILDER_LOGS}/install_pkg_install_ports.txt \
-		chroot ${_root} pkg ${_params}$@ >/dev/null 2>&1
+		chroot ${_root} pkg ${_params}$@ 
 	local result=$?
 	rm -f ${_root}/etc/resolv.conf
 	/sbin/umount -f ${_root}/dev
@@ -1260,7 +1260,7 @@ staginareas_clean_each_run() {
 	if [ -d "${FINAL_CHROOT_DIR}" ]; then
 		BASENAME=$(basename ${FINAL_CHROOT_DIR})
 		echo -n "$BASENAME "
-		chflags -R noschg ${FINAL_CHROOT_DIR} 2>&1 >/dev/null
+		chflags -R noschg ${FINAL_CHROOT_DIR}
 		rm -rf ${FINAL_CHROOT_DIR}/* 2>/dev/null
 	fi
 	echo "Done!"
@@ -1373,7 +1373,7 @@ pkg_repo_rsync() {
 		# https://github.com/freebsd/pkg/issues/1364
 		#
 		if script -aq ${_logfile} pkg repo ${_real_repo_path}/ \
-		    signing_command: ${PKG_REPO_SIGNING_COMMAND} >/dev/null 2>&1; then
+		    signing_command: ${PKG_REPO_SIGNING_COMMAND} ; then
 			echo "Done!" | tee -a ${_logfile}
 		else
 			echo "Failed!" | tee -a ${_logfile}
