@@ -521,11 +521,8 @@ function get_pkg_info($pkgs = 'all', $remote_repo_usage_disabled = false,
 				    $err);
 
 				if ($rc == 0) {
-					/*
-					 * just consider the first line of output from rquery
-					 * ref: https://github.com/freebsd/pkg/issues/2164
-					 */
-					$pkg_info['version'] = explode("\n", $out)[0];
+					$pkg_info['version'] =
+					    str_replace("\n", "", $out);
 				}
 			}
 
@@ -1312,8 +1309,8 @@ function get_base_pkg_name() {
 	return false;
 }
 
-/* Verify if system needs updating from selected repo or upgrading from available repos (meta package or base) */
-function get_system_pkg_version($baseonly = false, $use_cache = true, $updates_only = true) {
+/* Verify if system needs upgrade (meta package or base) */
+function get_system_pkg_version($baseonly = false, $use_cache = true) {
 	global $g;
 
 	if (!check_dnsavailable('any')) {
@@ -1333,7 +1330,7 @@ function get_system_pkg_version($baseonly = false, $use_cache = true, $updates_o
 		$output = @file_get_contents($cache_file);
 	} else if ($rc != "0") {
 		$output = exec(
-		    "/usr/local/sbin/{$g['product_name']}-upgrade " . ($updates_only?'-c':'-C') , $_gc,
+		    "/usr/local/sbin/{$g['product_name']}-upgrade -c", $_gc,
 		    $rc);
 
 		/* Update cache if it succeeded */
@@ -1398,30 +1395,37 @@ function get_system_pkg_version($baseonly = false, $use_cache = true, $updates_o
 function pkg_list_repos() {
 	global $g;
 
-	$repo_base = "{$g['pkg_repos_path']}/{$g['product_name']}-repo";
-	$result = array();
-	$name_files = glob("{$repo_base}-*.name");
-	foreach ($name_files as $name_file) {
-		$repo_name = file_get_contents($name_file);
-		if ($repo_name == false || strlen($repo_name) <= 1) {
-			continue;
-		}
-		$repo_name_base = "{$repo_base}-{$repo_name}";
-		$descr_file = "{$repo_name_base}.descr";
+	$path = "/usr/local/share/{$g['product_name']}/pkg/repos";
+
+	$default_descr = @file_get_contents($path .
+	    "/{$g['product_name']}-repo.descr");
+
+	$default = array(
+	    'name' => 'Default',
+	    'path' => $path . "/{$g['product_name']}-repo.conf",
+	    'descr' => $default_descr
+	);
+
+	$result = array($default);
+
+	$conf_files = glob("{$path}/{$g['product_name']}-repo-*.conf");
+	foreach ($conf_files as $conf_file) {
+		$descr_file = preg_replace('/.conf$/', '.descr', $conf_file);
 		if (file_exists($descr_file)) {
-			$descr = file_get_contents($descr_file);
-			if ($descr == false) {
-				$descr = 'Unknown';
-			}
+			$descr_content = file($descr_file);
+			$descr = chop($descr_content[0]);
 		} else {
 			$descr = 'Unknown';
 		}
+		if (!preg_match('/-repo-(.*).conf/', $conf_file, $matches)) {
+			continue;
+		}
 		$entry = array(
-		    'name' => $repo_name,
-		    'path' => "{$repo_name_base}.conf",
+		    'name' => ucfirst(strtolower($matches[1])),
+		    'path' => $conf_file,
 		    'descr' => $descr
 		);
-		if (file_exists("{$repo_name_base}.default")) {
+		if (file_exists($conf_file . ".default")) {
 			$entry['default'] = true;
 		}
 		$result[] = $entry;
@@ -1504,65 +1508,27 @@ function pkg_switch_repo($repo_path, $repo_name) {
 /*
  * Update the repository settings.
  */
-/*
-	function update_repos() {
-	$product_name = g_get('product_name');
-	$pipes = [];
-	$descriptorspec = [
-		1 => ["pipe", "w"],
-		2 => ["pipe", "w"]
-	];
+/*function update_repos() {
+
 	$rc = -1;
+	$out = NULL;
+	$product_name = g_get('product_name');
 
-	$fail_error = [
-		"error" => 1,
-		"messages" => ["Could not update connect to Netgate servers. Please try again later."]
-	];
-
-
-	$process = proc_open("/usr/local/sbin/{$product_name}-repoc",
-	    $descriptorspec, $pipes, '/', pkg_env());
-
-
-	if (!is_resource($process)) {
-		return $fail_error;
+	$res = exec("/usr/local/sbin/{$product_name}-repoc", $out, $rc);
+	if ($res === false || $out === NULL) {
+		return (array( "error" => 1,
+		    "messages" => array("We could not connect to Netgate servers. Please try again later.")));
+	}
+	$rtrn = array( "error" => $rc, "messages" => array() );
+	if (isset($out) && is_array($out) &&
+	    count($out) > 1 && $out[0] === "Messages:") {
+		for ($i = 1; $i < count($out); $i++) {
+			$rtrn['messages'][] = $out[$i];
+		}
 	}
 
-
-	$stdout = stream_get_contents($pipes[1]);
-	fclose($pipes[1]);
-
-	if ($stdout === false) {
-		return $fail_error;
-	}
-
-
-	$stderr = stream_get_contents($pipes[2]);
-	fclose($pipes[2]);
-
-
-	$rc = proc_close($process);
-	$result = [
-		"error" => $rc,
-		"messages" => []
-	];
-
-
-	$stdout = explode("\n", trim($stdout));
-
-	if ((count($stdout) > 1) &&
-	    ($stdout[0] === "Messages:")) {
-
-		$result['messages'] = array_merge($result['messages'], array_slice($stdout, 1));
-	} elseif (!empty($stderr)) {
-		$result['messages'][] = $stderr;
-	}
-
-	return ($result);
-}
-*/
-
-//Function from RELENG_2_6_0 as the pfsense-repoc is not available (closed code)
+	return ($rtrn);
+} */    // Function below if from RELENG_2_6_0 -
 function update_repos() {
 	global $g, $cafile, $cafilesrc, $config, $idfile, $FQDN, $repopath;
 
