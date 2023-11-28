@@ -1014,7 +1014,7 @@ setup_pkg_repo() {
 	local _target_arch="${4}"
 	local _staging="${5}"
 	local _pkg_conf="${6}"
-	local _mirror_type="srv"
+	local _mirror_type="none"
 	local _signature_type="fingerprints"
 
 	if [ -z "${_template}" -o ! -f "${_template}" ]; then
@@ -1174,7 +1174,7 @@ pkg_chroot() {
 		_params="${_params} --config /tmp/pkg/pkg.conf "
 	fi
 	script -aq ${BUILDER_LOGS}/install_pkg_install_ports.txt \
-		chroot ${_root} pkg ${_params}$@ 
+		chroot ${_root} pkg ${_params}$@
 	local result=$?
 	rm -f ${_root}/etc/resolv.conf
 	/sbin/umount -f ${_root}/dev
