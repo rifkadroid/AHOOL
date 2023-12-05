@@ -732,7 +732,7 @@ customize_stagearea_for_image() {
 	     "${_image_type}" = "memstickserial" -o \
 	     "${_image_type}" = "memstickadi" ]; then
 		mkdir -p ${FINAL_CHROOT_DIR}/pkgs
-		cp ${CORE_PKG_ALL_PATH}/*default-config*.pkg ${FINAL_CHROOT_DIR}/pkgs
+		#cp ${CORE_PKG_ALL_PATH}/*default-config*.pkg ${FINAL_CHROOT_DIR}/pkgs
 	fi
 
 	pkg_chroot_add ${FINAL_CHROOT_DIR} ${_default_config}
