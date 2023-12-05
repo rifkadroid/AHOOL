@@ -45,9 +45,7 @@ git_last_commit() {
 
 # Create core pkg repository
 core_pkg_create_repo() {
-	echo "starting core pkg create repo function"
 	if [ ! -d "${CORE_PKG_REAL_PATH}/All" ]; then
-		echo "core pkg folder (All) does not exist"
 		return
 	fi
 
@@ -657,7 +655,6 @@ clone_to_staging_area() {
 	echo force > ${STAGE_CHROOT_DIR}/cf/conf/enableserial_force
 
 	core_pkg_create default-config-serial "" ${CORE_PKG_VERSION} ${STAGE_CHROOT_DIR}
-	core_pkg_create default-config "bhyve" ${CORE_PKG_VERSION} ${STAGE_CHROOT_DIR}
 
 	rm -f ${STAGE_CHROOT_DIR}/cf/conf/enableserial_force
 	rm -f ${STAGE_CHROOT_DIR}/cf/conf/config.xml
@@ -1015,6 +1012,7 @@ setup_pkg_repo() {
 	local _staging="${5}"
 	local _pkg_conf="${6}"
 	local _mirror_type="none"
+	local MIRROR_TYPE="none"
 	local _signature_type="fingerprints"
 
 	if [ -z "${_template}" -o ! -f "${_template}" ]; then
@@ -1260,7 +1258,7 @@ staginareas_clean_each_run() {
 	if [ -d "${FINAL_CHROOT_DIR}" ]; then
 		BASENAME=$(basename ${FINAL_CHROOT_DIR})
 		echo -n "$BASENAME "
-		chflags -R noschg ${FINAL_CHROOT_DIR}
+		chflags -R noschg ${FINAL_CHROOT_DIR} 2>&1 >/dev/null
 		rm -rf ${FINAL_CHROOT_DIR}/* 2>/dev/null
 	fi
 	echo "Done!"
