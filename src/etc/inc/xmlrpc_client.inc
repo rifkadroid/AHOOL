@@ -92,7 +92,7 @@ class pfsense_xmlrpc_client {
 			return;
 		}
 		$options = array(
-			'prefix' => 'kontrol.',
+			'prefix' => 'ahool.',
 			'sslverify' => false,
 			'connectionTimeout' => $timeout
 		);

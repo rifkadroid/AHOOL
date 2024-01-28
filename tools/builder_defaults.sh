@@ -77,13 +77,13 @@ if [ ! -d ${SCRATCHDIR} ]; then
 fi
 
 # Product details
-export PRODUCT_NAME=${PRODUCT_NAME:-"Kontrol"}
+export PRODUCT_NAME=${PRODUCT_NAME:-"ahool"}
 export PRODUCT_NAME_SUFFIX=${PRODUCT_NAME_SUFFIX:-"-CE"}
 export REPO_BRANCH_PREFIX=${REPO_BRANCH_PREFIX:-""}
 export REPO_PATH_PREFIX=$(echo "${REPO_BRANCH_PREFIX}" | sed -e 's,-,_,g')
 export PRODUCT_URL=${PRODUCT_URL:-""}
 export PRODUCT_SRC=${PRODUCT_SRC:-"${BUILDER_ROOT}/src"}
-export PRODUCT_EMAIL=${PRODUCT_EMAIL:-"contato@kontrol.com.br"}
+export PRODUCT_EMAIL=${PRODUCT_EMAIL:-"contato@koahoolom.br"}
 export XML_ROOTOBJ=${XML_ROOTOBJ:-$(echo "${PRODUCT_NAME}" | tr '[[:upper:]]' '[[:lower:]]')}
 
 if [ "${PRODUCT_NAME}" = "pfSense" -a "${BUILD_AUTHORIZED_BY_NETGATE}" != "yes" ]; then

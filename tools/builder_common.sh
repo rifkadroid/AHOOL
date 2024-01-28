@@ -134,8 +134,8 @@ ensure_kernel_exists() {
 		print_error_pfS
 	fi
 echo "###### Copying and missing modules to kernel stage area ######"
-cp /boot/modules/*.ko /usr/Kontrol/tmp/kernels/Kontrol/boot/kernel/
-kldxref /usr/Kontrol/tmp/kernels/Kontrol/boot/kernel/
+cp /boot/modules/*.ko /usr/ahool/tmp/kernels/ahool/boot/kernel/
+kldxref /usr/ahool/tmp/kernels/ahool/boot/kernel/
 }
 
 get_pkg_name() {

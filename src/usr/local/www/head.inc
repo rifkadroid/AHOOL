@@ -339,7 +339,7 @@ if (g_get('services_dhcp_server_enable')) {
 
 $services_menu[] = [gettext('Router Advertisement'), '/services_radvd.php'];
 $services_menu[] = array(gettext("Dynamic DNS"), "/services_dyndns.php");
-if (file_exists("/usr/local/www/ad_remove.php")) {$services_menu[] = array(gettext("Kontrol-ID Config"), "/ad_remove.php");}
+if (file_exists("/usr/local/www/ad_remove.php")) {$services_menu[] = array(gettext("ahool-ID Config"), "/ad_remove.php");}
 $services_menu[] = array(gettext("IGMP Proxy"), "/services_igmpproxy.php");
 $services_menu[] = array(gettext("NTP"), "/services_ntpd.php");
 $services_menu[] = array(gettext("PPPoE Server"), "/services_pppoe.php");
@@ -492,7 +492,7 @@ if (are_notices_pending()) {
 			</button>
 			<a class="navbar-brand" href="/">
 				<?php include("/usr/local/www/logo.svg"); ?>
-				<span style="color:white;font-size:.5em;text-transform:uppercase;letter-spacing:3px;">KONTROL UTM</span>
+				<span style="color:white;font-size:.5em;text-transform:uppercase;letter-spacing:3px;">KOahoolTM</span>
 			</a>
 		</div>
 		<div class="collapse navbar-collapse" id="pf-navbar">
